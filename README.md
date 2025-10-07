@@ -1,8 +1,19 @@
-# Blog  
+<div align = "center">
 
-A modern, feature-rich static blog template built with [Astro](https://astro.build), featuring advanced functionality and beautiful design.
+# Twilight
 
-[**🖥️ Live Demo**](https://blog.spr-aachen.com/) [**📝 Documentation**](https://docs.blog.spr-aachen.com/)
+<table>
+  <tr>
+    <td><img alt="" src="docs/image/Desktop_1.jpg"></td>
+    <td><img alt="" src="docs/image/Desktop_2.jpg"></td>
+  <tr>
+</table>
+
+A modern, feature-rich static blog built with [Astro](https://astro.build), featuring advanced functionality and beautiful design.
+
+[**🖥️ Live Demo**](https://blog.spr-aachen.com/)
+
+</div>
 
 ---
 
@@ -53,8 +64,8 @@ A modern, feature-rich static blog template built with [Astro](https://astro.bui
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Spr-Aachen/Blog.git
-   cd Blog
+   git clone https://github.com/Spr-Aachen/Twilight.git
+   cd Twilight
    ```
 
 2. **Install dependencies:**
