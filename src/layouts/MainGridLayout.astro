@@ -1,0 +1,1159 @@
+---
+import BackToTop from "@components/control/BackToTop.astro";
+import Footer from "@components/Footer.astro";
+import Navbar from "@components/Navbar.astro";
+import SideBar from "@components/widget/SideBar.astro";
+import type { MarkdownHeading } from "astro";
+import { Icon } from "astro-icon/components";
+import FullscreenWallpaper from "../components/misc/FullscreenWallpaper.astro";
+import IconifyLoader from "../components/misc/IconifyLoader.astro";
+import ImageWrapper from "../components/misc/ImageWrapper.astro";
+import TypewriterText from "../components/TypewriterText.astro";
+import TOC from "../components/widget/TOC.astro";
+import {
+	fullscreenWallpaperConfig,
+	sidebarLayoutConfig,
+	siteConfig,
+} from "../config";
+import {
+	BANNER_HEIGHT,
+	BANNER_HEIGHT_EXTEND,
+	MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
+} from "../constants/constants";
+import { widgetManager } from "../utils/widget-manager";
+import Layout from "./Layout.astro";
+
+interface Props {
+	title?: string;
+	banner?: string;
+	description?: string;
+	lang?: string;
+	setOGTypeArticle?: boolean;
+	postSlug?: string;
+	headings?: MarkdownHeading[];
+        series?: string;
+}
+
+// 类型守卫函数
+const isBannerSrcObject = (
+	src:
+		| string
+		| string[]
+		| { desktop?: string | string[]; mobile?: string | string[] },
+): src is { desktop?: string | string[]; mobile?: string | string[] } => {
+	return (
+		typeof src === "object" &&
+		src !== null &&
+		!Array.isArray(src) &&
+		("desktop" in src || "mobile" in src)
+	);
+};
+
+// 获取banner图片的辅助函数
+const getBannerImages = async () => {
+	let bannerSrc = siteConfig.banner.src;
+
+	// 如果启用了图片API，获取API图片
+	if (siteConfig.banner.imageApi?.enable && siteConfig.banner.imageApi?.url) {
+		try {
+			const response = await fetch(siteConfig.banner.imageApi.url);
+			const text = await response.text();
+			const apiImages = text.split("\n").filter((line) => line.trim());
+
+			if (apiImages.length > 0) {
+				bannerSrc = apiImages;
+			}
+		} catch (error) {
+			console.warn("Failed to fetch images from API:", error);
+		}
+	}
+
+	if (
+		typeof bannerSrc === "object" &&
+		bannerSrc !== null &&
+		!Array.isArray(bannerSrc) &&
+		("desktop" in bannerSrc || "mobile" in bannerSrc)
+	) {
+		const srcObj = bannerSrc as {
+			desktop?: string | string[];
+			mobile?: string | string[];
+		};
+		return {
+			desktop: srcObj.desktop || srcObj.mobile || "",
+			mobile: srcObj.mobile || srcObj.desktop || "",
+		};
+	}
+	// 如果是字符串或字符串数组，同时用于桌面端和移动端
+	return {
+		desktop: bannerSrc,
+		mobile: bannerSrc,
+	};
+};
+
+const bannerImages = await getBannerImages();
+
+const {
+	title,
+	banner,
+	description,
+	lang,
+	setOGTypeArticle,
+	postSlug,
+	headings = [],
+        series,
+} = Astro.props;
+const hasBannerCredit =
+	siteConfig.banner.enable && siteConfig.banner.credit.enable;
+const hasBannerLink = !!siteConfig.banner.credit.url;
+
+// 检查是否为首页
+const isHomePage = Astro.url.pathname === "/" || Astro.url.pathname === "";
+const showHomeText = siteConfig.banner.homeText?.enable && isHomePage;
+// 手机端非首页不显示banner的CSS类
+const mobileNonHomeBannerClass = !isHomePage ? "mobile-hide-banner" : "";
+
+// 计算主内容区域位置，考虑手机端非首页时banner被隐藏
+const mainPanelTop = siteConfig.banner.enable
+	? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
+	: "5.5rem";
+const mobileNonHomeMainTop = !isHomePage ? "5.5rem" : mainPanelTop;
+
+// 当banner被禁用时，主内容区域应该始终从顶栏下面开始
+const finalMainPanelTop = siteConfig.banner.enable ? mainPanelTop : "5.5rem";
+
+// 检查侧边栏是否启用，动态调整网格布局
+// 全局启用状态
+const globalSidebarEnabled = sidebarLayoutConfig.enable;
+// 侧边栏位置配置
+const sidebarPosition = sidebarLayoutConfig.position || "left";
+// 响应式配置：不同设备上的侧边栏显示状态
+const mobileShowSidebar =
+	globalSidebarEnabled && widgetManager.shouldShowSidebar("mobile");
+const tabletShowSidebar =
+	globalSidebarEnabled && widgetManager.shouldShowSidebar("tablet");
+const desktopShowSidebar =
+	globalSidebarEnabled && widgetManager.shouldShowSidebar("desktop");
+
+// 动态网格布局类名 - 根据侧边栏位置调整列宽
+const gridCols = `
+	${mobileShowSidebar ? "grid-cols-1" : "grid-cols-1"}
+	${tabletShowSidebar ? (sidebarPosition === "right" ? "md:grid-cols-[1fr_17.5rem]" : "md:grid-cols-[17.5rem_1fr]") : "md:grid-cols-1"}
+	${desktopShowSidebar ? (sidebarPosition === "right" ? "lg:grid-cols-[1fr_17.5rem]" : "lg:grid-cols-[17.5rem_1fr]") : "lg:grid-cols-1"}
+`
+	.trim()
+	.replace(/\s+/g, " ");
+
+// 侧边栏容器类名 - 根据位置调整grid-column
+const sidebarClass = `
+	mb-4 row-start-2 row-end-3 col-span-2 onload-animation
+	${mobileShowSidebar ? "block" : "hidden"}
+	${tabletShowSidebar ? `md:block md:row-start-1 md:row-end-2 md:max-w-[17.5rem] ${sidebarPosition === "right" ? "md:col-start-2 md:col-end-3" : "md:col-start-1 md:col-end-2"}` : "md:hidden"}
+	${desktopShowSidebar ? `lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] ${sidebarPosition === "right" ? "lg:col-start-2 lg:col-end-3" : "lg:col-start-1 lg:col-end-2"}` : "lg:hidden"}
+`
+	.trim()
+	.replace(/\s+/g, " ");
+
+// 主内容区域类名 - 根据侧边栏位置调整grid-column
+const mainContentClass = `
+	transition-swup-fade overflow-hidden w-full
+	${mobileShowSidebar ? "col-span-2" : "col-span-1"}
+	${tabletShowSidebar ? `${sidebarPosition === "right" ? "md:col-start-1 md:col-end-2" : "md:col-start-2 md:col-end-3"}` : "md:col-span-1"}
+	${desktopShowSidebar ? `${sidebarPosition === "right" ? "lg:col-start-1 lg:col-end-2" : "lg:col-start-2 lg:col-end-3"}` : "lg:col-span-1"}
+`
+	.trim()
+	.replace(/\s+/g, " ");
+
+// 检查是否应该启用半透明效果
+const shouldEnableTransparency =
+	!siteConfig.banner.enable && fullscreenWallpaperConfig.enable;
+
+// 为组件添加半透明效果的CSS类
+const transparentClass = shouldEnableTransparency
+	? "wallpaper-transparent"
+	: "";
+---
+
+<Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} postSlug={postSlug}>
+
+<!-- 全屏壁纸 - 仅在banner关闭且全屏壁纸启用时显示 -->
+{!siteConfig.banner.enable && fullscreenWallpaperConfig.enable && (
+	<FullscreenWallpaper config={fullscreenWallpaperConfig} />
+)}
+
+<!-- 全局图标加载器 -->
+<IconifyLoader />
+
+<!-- 为全屏壁纸模式添加body类 -->
+{shouldEnableTransparency && (
+	<script>
+		document.body.classList.add('wallpaper-transparent');
+	</script>
+)}
+
+<!-- Navbar -->
+<slot slot="head" name="head"></slot>
+<div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 max-w-[var(--page-width)] px-0 md:px-4 mx-auto" class:list={[""]}>
+    <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all">
+        <Navbar></Navbar>
+    </div>
+</div>
+
+<!-- Banner -->
+{siteConfig.banner.enable && <div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass}`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
+    {(bannerImages.desktop && Array.isArray(bannerImages.desktop) && bannerImages.desktop.length > 1) || (bannerImages.mobile && Array.isArray(bannerImages.mobile) && bannerImages.mobile.length > 1) ? (
+        <!-- Carousel mode for multiple images -->
+        <div id="banner-carousel" class="relative h-full w-full">
+            <ul class="carousel-list h-full w-full">
+                {Math.max(
+                    Array.isArray(bannerImages.desktop) ? bannerImages.desktop.length : 0,
+                    Array.isArray(bannerImages.mobile) ? bannerImages.mobile.length : 0
+                ) && Array.from({ length: Math.max(
+                    Array.isArray(bannerImages.desktop) ? bannerImages.desktop.length : 0,
+                    Array.isArray(bannerImages.mobile) ? bannerImages.mobile.length : 0
+                ) }).map((_, index) => {
+                    // 确保至少有一个平台有对应索引的图片
+                    const hasDesktopImage = Array.isArray(bannerImages.desktop) && bannerImages.desktop[index];
+                    const hasMobileImage = Array.isArray(bannerImages.mobile) && bannerImages.mobile[index];
+                    
+                    // 如果两个平台都没有对应索引的图片，跳过这个轮播项
+                    if (!hasDesktopImage && !hasMobileImage) {
+                        return null;
+                    }
+                    
+                    return (
+                        <li class={`carousel-item absolute inset-0 transition-all duration-500 ${index === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}>
+                            <!-- Mobile: use mobile-specific images with same logic as desktop -->
+                            {hasMobileImage && (
+                                <ImageWrapper 
+                                    alt={`Mobile banner image ${index + 1}`} 
+                                    class:list={["block lg:hidden object-cover h-full w-full transition-transform duration-500 ease-out"]}
+                                    src={Array.isArray(bannerImages.mobile) ? bannerImages.mobile[index] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')} 
+                                    position={siteConfig.banner.position}
+                                />
+                            )}
+                            <!-- Desktop: use desktop-specific images -->
+                            {hasDesktopImage && (
+                                <ImageWrapper 
+                                    alt={`Desktop banner image ${index + 1}`} 
+                                    class:list={["hidden lg:block object-cover h-full w-full transition-transform duration-500 ease-out"]}
+                                    src={Array.isArray(bannerImages.desktop) ? bannerImages.desktop[index] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')} 
+                                    position={siteConfig.banner.position}
+                                />
+                            )}
+                        </li>
+                    );
+                }).filter(Boolean)}
+            </ul>
+        </div>
+    ) : (
+        <!-- Single image mode -->
+            <div class="relative h-full w-full">
+                <!-- Mobile: use mobile-specific image with same logic as desktop -->
+                <ImageWrapper 
+                    alt="Mobile banner image of the blog" 
+                    class:list={["block lg:hidden object-cover h-full w-full transition duration-700 opacity-100"]}
+                    src={(Array.isArray(bannerImages.mobile) ? bannerImages.mobile[0] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')) || (Array.isArray(bannerImages.desktop) ? bannerImages.desktop[0] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')) || ''} 
+                    position={siteConfig.banner.position}
+                />
+                <!-- Desktop: use desktop-specific image -->
+                <ImageWrapper 
+                    id="banner" 
+                    alt="Desktop banner image of the blog" 
+                    class:list={["hidden lg:block object-cover h-full transition duration-700 opacity-100"]}
+                    src={(Array.isArray(bannerImages.desktop) ? bannerImages.desktop[0] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')) || (Array.isArray(bannerImages.mobile) ? bannerImages.mobile[0] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')) || ''} 
+                    position={siteConfig.banner.position}
+                />
+            </div>
+    )}
+    
+    <!-- Home page text overlay -->
+    {siteConfig.banner.homeText?.enable && (
+        <div class={`banner-text-overlay absolute inset-0 z-20 flex items-center justify-center ${!showHomeText ? 'hidden' : ''}`}>
+            <div class="w-4/5 lg:w-3/4 text-center mb-0">
+                <div class="flex flex-col">
+                    {siteConfig.banner.homeText?.title && (
+                        <h1 class="banner-title text-6xl lg:text-8xl text-white drop-shadow-lg mb-2 lg:mb-4">
+                            {siteConfig.banner.homeText.title}
+                        </h1>
+                    )}
+                    {siteConfig.banner.homeText?.subtitle && (
+                        <h2 class="banner-subtitle text-xl lg:text-3xl text-white/90 drop-shadow-md">
+                            {siteConfig.banner.homeText.typewriter?.enable ? (
+                                <TypewriterText 
+                                    text={siteConfig.banner.homeText.subtitle}
+                                    speed={siteConfig.banner.homeText.typewriter.speed}
+                                    deleteSpeed={siteConfig.banner.homeText.typewriter.deleteSpeed}
+                                    pauseTime={siteConfig.banner.homeText.typewriter.pauseTime}
+                                />
+                            ) : (
+                                Array.isArray(siteConfig.banner.homeText.subtitle) 
+                                    ? siteConfig.banner.homeText.subtitle[0] 
+                                    : siteConfig.banner.homeText.subtitle
+                            )}
+                        </h2>
+                    )}
+                </div>
+            </div>
+        </div>
+    )}
+    
+    <!-- Water waves effect -->
+    <div class="waves absolute -bottom-[1px] h-[10vh] max-h-[9.375rem] min-h-[3.125rem] w-full md:h-[15vh]" id="header-waves" style="transform: translateZ(0); will-change: fill;">
+        <svg
+            class="waves"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 20 150 32"
+            preserveAspectRatio="none"
+            shape-rendering="auto"
+            style="transform: translateZ(0); backface-visibility: hidden;"
+        >
+            <defs>
+                <path
+                    id="gentle-wave"
+                    d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v48h-352z"
+                >
+                </path>
+            </defs>
+            <g class="parallax" style="transform: translateZ(0);">
+                <use
+                    xlink:href="#gentle-wave"
+                    x="48"
+                    y="0"
+                    class="opacity-25 fill-[var(--page-bg)]"
+                    style="animation-delay: -2s; animation-duration: 7s; will-change: transform;"
+                ></use>
+                <use
+                    xlink:href="#gentle-wave"
+                    x="48"
+                    y="3"
+                    class="opacity-50 fill-[var(--page-bg)]"
+                    style="animation-delay: -3s; animation-duration: 10s; will-change: transform;"
+                ></use>
+                <use
+                    xlink:href="#gentle-wave"
+                    x="48"
+                    y="5"
+                    class="opacity-75 fill-[var(--page-bg)]"
+                    style="animation-delay: -4s; animation-duration: 13s; will-change: transform;"
+                ></use>
+                <use
+                    xlink:href="#gentle-wave"
+                    x="48"
+                    y="7"
+                    class="fill-[var(--page-bg)]"
+                    style="animation-delay: -5s; animation-duration: 20s; will-change: transform;"
+                ></use>
+            </g>
+        </svg>
+    </div>
+</div>}
+
+<!-- Main content -->
+<div class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? 'mobile-main-no-banner' : ''} ${!siteConfig.banner.enable ? 'no-banner-layout' : ''} ${transparentClass}`} style={`top: ${finalMainPanelTop}`}>
+    <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
+    <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
+        <div id="main-grid" class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!mobileShowSidebar ? 'mobile-no-sidebar' : ''}`}
+        >
+            <!-- Banner image credit -->
+            {hasBannerCredit && <a href={siteConfig.banner.credit.url} id="banner-credit" target="_blank" rel="noopener" aria-label="Visit image source"
+                                   class:list={["group onload-animation transition-all absolute flex justify-center items-center rounded-full " +
+                                   "px-3 right-4 -top-[3.25rem] bg-black/60 hover:bg-black/70 h-9", {"hover:pr-9 active:bg-black/80": hasBannerLink}]}
+            >
+                <Icon class="text-white/75 text-[1.25rem] mr-1" name="material-symbols:copyright-outline-rounded" ></Icon>
+                <div class="text-white/75 text-xs">{siteConfig.banner.credit.text}</div>
+                <Icon class:list={["transition absolute text-[oklch(0.75_0.14_var(--hue))] right-4 text-[0.75rem] opacity-0",
+                    {"group-hover:opacity-100": hasBannerLink}]}
+                      name="fa6-solid:arrow-up-right-from-square">
+                </Icon>
+            </a>}
+
+
+            {(mobileShowSidebar || tabletShowSidebar || desktopShowSidebar) && <SideBar class={`${sidebarClass} ${transparentClass}`} headings={headings} series={ series }></SideBar>}
+
+            <main id="swup-container" class={`${mainContentClass} transition-main`}>
+                <div id="content-wrapper" class="onload-animation transition-leaving">
+                    <!-- the overflow-hidden here prevent long text break the layout-->
+                    <!-- make id different from windows.swup global property -->
+                    <slot></slot>
+                    <div class="footer col-span-2 onload-animation hidden lg:block">
+                        <Footer></Footer>
+                    </div>
+                </div>
+            </main>
+
+            <div class="footer col-span-2 onload-animation block lg:hidden">
+                <Footer></Footer>
+            </div>
+        </div>
+
+        <BackToTop></BackToTop>
+    </div>
+</div>
+
+<!-- The things that should be under the banner, only the TOC for now -->
+<div class="absolute w-full z-0 hidden xl:block">
+    <div class="relative max-w-[var(--page-width)] mx-auto">
+        <!-- TOC component -->
+        {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden lg:block transition absolute top-0 w-[var(--toc-width)] items-center",
+            sidebarLayoutConfig.position === "right" ? "-left-[var(--toc-width)]" : "-right-[var(--toc-width)]",
+            {"toc-hide": siteConfig.banner.enable}]}
+        >
+            <div id="toc-inner-wrapper" class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar">
+                <div id="toc" class="w-full h-full transition-swup-fade ">       
+                    <TOC headings={headings}></TOC>
+                </div>
+            </div>
+        </div>}
+
+        <!-- #toc needs to exist for Swup to work normally -->
+        {!siteConfig.toc.enable && <div id="toc"></div>}
+    </div>
+</div>
+</Layout>
+
+<style>
+/* Banner text styles */
+.banner-title {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    animation: fadeInUp 1s ease-out;
+    font-weight: bold;
+}
+
+.banner-subtitle {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+    animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* 移动端无侧边栏布局优化 */
+@media (max-width: 768px) {
+    .mobile-no-sidebar {
+        display: block !important;
+        width: 100% !important;
+    }
+    
+    .mobile-no-sidebar main {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    .mobile-no-sidebar #content-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+}
+
+/* 移动端横幅优化 - 小屏手机 (320px - 480px) */
+@media (max-width: 480px) {
+    /* Banner wrapper 高度优化 - 优先保持banner显示 */
+    #banner-wrapper {
+        height: 70vh !important; /* 保持较大高度优先显示banner */
+        min-height: 450px;
+        max-height: none; /* 移除最大高度限制 */
+        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+    }
+    
+    /* 主内容区域位置调整 - 确保在banner下面 */
+    .absolute.w-full.z-30 {
+        top: 70vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 70vh) !important;
+    }
+    
+    /* 横幅文本覆盖层优化 */
+    .banner-text-overlay {
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        padding: 1rem !important;
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    /* 文本容器优化 */
+    .banner-text-overlay > div {
+        margin-bottom: 0 !important; /* 移除底部边距，保持居中 */
+        width: 95% !important; /* 增加文本宽度利用率 */
+        text-align: center !important; /* 确保文字居中 */
+    }
+    
+    /* 标题字体优化 */
+    .banner-title {
+        font-size: 3.2rem !important; /* 增大字体大小 */
+        line-height: 1.1 !important;
+        margin-bottom: 0.5rem !important;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important; /* 增强阴影 */
+    }
+    
+    /* 副标题字体优化 */
+    .banner-subtitle {
+        font-size: 1rem !important;
+        line-height: 1.3 !important;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
+    }
+    
+    /* 波浪效果高度调整 */
+    .waves {
+        height: 8vh !important;
+        min-height: 60px !important;
+        max-height: 80px !important;
+    }
+}
+
+/* 移动端横幅优化 - 大屏手机 (481px - 640px) */
+@media (min-width: 481px) and (max-width: 640px) {
+    /* Banner wrapper 高度优化 - 优先保持banner显示 */
+    #banner-wrapper {
+        height: 75vh !important;
+        min-height: 500px;
+        max-height: none; /* 移除最大高度限制 */
+        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+    }
+    
+    /* 主内容区域位置调整 - 确保在banner下面 */
+    .absolute.w-full.z-30 {
+        top: 75vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 75vh) !important;
+    }
+    
+    /* 横幅文本覆盖层优化 */
+    .banner-text-overlay {
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        padding: 1.5rem !important;
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    /* 文本容器优化 */
+    .banner-text-overlay > div {
+        margin-bottom: 0 !important; /* 移除底部边距，保持居中 */
+        width: 90% !important;
+        text-align: center !important; /* 确保文字居中 */
+    }
+    
+    /* 标题字体优化 */
+    .banner-title {
+        font-size: 3.8rem !important; /* 增大字体大小 */
+        line-height: 1.1 !important;
+        margin-bottom: 0.75rem !important;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
+    }
+    
+    /* 副标题字体优化 */
+    .banner-subtitle {
+        font-size: 1.125rem !important;
+        line-height: 1.4 !important;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
+    }
+    
+    /* 波浪效果高度调整 */
+    .waves {
+        height: 10vh !important;
+        min-height: 70px !important;
+        max-height: 100px !important;
+    }
+}
+
+/* 平板设备横幅优化 (641px - 1023px) */
+@media (min-width: 641px) and (max-width: 1023px) {
+    /* Banner wrapper 高度优化 */
+    #banner-wrapper {
+        height: 70vh !important;
+        min-height: 500px;
+        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+    }
+    
+    /* 主内容区域位置调整 - 确保在banner下面 */
+    .absolute.w-full.z-30 {
+        top: 70vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 70vh) !important;
+    }
+    
+    /* 横幅文本覆盖层优化 */
+    .banner-text-overlay {
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        padding: 2rem !important;
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    /* 文本容器优化 */
+    .banner-text-overlay > div {
+        margin-bottom: 0 !important; /* 移除底部边距，保持居中 */
+        width: 85% !important;
+        text-align: center !important; /* 确保文字居中 */
+    }
+    
+    /* 标题字体优化 */
+    .banner-title {
+        font-size: 4rem !important;
+        line-height: 1.1 !important;
+        margin-bottom: 1rem !important;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
+    }
+    
+    /* 副标题字体优化 */
+    .banner-subtitle {
+        font-size: 1.5rem !important;
+        line-height: 1.4 !important;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
+    }
+    
+    /* 波浪效果高度调整 */
+    .waves {
+        height: 12vh !important;
+        min-height: 80px !important;
+        max-height: 120px !important;
+    }
+}
+
+/* 桌面端保持居中 (1024px+) */
+@media (min-width: 1024px) {
+    .banner-text-overlay {
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        padding: 2rem !important;
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    .banner-text-overlay > div {
+        margin-bottom: 0 !important;
+        width: 75% !important;
+        text-align: center !important; /* 确保文字居中 */
+    }
+    
+    /* 桌面端图片容器优化 */
+    .carousel-item img,
+    #banner img {
+        object-position: center center !important; /* 确保图片居中显示 */
+        transition: transform 1s ease-out !important; /* 与移动端保持一致的过渡时间 */
+    }
+    
+    /* 桌面端轮播图片过渡优化 - 与移动端保持一致 */
+    .carousel-item {
+        transition: all 0.5s ease-out !important; /* 优化过渡时间，避免与轮播间隔冲突 */
+        transform-origin: center center !important; /* 确保缩放从中心开始 */
+    }
+    
+    /* 桌面端当前图片缩放效果 */
+    .carousel-item.opacity-100.scale-100 {
+        transform: scale(1) !important; /* 当前图片正常大小 */
+        opacity: 1 !important;
+    }
+    
+    /* 桌面端非当前图片缩放效果 */
+    .carousel-item.opacity-0.scale-110 {
+        transform: scale(1.15) !important; /* 非当前图片明显放大 */
+        opacity: 0 !important;
+    }
+    
+    /* 确保轮播容器有正确的overflow设置 */
+    #banner-carousel {
+        overflow: hidden !important;
+    }
+    
+    /* 波浪效果恢复默认 */
+    .waves {
+        height: 15vh !important;
+        min-height: 80px !important;
+        max-height: 150px !important;
+    }
+}
+
+/* 移动端图片优化 */
+@media (max-width: 1023px) {
+    /* 移动端图片容器优化 */
+    .carousel-item img,
+    #banner img {
+        object-position: center center !important; /* 确保图片居中显示 */
+        transition: transform 0.5s ease-out !important; /* 优化过渡时间，避免与轮播间隔冲突 */
+    }
+    
+    /* 轮播图片过渡优化 - 与电脑端保持一致 */
+    .carousel-item {
+        transition: all 1s ease-out !important; /* 包含opacity和transform的过渡 */
+        transform-origin: center center !important; /* 确保缩放从中心开始 */
+    }
+    
+    /* 移动端当前图片缩放效果 */
+    .carousel-item.opacity-100.scale-100 {
+        transform: scale(1) !important; /* 当前图片正常大小 */
+        opacity: 1 !important;
+    }
+    
+    /* 移动端非当前图片缩放效果 */
+    .carousel-item.opacity-0.scale-110 {
+        transform: scale(1.15) !important; /* 非当前图片明显放大 */
+        opacity: 0 !important;
+    }
+    
+    /* 确保轮播容器有正确的overflow设置 */
+    #banner-carousel {
+        overflow: hidden !important;
+    }
+    
+    /* 移动端banner加载动画优化 */
+    .onload-animation-fade-in {
+        animation: mobile-fade-in 0.8s ease-out forwards !important;
+    }
+}
+
+/* 移动端专用淡入动画 - 与电脑端保持一致 */
+@keyframes mobile-fade-in {
+    0% {
+        opacity: 0;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1); /* 与电脑端当前图片缩放保持一致 */
+    }
+}
+
+/* 手机端非首页隐藏banner - 改进的分阶段动画 */
+@media (max-width: 1023px) {
+    #banner-wrapper {
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease-out;
+        transform-origin: top center;
+        /* 硬件加速优化 */
+        will-change: transform, opacity;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+    
+    .mobile-hide-banner {
+        transform: translateY(-100%) translateZ(0) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        /* 快速消失 */
+        transition: transform 0.3s ease-in, opacity 0.2s ease-in !important;
+    }
+    
+    /* 手机端非首页时主内容区域从顶部开始 - 延迟出现的动画 */
+    .absolute.w-full.z-30 {
+        transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
+        /* 硬件加速优化 */
+        will-change: top;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+    
+    .absolute.w-full.z-30.mobile-main-no-banner {
+        top: 5.5rem !important;
+        min-height: calc(100vh - 5.5rem) !important;
+        /* 内容区域快速上移 */
+        transition: top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s !important;
+    }
+}
+
+/* 移动端导航栏与banner的协调 */
+@media (max-width: 1023px) {
+    #navbar-wrapper {
+        /* 移除覆盖样式，让Navbar.astro的圆角和半透明效果生效 */
+    }
+    
+    /* 暗色主题下的导航栏 */
+    :root.dark #navbar-wrapper {
+        /* 移除覆盖样式，让Navbar.astro的圆角和半透明效果生效 */
+    }
+}
+
+/* 移动端banner性能优化 */
+@media (max-width: 1023px) {
+    .banner-container {
+        /* 启用硬件加速 */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: transform, opacity;
+        
+        /* 优化渲染性能 */
+        contain: layout style paint;
+        
+        /* 减少重绘 */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .carousel-item {
+        /* 硬件加速 */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: transform, opacity;
+        
+        /* 优化触摸响应 */
+        touch-action: pan-y;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    .banner-text-overlay {
+        /* 文字渲染优化 */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        
+        /* 减少重排 */
+        contain: layout style;
+    }
+
+    /* 移动端图片优化 */
+    .banner-container img {
+        /* 图片渲染优化 */
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        
+        /* 防止图片拖拽 */
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+        user-drag: none;
+        
+        /* 触摸优化 */
+        pointer-events: none;
+    }
+
+    /* 移动端轮播指示器 */
+    .carousel-indicators {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+    }
+
+    .carousel-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .carousel-indicator.active {
+        background: rgba(255, 255, 255, 0.9);
+        transform: scale(1.2);
+    }
+}
+
+/* 当banner被禁用时的布局样式 */
+.no-banner-layout {
+    top: 5.5rem !important;
+    min-height: calc(100vh - 5.5rem) !important;
+}
+
+/* 移动端当banner被禁用时的布局样式 */
+@media (max-width: 1023px) {
+    .absolute.w-full.z-30.no-banner-layout {
+        top: 5.5rem !important;
+        min-height: calc(100vh - 5.5rem) !important;
+        transition: none !important; /* 移除过渡动画，立即应用位置 */
+    }
+}
+
+/* 小屏手机当banner被禁用时的布局样式 */
+@media (max-width: 480px) {
+    .absolute.w-full.z-30.no-banner-layout {
+        top: 5.5rem !important;
+        min-height: calc(100vh - 5.5rem) !important;
+        transition: none !important;
+    }
+}
+
+/* 平板设备当banner被禁用时的布局样式 */
+@media (min-width: 641px) and (max-width: 1023px) {
+    .absolute.w-full.z-30.no-banner-layout {
+        top: 5.5rem !important;
+        min-height: calc(100vh - 5.5rem) !important;
+        transition: none !important;
+    }
+}
+
+/* 移动端横屏优化 */
+@media (max-width: 1023px) and (orientation: landscape) {
+    #banner-wrapper:not(.mobile-hide-banner) {
+        top: 0 !important; /* 横屏模式从顶部开始，避免被导航栏覆盖 */
+        height: 60vh !important;
+    }
+    
+    /* 主内容区域位置调整 - 确保在banner下面，但不影响非首页 */
+    .absolute.w-full.z-30:not(.mobile-main-no-banner) {
+        top: 60vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 60vh) !important;
+    }
+    
+    .banner-container {
+        height: 60vh;
+        min-height: 300px;
+    }
+
+    .banner-text-overlay {
+        padding: 1rem 1.5rem;
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        text-align: center !important; /* 文字居中对齐 */
+    }
+
+    .banner-title {
+        font-size: 2.2rem !important; /* 增大字体大小 */
+        line-height: 1.3;
+    }
+
+    .banner-subtitle {
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+}
+
+/* 移动端暗色模式优化 */
+@media (max-width: 1023px) and (prefers-color-scheme: dark) {
+    .banner-text-overlay {
+        background: linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.8) 0%,
+            rgba(0, 0, 0, 0.4) 50%,
+            transparent 100%
+        );
+    }
+
+    .banner-title {
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    .banner-subtitle {
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    }
+}
+
+/* 水波纹显示优化 */
+.waves {
+    /* 确保水波纹完整显示 */
+    overflow: visible;
+    z-index: 5;
+    /* 硬件加速，确保与背景同步渲染 */
+    transform: translateZ(0);
+    will-change: transform;
+    /* 确保与页面背景在同一合成层 */
+    contain: layout style paint;
+}
+
+.waves svg {
+    /* 确保SVG完整渲染 */
+    width: 100%;
+    height: 100%;
+    display: block;
+    /* SVG硬件加速 */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* 波浪填充色主题切换优化 */
+.waves use {
+    /* 确保填充色与页面背景同步更新 */
+    will-change: fill;
+}
+
+/* 波浪与背景同步切换优化 - 解决交界线闪烁 */
+#header-waves {
+    /* 确保波浪容器与页面背景在同一合成层 */
+    isolation: isolate;
+    /* 强制重绘，确保与body背景同步 */
+    contain: layout style paint;
+    /* 精确对齐 */
+    margin-bottom: -1px;
+}
+
+/* 主题切换时的额外保护 */
+.theme-changing #header-waves,
+.theme-changing #header-waves svg,
+.theme-changing #header-waves use {
+    /* 在主题切换期间禁用所有可能的渲染延迟 */
+    will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* 移动端水波纹特殊优化 */
+@media (max-width: 1023px) {
+    #header-waves {
+        /* 确保水波纹容器不被裁剪 */
+        overflow: visible;
+        z-index: 5;
+        /* 水波纹快速消失动画 */
+        transition: transform 0.3s ease-in, opacity 0.2s ease-in;
+    }
+    
+    /* 当banner隐藏时，水波纹快速消失 */
+    .mobile-hide-banner #header-waves {
+        transform: translateY(-100%);
+        opacity: 0;
+        /* 水波纹比banner更快消失 */
+        transition: transform 0.25s ease-in, opacity 0.15s ease-in;
+    }
+    
+    .waves svg {
+        /* 移动端SVG优化 */
+        min-height: 60px;
+    }
+    
+    /* 确保水波纹在banner底部正确定位 */
+    .waves {
+        bottom: -1px !important;
+        position: absolute !important;
+    }
+}
+
+/* 超小屏幕水波纹优化 */
+@media (max-width: 360px) {
+    .waves {
+        height: 6vh !important;
+        min-height: 50px !important;
+        max-height: 70px !important;
+    }
+}
+
+/* 基于屏幕高度的banner优化 - 优先显示banner */
+/* 极小高度屏幕 (高度 ≤ 500px) */
+@media (max-height: 500px) {
+    #banner-wrapper {
+        height: 85vh !important; /* 占用更多高度确保banner显示 */
+        min-height: 350px !important;
+    }
+    
+    .banner-text-overlay {
+        padding: 1rem !important;
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    .banner-title {
+        font-size: 2.8rem !important; /* 增大字体大小 */
+        line-height: 1.1 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .banner-subtitle {
+        font-size: 0.9rem !important;
+        line-height: 1.2 !important;
+    }
+    
+    .waves {
+        height: 5vh !important;
+        min-height: 40px !important;
+        max-height: 50px !important;
+    }
+}
+
+/* 小高度屏幕 (高度 501px - 600px) */
+@media (min-height: 501px) and (max-height: 600px) {
+    #banner-wrapper {
+        height: 80vh !important;
+        min-height: 400px !important;
+    }
+    
+    .banner-text-overlay {
+        padding: 1.5rem !important;
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    .banner-title {
+        font-size: 3.2rem !important; /* 增大字体大小 */
+        line-height: 1.1 !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .banner-subtitle {
+        font-size: 1rem !important;
+        line-height: 1.3 !important;
+    }
+    
+    .waves {
+        height: 6vh !important;
+        min-height: 50px !important;
+        max-height: 60px !important;
+    }
+}
+
+/* 中等高度屏幕 (高度 601px - 700px) */
+@media (min-height: 601px) and (max-height: 700px) {
+    #banner-wrapper {
+        height: 75vh !important;
+        min-height: 450px !important;
+    }
+    
+    .banner-text-overlay {
+        padding: 2rem !important;
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    .banner-title {
+        font-size: 3.8rem !important; /* 增大字体大小 */
+        line-height: 1.1 !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.125rem !important;
+        line-height: 1.4 !important;
+    }
+    
+    .waves {
+        height: 8vh !important;
+        min-height: 60px !important;
+        max-height: 80px !important;
+    }
+}
+
+/* 横屏模式特殊处理 - 优先显示banner */
+@media (orientation: landscape) and (max-height: 500px) {
+    #banner-wrapper {
+        height: 90vh !important; /* 横屏时占用更多高度 */
+        min-height: 300px !important;
+    }
+    
+    .banner-text-overlay {
+        padding: 1rem 2rem !important;
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    .banner-title {
+        font-size: 2.8rem !important; /* 增大字体大小 */
+        line-height: 1.1 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .banner-subtitle {
+        font-size: 1rem !important;
+        line-height: 1.2 !important;
+    }
+    
+    .waves {
+        height: 4vh !important;
+        min-height: 30px !important;
+        max-height: 40px !important;
+    }
+}

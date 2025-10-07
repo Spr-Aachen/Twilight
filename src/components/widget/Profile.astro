@@ -1,0 +1,126 @@
+---
+import { Icon } from "astro-icon/components";
+import { profileConfig } from "../../config";
+import { url } from "../../utils/url-utils";
+import ImageWrapper from "../misc/ImageWrapper.astro";
+
+import { umamiConfig } from '../../config.ts';
+
+// 解析 umami
+const umamiEnabled  = umamiConfig.enabled || false;
+const umamiShareURL = umamiConfig.shareURL || "";
+let umamiBaseUrl = "";
+let umamiShareId = "";
+if (umamiShareURL) {
+    try {
+        const u = new URL(umamiShareURL);
+        umamiBaseUrl = `${u.protocol}//${u.host}`;
+        const segments = u.pathname.split('/').filter(Boolean);
+        if (segments[0] === 'share' && segments.length >= 2) {
+            umamiShareId = segments[1];
+        } else {
+            umamiShareId = segments.pop() || '';
+        }
+    } catch {
+        console.warn("Invalid Umami shareURL");
+    }
+}
+---
+
+<div class="card-base p-3">
+    <a aria-label="Go to About Page" href={url('/about/')}
+       class="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3
+       max-w-[12rem] lg:max-w-none overflow-hidden rounded-xl active:scale-95">
+        <div class="absolute transition pointer-events-none group-hover:bg-black/30 group-active:bg-black/50
+        w-full h-full z-50 flex items-center justify-center">
+            <Icon name="fa6-regular:address-card"
+                  class="transition opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white text-5xl">
+            </Icon>
+        </div>
+        <ImageWrapper src={profileConfig.avatar || ""} alt="Profile Image of the Author" class="mx-auto lg:w-full h-full lg:mt-0 "></ImageWrapper>
+    </a>
+    <div class="px-2">
+        <div class="font-bold text-xl text-center mb-1 dark:text-neutral-50 transition">{profileConfig.name}</div>
+        <div class="h-1 w-5 bg-[var(--primary)] mx-auto rounded-full mb-2 transition"></div>
+        <div class="text-center text-neutral-400 mb-2.5 transition">{profileConfig.bio}</div>
+        <div class="flex gap-2 justify-center mb-1">
+            {profileConfig.links.length > 1 && profileConfig.links.map(item =>
+                    <a rel="me" aria-label={item.name} href={item.url} target="_blank" class="btn-regular rounded-lg h-10 w-10 active:scale-90">
+                        <Icon name={item.icon} class="text-[1.5rem]"></Icon>
+                    </a>
+            )}
+            {profileConfig.links.length == 1 && <a rel="me" aria-label={profileConfig.links[0].name} href={profileConfig.links[0].url} target="_blank"
+                                            class="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95">
+                <Icon name={profileConfig.links[0].icon} class="text-[1.5rem]"></Icon>
+                {profileConfig.links[0].name}
+            </a>}
+        </div>
+        {umamiEnabled && (
+            <div class="text-sm text-gray-500 mt-2 text-center">
+                <Icon name="fa6-solid:eye" class="inline-block mr-1 text-gray-400 text-sm align-middle" />
+                <span id="site-stats-display">统计加载中...</span>
+            </div>
+        )}
+    </div>
+</div>
+
+{umamiEnabled && (
+    <script define:vars={{ umamiBaseUrl, umamiShareId, umamiConfig }}>
+        // 客户端统计文案生成函数
+        function generateStatsText(pageViews, visits) {
+            return `浏览量 ${pageViews} · 访问次数 ${visits}`;
+        }
+        
+        // 获取访问量统计
+        async function fetchSiteStats(isRetry = false) {
+            if (!umamiConfig.enabled) {
+                return;
+            }
+            
+            try {
+                // 调用全局工具获取 Umami 分享数据
+                const { websiteId, token } = await getUmamiShareData(umamiBaseUrl, umamiShareId);
+                
+                // 第二步：获取统计数据
+                const currentTimestamp = Date.now();
+                const statsUrl = `${umamiBaseUrl}/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent('Asia/Shanghai')}&url=%2F&compare=false`;
+                
+                const statsResponse = await fetch(statsUrl, {
+                    headers: {
+                        'x-umami-share-token': token
+                    }
+                });
+                
+                if (!statsResponse.ok) {
+                    if (statsResponse.status === 401 && !isRetry) {
+                        clearUmamiShareCache();
+                        return fetchSiteStats(true);
+                    }
+                    throw new Error('获取统计数据失败');
+                }
+                
+                const statsData = await statsResponse.json();
+                const pageViews = statsData.pageviews?.value || 0;
+                const visits = statsData.visits?.value || 0;
+                
+                const displayElement = document.getElementById('site-stats-display');
+                if (displayElement) {
+                    displayElement.textContent = generateStatsText(pageViews, visits);
+                }
+            } catch (error) {
+                console.error('Error fetching site stats:', error);
+                const displayElement = document.getElementById('site-stats-display');
+                if (displayElement) {
+                    displayElement.textContent = '统计不可用';
+                }
+            }
+        }
+
+        // 页面加载完成后获取统计数据
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fetchSiteStats);
+        } else {
+            fetchSiteStats();
+        }
+    </script>
+)}

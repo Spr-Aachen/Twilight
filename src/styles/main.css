@@ -1,0 +1,382 @@
+/* 导入相册样式 */
+@import './albums.css';
+/* 导入追番页面样式 */
+@import './anime.css';
+/* 导入动画样式 */
+@import './transition.css';
+@import './animation-enhancements.css';
+/* 导入加密内容样式 */
+@import './encrypted-content.css';
+
+/* 导入 ZenMaruGothic-Medium 字体 */
+@font-face {
+  font-family: 'ZenMaruGothic-Medium';
+  src: url('/assets/font/ZenMaruGothic-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+
+
+
+/* 导入 Hanalei 字体 */
+@font-face {
+	font-family: "Hanalei";
+	src: url("/assets/font/Hanalei.woff2") format("woff2");
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 确保平滑滚动 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 当启用 ZenMaruGothic-Medium 字体时应用为全局字体 */
+.zen-maru-gothic-enabled {
+  font-family: 'ZenMaruGothic-Medium', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* 当启用 Hanalei 字体时应用为全局字体 */
+.hanalei-enabled {
+  font-family: 'Hanalei', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* 页面顶部渐变高光效果 */
+.top-gradient-highlight {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 180px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.3) 30%, rgba(255, 255, 255, 0.15) 60%, rgba(255, 255, 255, 0.05) 80%, transparent 100%);
+    pointer-events: none;
+    z-index: 20;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 暗色主题下的渐变高光效果 */
+:root.dark .top-gradient-highlight {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0.15) 60%, rgba(0, 0, 0, 0.05) 80%, transparent 100%);
+}
+
+@layer components {
+    /* 主题过渡保护类 - 临时禁用所有过渡动画 */
+    .is-theme-transitioning *,
+    .is-theme-transitioning *::before,
+    .is-theme-transitioning *::after {
+        transition: none !important;
+    }
+    
+    /* 波浪效果精确同步处理 */
+    .is-theme-transitioning svg use {
+        /* 禁用过渡但保持动画 */
+        transition: none;
+        /* 强制立即继承页面背景色 */
+        fill: currentColor;
+    }
+    
+    /* 导航栏主题切换保护 - 完全禁用过渡以确保性能 */
+    .is-theme-transitioning #navbar > div,
+    .is-theme-transitioning #navbar[data-transparent-mode] > div,
+    .is-theme-transitioning #navbar[data-transparent-mode].scrolled > div,
+    .is-theme-transitioning body.wallpaper-transparent #navbar > div,
+    .is-theme-transitioning body.wallpaper-transparent #navbar[data-transparent-mode] > div,
+    .is-theme-transitioning body.wallpaper-transparent #navbar[data-transparent-mode].scrolled > div,
+    .is-theme-transitioning #banner-wrapper ~ * #navbar > div,
+    .is-theme-transitioning #banner-wrapper ~ * #navbar[data-transparent-mode] > div,
+    .is-theme-transitioning body:has(#banner-wrapper) #navbar > div,
+    .is-theme-transitioning body:has(#banner-wrapper) #navbar[data-transparent-mode] > div {
+        transition: none !important;
+        backdrop-filter: none !important;
+    }
+    
+    /* 导航栏相关浮动面板的过渡禁用 */
+    .is-theme-transitioning .dropdown-content,
+    .is-theme-transitioning .float-panel,
+    .is-theme-transitioning #display-setting,
+    .is-theme-transitioning #nav-menu-panel,
+    .is-theme-transitioning #translate-panel,
+    .is-theme-transitioning #mobile-toc-panel,
+    .is-theme-transitioning #search-panel {
+        transition: none !important;
+        backdrop-filter: none !important;
+    }
+    
+    /* 波浪容器的颜色传递 */
+    .is-theme-transitioning #header-waves {
+        /* 设置当前颜色为页面背景色，供SVG继承 */
+        color: var(--page-bg);
+        /* 确保与页面在同一合成层 */
+        isolation: isolate;
+        /* 优化渲染性能 */
+        contain: layout style paint;
+        /* GPU层合成 */
+        transform: translateZ(0);
+        /* 确保没有背景色 */
+        background: transparent;
+    }
+    
+    .is-theme-transitioning #header-waves use {
+        /* 保持动画连续性 */
+        will-change: transform;
+        /* GPU优化 */
+        transform: translateZ(0);
+    }
+    
+    .card-base {
+        @apply rounded-[var(--radius-large)] overflow-hidden bg-[var(--card-bg)] transition-colors duration-150;
+    }
+    .card-base-transparent {
+        @apply rounded-[var(--radius-large)] overflow-hidden bg-[var(--card-bg-transparent)] backdrop-blur-sm transition-colors duration-150;
+    }
+    
+    /* 全屏壁纸模式下的半透明效果 */
+    .wallpaper-transparent .card-base {
+        @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
+    }
+    
+    .wallpaper-transparent .float-panel {
+        @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
+    }
+    
+    .wallpaper-transparent #navbar > div {
+    @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
+}
+    
+    .wallpaper-transparent .btn-card {
+        @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
+    }
+    
+    .wallpaper-transparent ~ * .music-player .mini-player,
+    .wallpaper-transparent ~ * .music-player .expanded-player,
+    .wallpaper-transparent ~ * .music-player .playlist-panel,
+    body.wallpaper-transparent .music-player .mini-player,
+    body.wallpaper-transparent .music-player .expanded-player,
+    body.wallpaper-transparent .music-player .playlist-panel {
+        background-color: var(--card-bg-transparent) !important;
+        backdrop-filter: blur(8px) !important;
+    }
+    h1, h2, h3, h4, h5, h6, p, a, span, li, ul, ol, blockquote, code, pre, table, th, td, strong {
+        @apply transition-colors duration-150;
+    }
+    .card-shadow {
+        @apply drop-shadow-[0_2px_4px_rgba(0,0,0,0.005)]
+    }
+    .expand-animation {
+        @apply relative before:ease-out before:transition active:bg-none hover:before:bg-[var(--btn-plain-bg-hover)] active:before:bg-[var(--btn-plain-bg-active)] z-0
+        before:absolute before:rounded-[inherit] before:inset-0 before:scale-[0.85] hover:before:scale-100 before:-z-10
+    }
+    .link {
+        @apply transition-colors duration-150 rounded-md p-1 -m-1 expand-animation;
+    }
+    .link-lg {
+        @apply transition-colors duration-150 rounded-md p-1.5 -m-1.5 expand-animation;
+    }
+    .float-panel {
+        @apply top-[5.25rem] rounded-[var(--radius-large)] overflow-hidden bg-[var(--float-panel-bg)] transition-colors duration-150 shadow-xl dark:shadow-none
+    }
+    .float-panel-closed {
+        @apply -translate-y-1 opacity-0 pointer-events-none
+    }
+    .search-panel mark {
+        @apply bg-transparent text-[var(--primary)]
+    }
+
+    .btn-card {
+        @apply transition-colors duration-150 flex items-center justify-center bg-[var(--card-bg)] hover:bg-[var(--btn-card-bg-hover)]
+        active:bg-[var(--btn-card-bg-active)]
+    }
+    .btn-card.disabled {
+        @apply pointer-events-none text-black/10 dark:text-white/10
+    }
+    .btn-plain {
+        @apply transition-colors duration-150 relative flex items-center justify-center bg-none
+        text-black/75 hover:text-[var(--primary)] dark:text-white/75 dark:hover:text-[var(--primary)];
+        &:not(.scale-animation) {
+            @apply hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)]
+        }
+        &.scale-animation {
+            @apply expand-animation;
+        }
+    }
+    .btn-regular {
+        @apply transition-colors duration-150 flex items-center justify-center bg-[var(--btn-regular-bg)] hover:bg-[var(--btn-regular-bg-hover)] active:bg-[var(--btn-regular-bg-active)]
+        text-[var(--btn-content)] dark:text-white/75
+    }
+
+    .link-underline {
+        @apply transition-colors duration-150 underline decoration-2 decoration-dashed decoration-[var(--link-underline)]
+        hover:decoration-[var(--link-hover)] active:decoration-[var(--link-active)] underline-offset-[0.25rem]
+    }
+
+    .toc-hide,
+    .toc-not-ready {
+        @apply opacity-0 pointer-events-none
+    }
+
+    /* #toc-inner-wrapper {
+        mask-image: linear-gradient(to bottom, transparent 0%, black 2rem, black calc(100% - 2rem), transparent 100%);
+    } */
+
+    .hide-scrollbar {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .text-90 {
+        @apply text-black/90 dark:text-white/90
+    }
+    .text-75 {
+        @apply text-black/75 dark:text-white/75
+    }
+    .text-50 {
+        @apply text-black/50 dark:text-white/50
+    }
+    .text-30 {
+        @apply text-black/30 dark:text-white/30
+    }
+    .text-25 {
+        @apply text-black/25 dark:text-white/25
+    }
+
+    /* 下拉菜单样式 */
+    .dropdown-container {
+        @apply relative;
+    }
+
+    .dropdown-menu {
+        @apply absolute top-full left-0 pt-2 opacity-0 invisible pointer-events-none transition-all duration-200 ease-out transform translate-y-[-8px] z-50;
+    }
+
+    .dropdown-container:hover .dropdown-menu,
+    .dropdown-container:focus-within .dropdown-menu {
+        @apply opacity-100 visible pointer-events-auto translate-y-0;
+    }
+
+    .dropdown-container:hover .dropdown-arrow,
+    .dropdown-container:focus-within .dropdown-arrow {
+        @apply rotate-180;
+    }
+
+    .dropdown-content {
+        @apply bg-[var(--float-panel-bg)] rounded-[var(--radius-large)] shadow-xl dark:shadow-none border border-black/5 dark:border-white/10 py-2 min-w-[12rem];
+    }
+
+    .dropdown-item {
+        @apply flex items-center justify-between px-4 py-2.5 text-black/75 dark:text-white/75 hover:text-[var(--primary)] hover:bg-[var(--btn-plain-bg-hover)] transition-colors duration-150 font-medium;
+    }
+
+    .dropdown-item:first-child {
+        @apply rounded-t-[calc(var(--radius-large)-0.5rem)];
+    }
+
+    .dropdown-item:last-child {
+        @apply rounded-b-[calc(var(--radius-large)-0.5rem)];
+    }
+
+    /* 移动端菜单样式 */
+    .mobile-submenu {
+        @apply max-h-0 overflow-hidden transition-all duration-300 ease-in-out;
+    }
+    
+    .mobile-dropdown[data-expanded="true"] .mobile-submenu {
+        @apply max-h-96;
+    }
+    
+    .mobile-dropdown[data-expanded="true"] .mobile-dropdown-arrow {
+        @apply rotate-180;
+    }
+
+    /* 响应式隐藏 */
+    @media (max-width: 768px) {
+        .dropdown-container {
+            @apply hidden;
+        }
+    }
+
+    /* 无障碍支持 */
+    .dropdown-container:focus-within .dropdown-menu {
+        @apply opacity-100 visible pointer-events-auto translate-y-0;
+    }
+
+    .dropdown-item:focus {
+        @apply outline-none;
+    }
+
+    .mobile-dropdown button:focus {
+        @apply outline-none;
+    }
+
+    .meta-icon {
+        @apply w-8 h-8 transition-colors duration-150 rounded-md flex items-center justify-center bg-[var(--btn-regular-bg)]
+        text-[var(--btn-content)] mr-2
+    }
+    .with-divider {
+        @apply before:content-['/'] before:ml-1.5 before:mr-1.5 before:text-[var(--meta-divider)] before:text-sm
+        before:font-medium before:first-of-type:hidden before:transition-colors before:duration-150
+    }
+
+    .btn-regular-dark {
+        @apply flex items-center justify-center
+        bg-[oklch(0.45_0.01_var(--hue))] hover:bg-[oklch(0.50_0.01_var(--hue))] active:bg-[oklch(0.55_0.01_var(--hue))]
+        dark:bg-[oklch(0.30_0.02_var(--hue))] dark:hover:bg-[oklch(0.35_0.03_var(--hue))] dark:active:bg-[oklch(0.40_0.03_var(--hue))]
+    }
+    .btn-regular-dark.success {
+        @apply bg-[oklch(0.75_0.14_var(--hue))] dark:bg-[oklch(0.75_0.14_var(--hue))]
+    }
+}
+
+.custom-md img, #post-cover img {
+    @apply cursor-zoom-in
+}
+
+::selection {
+    background-color: var(--selection-bg)
+}
+
+.dash-line {
+    position: relative;
+}
+
+.dash-line::before {
+    content: "";
+    position: absolute;
+    width: 10%;
+    height: 100%;
+    left: calc(50% - 1px);
+    border-left: 2px dashed var(--line-color);
+    pointer-events: none;
+    transition: all 0.3s;
+    transform: translateY(-50%);
+}
+
+.collapsed {
+    height: var(--collapsedHeight);
+}
+
+/*剧透效果*/
+.custom-md spoiler {
+  --_spoiler-mask: var(--primary);
+  @apply hover:bg-transparent px-1 py-0.5 overflow-hidden rounded-md transition-all duration-150;
+  background-color: var(--_spoiler-mask);
+
+  &:not(:hover) {
+    color: var(--_spoiler-mask);
+    * {
+        color: var(--_spoiler-mask);
+    }
+  }
+}
+
+/* 浅色模式：使用更浅的主题色且完全不透明 */
+:root:not(.dark) .custom-md spoiler {
+  --_spoiler-mask: color-mix(in oklch, var(--primary) 55%, white 45%);
+}

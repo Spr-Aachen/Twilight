@@ -1,0 +1,183 @@
+---
+import { Icon } from "astro-icon/components";
+import { profileConfig } from "../config";
+import I18nKey from "../i18n/i18nKey";
+import { i18n } from "../i18n/translation";
+import { formatDateToYYYYMMDD } from "../utils/date-utils";
+import { getCategoryUrl, getTagUrl } from "../utils/url-utils";
+
+import { umamiConfig } from '../config.ts';
+
+// 解析 umami
+const umamiEnabled  = umamiConfig.enabled || false;
+const umamiShareURL = umamiConfig.shareURL || "";
+let umamiBaseUrl = "";
+let umamiShareId = "";
+if (umamiShareURL) {
+    try {
+        const u = new URL(umamiShareURL);
+        umamiBaseUrl = `${u.protocol}//${u.host}`;
+        const segments = u.pathname.split('/').filter(Boolean);
+        if (segments[0] === 'share' && segments.length >= 2) {
+            umamiShareId = segments[1];
+        } else {
+            umamiShareId = segments.pop() || '';
+        }
+    } catch {
+        console.warn('Invalid Umami shareURL', e);
+    }
+}
+
+export interface Props {
+  published: Date;
+  updated?: Date;
+  category?: string;
+  tags?: string[];
+  hideUpdateDate?: boolean;
+  hideTagsForMobile?: boolean;
+  isHome?: boolean;
+  className?: string;
+  slug?: string;
+}
+
+const {
+  published,
+  updated,
+  category,
+  tags,
+  hideUpdateDate,
+  hideTagsForMobile,
+  isHome,
+  className = "",
+  slug
+} = Astro.props;
+---
+
+
+<div class:list={["flex flex-wrap text-neutral-500 dark:text-neutral-400 items-center gap-4 gap-x-4 gap-y-2", className]}>
+    <!-- publish date -->
+    <div class="flex items-center">
+        <div class="meta-icon"
+        >
+            <Icon name="material-symbols:calendar-today-outline-rounded" class="text-xl"></Icon>
+        </div>
+        <span class="text-50 text-sm font-medium">{formatDateToYYYYMMDD(published)}</span>
+    </div>
+
+    <!-- update date -->
+    {!hideUpdateDate && updated && updated.getTime() !== published.getTime() && (
+        <div class="flex items-center">
+            <div class="meta-icon"
+            >
+                <Icon name="material-symbols:edit-calendar-outline-rounded" class="text-xl"></Icon>
+            </div>
+            <span class="text-50 text-sm font-medium">{formatDateToYYYYMMDD(updated)}</span>
+        </div>
+    )}
+
+    <!-- categories -->
+    <div class="flex items-center">
+        <div class="meta-icon"
+        >
+            <Icon name="material-symbols:book-2-outline-rounded" class="text-xl"></Icon>
+        </div>
+        <div class="flex flex-row flex-nowrap items-center">
+            <a href={getCategoryUrl(category)} aria-label={`View all posts in the ${category} category`}
+               class="link-lg transition text-50 text-sm font-medium
+                            hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap">
+                {category || i18n(I18nKey.uncategorized)}
+            </a>
+        </div>
+    </div>
+
+    <!-- tags -->
+    <div class:list={["items-center", {"flex": !hideTagsForMobile, "hidden md:flex": hideTagsForMobile}]}>
+        <div class="meta-icon"
+        >
+            <Icon name="material-symbols:tag-rounded" class="text-xl"></Icon>
+        </div>
+        <div class="flex flex-row flex-nowrap items-center">
+            {(tags && tags.length > 0) && tags.map((tag, i) => (
+                <div class:list={[{"hidden": i == 0}, "mx-1.5 text-[var(--meta-divider)] text-sm"]}>/</div>
+                <a href={getTagUrl(tag)} aria-label={`View all posts with the ${tag.trim()} tag`}
+                   class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap">
+                    {tag.trim()}
+                </a>
+            ))}
+            {!(tags && tags.length > 0) && <div class="transition text-50 text-sm font-medium">{i18n(I18nKey.noTags)}</div>}
+        </div>
+    </div>
+    
+    <!-- 访问量（首页不显示，且umami.enabled为true时显示） -->
+    {!isHome && umamiEnabled && slug && (
+        <div class="flex items-center">
+            <div class="meta-icon">
+                <Icon name="material-symbols:visibility-outline-rounded" class="text-xl"></Icon>
+            </div>
+            <span class="text-50 text-sm font-medium" id="page-views-display">统计加载中...</span>
+        </div>
+    )}
+</div>
+
+<!-- 只有在非首页且启用umami且有slug时才加载脚本 -->
+{!isHome && umamiEnabled && slug && (
+    <script define:vars={{ slug, umamiBaseUrl, umamiShareId, umamiConfig }}>
+        // 客户端统计文案生成函数
+        function generateStatsText(pageViews, visits) {
+            return `浏览量 ${pageViews} · 访问次数 ${visits}`;
+        }
+        
+        // 获取访问量统计
+        async function fetchPageViews(isRetry = false) {
+            if (!umamiConfig.enabled) {
+                return;
+            }
+            
+            try {
+                // 调用全局工具获取 Umami 分享数据
+                const { websiteId, token } = await getUmamiShareData(umamiBaseUrl, umamiShareId);
+                
+                // 第二步：获取统计数据
+                const currentTimestamp = Date.now();
+                const statsUrl = `${umamiBaseUrl}/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent('Asia/Shanghai')}&url=%2Fposts%2F${slug}%2F&compare=false`;
+                
+                const statsResponse = await fetch(statsUrl, {
+                    headers: {
+                        'x-umami-share-token': token
+                    }
+                });
+                
+                if (!statsResponse.ok) {
+                    if (statsResponse.status === 401 && !isRetry) {
+                        clearUmamiShareCache();
+                        return fetchPageViews(true);
+                    }
+                    throw new Error('获取统计数据失败');
+                }
+                
+                const statsData = await statsResponse.json();
+                const pageViews = statsData.pageviews?.value || 0;
+                const visits = statsData.visits?.value || 0;
+                
+                const displayElement = document.getElementById('page-views-display');
+                if (displayElement) {
+                    displayElement.textContent = generateStatsText(pageViews, visits);
+                }
+            } catch (error) {
+                console.error('Error fetching page views:', error);
+                const displayElement = document.getElementById('page-views-display');
+                if (displayElement) {
+                    displayElement.textContent = '统计不可用';
+                }
+            }
+        }
+
+        // 页面加载完成后获取统计数据
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fetchPageViews);
+        } else {
+            fetchPageViews();
+        }
+    </script>
+)}

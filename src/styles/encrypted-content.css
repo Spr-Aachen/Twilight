@@ -1,0 +1,181 @@
+/* 加密内容的代码块样式，确保与非加密文章完全一致 */
+
+/* 基础容器样式 */
+#decrypted-content {
+  /* 确保基本样式继承 */
+}
+
+/* 继承所有markdown样式 */
+#decrypted-content .custom-md {
+  /* 所有样式都从markdown.css继承 */
+}
+
+/* expressive-code容器样式 */
+#decrypted-content .expressive-code {
+  @apply my-4;
+}
+
+#decrypted-content .expressive-code ::selection {
+  @apply bg-[var(--codeblock-selection)];
+}
+
+/* frame容器样式 - 与expressive-code.css保持一致 */
+#decrypted-content .expressive-code .frame {
+  @apply !shadow-none relative rounded-lg overflow-hidden;
+  background: var(--codeblock-bg);
+}
+
+/* 语言标签样式 - 与expressive-code.css保持一致 */
+#decrypted-content .expressive-code .title {
+  @apply px-4 py-2 text-xs font-medium;
+  background: var(--primary);
+  color: white;
+  font-family: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* pre元素样式 */
+#decrypted-content .frame pre {
+  @apply p-4 overflow-x-auto m-0;
+  font-family: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: inherit; /* 使用继承的颜色而不是强制白色 */
+}
+
+/* 复制按钮样式 - 与markdown.css保持完全一致 */
+#decrypted-content .copy-btn {
+  all: initial;
+  @apply opacity-0 absolute active:scale-90 h-6 w-6 top-2 right-2 text-xs rounded transition-all ease-in-out z-20 cursor-pointer bg-[var(--btn-regular-bg)] hover:bg-[var(--btn-regular-bg-hover)];
+}
+
+#decrypted-content .frame:hover .copy-btn {
+  opacity: 1;
+}
+
+#decrypted-content .copy-btn-icon {
+  @apply absolute top-1/2 left-1/2 transition -translate-x-1/2 -translate-y-1/2 w-3 h-3 fill-white pointer-events-none;
+}
+
+#decrypted-content .copy-btn .copy-icon {
+  @apply opacity-100 fill-white dark:fill-white/90;
+}
+
+#decrypted-content .copy-btn.success .copy-icon {
+  @apply opacity-0 fill-[var(--deep-text)];
+}
+
+#decrypted-content .copy-btn .success-icon {
+  @apply opacity-0 fill-white;
+}
+
+#decrypted-content .copy-btn.success .success-icon {
+  @apply opacity-100;
+}
+
+/* 代码元素样式 */
+#decrypted-content code {
+  font-family: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+/* 内联代码样式 - 与markdown.css保持一致 */
+#decrypted-content .custom-md code:not(.astro-code code) {
+  @apply bg-[var(--inline-code-bg)] text-[var(--inline-code-color)] px-1 py-0.5 rounded-md overflow-hidden;
+}
+
+/* 代码块内的code元素不应用内联代码样式 */
+#decrypted-content .astro-code code {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  counter-reset: line; /* 重置行号计数器 */
+  /* 移除强制白色，让语法高亮颜色显示 */
+}
+
+/* 代码行样式 - 与markdown.css保持一致 */
+#decrypted-content .astro-code code span.line {
+  /* 移除强制白色，让语法高亮颜色显示 */
+}
+
+/* highlight.js 语法高亮样式支持 - 让highlight.js的颜色能够正确显示 */
+#decrypted-content .astro-code code .hljs-comment,
+#decrypted-content .astro-code code .hljs-quote {
+  color: #7c7c7c !important;
+}
+
+#decrypted-content .astro-code code .hljs-variable,
+#decrypted-content .astro-code code .hljs-template-variable,
+#decrypted-content .astro-code code .hljs-tag,
+#decrypted-content .astro-code code .hljs-name,
+#decrypted-content .astro-code code .hljs-selector-id,
+#decrypted-content .astro-code code .hljs-selector-class,
+#decrypted-content .astro-code code .hljs-regexp,
+#decrypted-content .astro-code code .hljs-deletion {
+  color: #f92672 !important;
+}
+
+#decrypted-content .astro-code code .hljs-number,
+#decrypted-content .astro-code code .hljs-built_in,
+#decrypted-content .astro-code code .hljs-builtin-name,
+#decrypted-content .astro-code code .hljs-literal,
+#decrypted-content .astro-code code .hljs-type,
+#decrypted-content .astro-code code .hljs-params,
+#decrypted-content .astro-code code .hljs-meta,
+#decrypted-content .astro-code code .hljs-link {
+  color: #ae81ff !important;
+}
+
+#decrypted-content .astro-code code .hljs-attribute {
+  color: #a6e22e !important;
+}
+
+#decrypted-content .astro-code code .hljs-string,
+#decrypted-content .astro-code code .hljs-symbol,
+#decrypted-content .astro-code code .hljs-bullet,
+#decrypted-content .astro-code code .hljs-addition {
+  color: #e6db74 !important;
+}
+
+#decrypted-content .astro-code code .hljs-title,
+#decrypted-content .astro-code code .hljs-section {
+  color: #66d9ef !important;
+}
+
+#decrypted-content .astro-code code .hljs-keyword,
+#decrypted-content .astro-code code .hljs-selector-tag {
+  color: #f92672 !important;
+}
+
+/* 默认文本颜色 - 移除强制颜色，使用继承的颜色 */
+#decrypted-content .astro-code code {
+  color: inherit;
+}
+
+/* 确保语法高亮的span元素能够正确显示颜色 */
+#decrypted-content .astro-code code span[class*="hljs-"] {
+  /* 不覆盖颜色，让highlight.js的样式生效 */
+}
+
+/* 行号样式 - 与markdown.css保持一致 */
+#decrypted-content .astro-code code span.line:before {
+  @apply text-black/25 dark:text-white/25 mr-4 w-4 inline-block;
+  content: counter(line);
+  counter-increment: line;
+  direction: rtl;
+}
+
+/* 隐藏最后的空行 */
+#decrypted-content .astro-code code span.line:last-child:empty,
+#decrypted-content .astro-code code span.line:last-child:has(> span:empty:only-child) {
+  display: none;
+}
+
+/* 修复代码块内列表项标记颜色问题 */
+#decrypted-content .custom-md .expressive-code ul li::marker,
+#decrypted-content .custom-md .expressive-code ol li::marker {
+  @apply text-inherit;
+}
+
+/* 确保代码块选择样式正确 */
+#decrypted-content .astro-code ::selection {
+  @apply bg-[var(--codeblock-selection)];
+}

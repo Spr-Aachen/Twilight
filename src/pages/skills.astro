@@ -1,0 +1,388 @@
+---
+import { UNCATEGORIZED } from "../constants/constants";
+import {
+	getAdvancedSkills,
+	getSkillStats,
+	getSkillsByCategory,
+	getTotalExperience,
+	skillsData,
+} from "../data/skills";
+import I18nKey from "../i18n/i18nKey";
+import { i18n } from "../i18n/translation";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import IconifyLoader from "../components/misc/IconifyLoader.astro";
+import Icon from "../components/misc/Icon.astro";
+
+const { lang } = Astro.props;
+
+// 获取技能统计信息
+const stats = getSkillStats();
+const advancedSkills = getAdvancedSkills();
+const totalExperience = getTotalExperience();
+
+// 获取所有分类
+const categories = [...new Set(skillsData.map((skill) => skill.category))];
+
+// 按分类获取技能
+const skillsByCategory = categories.reduce(
+	(acc, category) => {
+		acc[category] = getSkillsByCategory(category);
+		return acc;
+	},
+	{} as Record<string, typeof skillsData>,
+);
+
+// 技能等级颜色映射
+const getLevelColor = (level: string) => {
+	switch (level) {
+		case "expert":
+			return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+		case "advanced":
+			return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
+		case "intermediate":
+			return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
+		case "beginner":
+			return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
+		default:
+			return "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400";
+	}
+};
+
+// 技能等级进度条宽度
+const getLevelWidth = (level: string) => {
+	switch (level) {
+		case "expert":
+			return "100%";
+		case "advanced":
+			return "80%";
+		case "intermediate":
+			return "60%";
+		case "beginner":
+			return "40%";
+		default:
+			return "20%";
+	}
+};
+
+// 获取分类的翻译文本
+const getCategoryText = (category: string) => {
+	switch (category) {
+		case "ai":
+			return i18n(I18nKey.skillsAI);
+		case "server":
+			return i18n(I18nKey.skillsServer);
+		case "client":
+			return i18n(I18nKey.skillsClient);
+		case "web":
+			return i18n(I18nKey.skillsWeb);
+		case "database":
+			return i18n(I18nKey.skillsDatabase);
+		case "tools":
+			return i18n(I18nKey.skillsTools);
+		case "others":
+			return i18n(I18nKey.skillsOthers);
+		case UNCATEGORIZED:
+			return i18n(I18nKey.uncategorized);
+		default:
+			return category;
+	}
+};
+
+const title = i18n(I18nKey.skills);
+const subtitle = i18n(I18nKey.skillsSubtitle);
+
+// 收集所有技能图标用于预加载
+const allIcons = skillsData.map((skill) => skill.icon).filter(Boolean);
+---
+
+<MainGridLayout title={title} description={subtitle}>
+  <!-- 图标加载器，预加载所有技能图标 -->
+  <IconifyLoader preloadIcons={allIcons} />
+  <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+    <div class="card-base z-10 px-9 py-6 relative w-full">
+      <!-- 页面标题 -->
+      <div class="flex flex-col items-start justify-center mb-8">
+        <h1 class="text-4xl font-bold text-black/90 dark:text-white/90 mb-2">
+          {i18n(I18nKey.skills)}
+        </h1>
+        <p class="text-lg text-black/60 dark:text-white/60">
+          {i18n(I18nKey.skillsSubtitle)}
+        </p>
+      </div>
+
+      <!-- 统计信息 -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg p-4">
+          <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.total}</div>
+          <div class="text-sm text-blue-600/70 dark:text-blue-400/70">{i18n(I18nKey.skillsTotal)}</div>
+        </div>
+        <div class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-lg p-4">
+          <div class="text-2xl font-bold text-red-600 dark:text-red-400">{stats.byLevel.expert}</div>
+          <div class="text-sm text-red-600/70 dark:text-red-400/70">{i18n(I18nKey.skillsExpert)}</div>
+        </div>
+        <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-lg p-4">
+          <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.byLevel.advanced}</div>
+          <div class="text-sm text-orange-600/70 dark:text-orange-400/70">{i18n(I18nKey.skillsAdvanced)}</div>
+        </div>
+        <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-4">
+          <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+            {totalExperience.years}{totalExperience.months > 0 ? `.${totalExperience.months}` : ''}
+          </div>
+          <div class="text-sm text-purple-600/70 dark:text-purple-400/70">{i18n(I18nKey.skillExperience)}</div>
+        </div>
+      </div>
+
+      <!-- 专业技能 -->
+      {advancedSkills.length > 0 && (
+        <div class="mb-8">
+          <h2 class="text-2xl font-bold text-black/90 dark:text-white/90 mb-4">
+            {i18n(I18nKey.skillsAdvancedTitle)}
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {advancedSkills.map((skill) => (
+              <div class="bg-white dark:bg-gray-800 rounded-lg border border-black/10 dark:border-white/10 p-6 hover:shadow-lg transition-shadow duration-300">
+                <div class="flex items-start gap-4">
+                  {skill.icon && (
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style={`background-color: ${skill.color || 'rgb(99 102 241)'}20`}>
+                      <Icon 
+                        icon={skill.icon} 
+                        class="text-2xl" 
+                        color={skill.color || 'rgb(99 102 241)'}
+                        fallback={skill.name.charAt(0)}
+                        loading="eager"
+                      />
+                    </div>
+                  )}
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-2">
+                      <h3 class="text-xl font-semibold text-black/90 dark:text-white/90">
+                        {skill.name}
+                      </h3>
+                      <span class={`px-2 py-1 text-xs rounded-full ${getLevelColor(skill.level)}`}>
+                        {i18n(skill.level === 'expert' ? I18nKey.skillsExpert :
+                              skill.level === 'advanced' ? I18nKey.skillsAdvanced :
+                              skill.level === 'intermediate' ? I18nKey.skillsIntermediate :
+                              I18nKey.skillsBeginner)}
+                      </span>
+                    </div>
+                    <p class="text-black/60 dark:text-white/60 mb-3 text-sm">
+                      {skill.description}
+                    </p>
+                    <div class="mb-3">
+                      <div class="flex justify-between text-sm mb-1">
+                        <span class="text-black/60 dark:text-white/60">{i18n(I18nKey.skillExperience)}</span>
+                        <span class="text-black/80 dark:text-white/80">
+                          {skill.experience.years}{i18n(I18nKey.skillYears)}{skill.experience.months > 0 ? ` ${skill.experience.months}${i18n(I18nKey.skillMonths)}` : ''}
+                        </span>
+                      </div>
+                      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div 
+                            class="h-2 rounded-full transition-all duration-300"
+                            style={`width: ${getLevelWidth(skill.level)}; background-color: ${skill.color || 'rgb(99 102 241)'}`}
+                          ></div>
+                      </div>
+                    </div>
+                    {skill.certifications && skill.certifications.length > 0 && (
+                      <div class="flex flex-wrap gap-1">
+                        {skill.certifications.map((cert) => (
+                          <span class="px-2 py-1 text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded">
+                            {cert}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- 按分类展示技能 -->
+      <div class="space-y-8">
+        {categories.map((category) => {
+          const categorySkills = skillsByCategory[category];
+          if (categorySkills.length === 0) return null;
+          
+          return (
+            <div>
+              <h2 class="text-2xl font-bold text-black/90 dark:text-white/90 mb-4">
+                {getCategoryText(category)}
+                <span class="text-lg font-normal text-black/60 dark:text-white/60 ml-2">
+                  ({categorySkills.length})
+                </span>
+              </h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {categorySkills.map((skill) => (
+                  <div class="bg-white dark:bg-gray-800 rounded-lg border border-black/10 dark:border-white/10 p-4 hover:shadow-lg transition-shadow duration-300">
+                    <div class="flex items-start gap-3">
+                      {skill.icon && (
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={`background-color: ${skill.color || 'rgb(99 102 241)'}20`}>
+                          <Icon 
+                            icon={skill.icon} 
+                            class="text-lg" 
+                            color={skill.color || 'rgb(99 102 241)'}
+                            fallback={skill.name.charAt(0)}
+                            loading="eager"
+                          />
+                        </div>
+                      )}
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between mb-1">
+                          <h3 class="text-lg font-semibold text-black/90 dark:text-white/90 truncate">
+                            {skill.name}
+                          </h3>
+                          <span class={`px-2 py-1 text-xs rounded-full shrink-0 ml-2 ${getLevelColor(skill.level)}`}>
+                            {i18n(skill.level === 'expert' ? I18nKey.skillsExpert :
+                                  skill.level === 'advanced' ? I18nKey.skillsAdvanced :
+                                  skill.level === 'intermediate' ? I18nKey.skillsIntermediate :
+                                  I18nKey.skillsBeginner)}
+                          </span>
+                        </div>
+                        <p class="text-black/60 dark:text-white/60 mb-2 text-sm line-clamp-2">
+                          {skill.description}
+                        </p>
+                        <div class="mb-2">
+                          <div class="flex justify-between text-xs mb-1">
+                            <span class="text-black/60 dark:text-white/60">{i18n(I18nKey.skillExperience)}</span>
+                            <span class="text-black/80 dark:text-white/80">
+                              {skill.experience.years}{i18n(I18nKey.skillYears)}{skill.experience.months > 0 ? ` ${skill.experience.months}${i18n(I18nKey.skillMonths)}` : ''}
+                            </span>
+                          </div>
+                          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                            <div 
+                              class="h-1.5 rounded-full transition-all duration-300"
+                              style={`width: ${getLevelWidth(skill.level)}; background-color: ${skill.color || 'rgb(99 102 241)'}`}
+                            ></div>
+                          </div>
+                        </div>
+                        {skill.projects && skill.projects.length > 0 && (
+                          <div class="text-xs text-black/60 dark:text-white/60">
+                            {i18n(I18nKey.skillsProjects)}: {skill.projects.length}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <!-- 技能分布图表 -->
+      <div class="mt-12 pt-8 border-t border-black/10 dark:border-white/10">
+        <h2 class="text-2xl font-bold text-black/90 dark:text-white/90 mb-6">
+          {i18n(I18nKey.skillsDistribution)}
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- 按等级分布 -->
+          <div>
+            <h3 class="text-lg font-semibold text-black/80 dark:text-white/80 mb-4">
+              {i18n(I18nKey.skillsByLevel)}
+            </h3>
+            <div class="space-y-3">
+              {Object.entries(stats.byLevel).map(([level, count]) => {
+                const percentage = Math.round((count / stats.total) * 100);
+                return (
+                  <div class="flex items-center gap-3">
+                    <div class="w-20 text-sm text-black/70 dark:text-white/70">
+                      {i18n(level === 'expert' ? I18nKey.skillsExpert :
+                            level === 'advanced' ? I18nKey.skillsAdvanced :
+                            level === 'intermediate' ? I18nKey.skillsIntermediate :
+                            I18nKey.skillsBeginner)}
+                    </div>
+                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div 
+                        class={`h-2 rounded-full transition-all duration-500 ${
+                          level === 'expert' ? 'bg-red-500' :
+                          level === 'advanced' ? 'bg-orange-500' :
+                          level === 'intermediate' ? 'bg-yellow-500' :
+                          'bg-green-500'
+                        }`}
+                        style={`width: ${percentage}%`}
+                      ></div>
+                    </div>
+                    <div class="w-12 text-sm text-black/70 dark:text-white/70 text-right">
+                      {count}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          
+          <!-- 按分类分布 -->
+          <div>
+            <h3 class="text-lg font-semibold text-black/80 dark:text-white/80 mb-4">
+              {i18n(I18nKey.skillsByCategory)}
+            </h3>
+            <div class="space-y-3">
+              {Object.entries(stats.byCategory).map(([category, count]) => {
+                const percentage = Math.round((count / stats.total) * 100);
+                return (
+                  <div class="flex items-center gap-3">
+                    <div class="w-20 text-sm text-black/70 dark:text-white/70 truncate">
+                      {getCategoryText(category)}
+                    </div>
+                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div 
+                        class="h-2 rounded-full bg-blue-500 transition-all duration-500"
+                        style={`width: ${percentage}%`}
+                      ></div>
+                    </div>
+                    <div class="w-12 text-sm text-black/70 dark:text-white/70 text-right">
+                      {count}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</MainGridLayout>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  // 确保图标库已加载，并处理页面导航
+  document.addEventListener('DOMContentLoaded', () => {
+    // 如果图标加载器存在，确保图标已加载
+    if (window.__iconifyLoader) {
+      window.__iconifyLoader.load().then(() => {
+        // 图标加载完成后，触发技能卡片的重新渲染
+        const skillCards = document.querySelectorAll('.skill-card');
+        skillCards.forEach(card => {
+          card.dispatchEvent(new CustomEvent('iconify-ready'));
+        });
+      }).catch(error => {
+        console.error('Failed to load icons on skills page:', error);
+      });
+    }
+  });
+
+  // 处理页面导航时的图标重新加载
+  if (typeof window !== 'undefined') {
+    // 监听页面显示事件（包括前进/后退导航）
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted && window.__iconifyLoader) {
+        // 页面从缓存恢复，重新检查图标状态
+        setTimeout(() => {
+          window.__iconifyLoader.load().catch(console.error);
+        }, 100);
+      }
+    });
+  }
+</script>
