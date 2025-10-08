@@ -1197,14 +1197,14 @@ const setup = () => {
 		setTimeout(() => {
 			if (document.getElementById('tcomment')) {
 				// 触发自定义事件，通知评论系统页面已完全加载
-				const pageLoadedEvent = new CustomEvent('mizuki:page:loaded', {
+				const pageLoadedEvent = new CustomEvent('twilight:page:loaded', {
 					detail: {
 						path: window.location.pathname,
 						timestamp: Date.now()
 					}
 				});
 				document.dispatchEvent(pageLoadedEvent);
-				console.log('Layout: 触发 mizuki:page:loaded 事件，路径:', window.location.pathname);
+				console.log('Layout: 触发 twilight:page:loaded 事件，路径:', window.location.pathname);
 			}
 		}, 300);
 	});
