@@ -4,27 +4,13 @@ import { profileConfig } from "../../config";
 import { url } from "../../utils/url-utils";
 import ImageWrapper from "../misc/ImageWrapper.astro";
 
-import { umamiConfig } from '../../config.ts';
+import { umamiConfig } from '../../config';
 
 // 解析 umami
-const umamiEnabled  = umamiConfig.enabled || false;
-const umamiShareURL = umamiConfig.shareURL || "";
-let umamiBaseUrl = "";
-let umamiShareId = "";
-if (umamiShareURL) {
-    try {
-        const u = new URL(umamiShareURL);
-        umamiBaseUrl = `${u.protocol}//${u.host}`;
-        const segments = u.pathname.split('/').filter(Boolean);
-        if (segments[0] === 'share' && segments.length >= 2) {
-            umamiShareId = segments[1];
-        } else {
-            umamiShareId = segments.pop() || '';
-        }
-    } catch {
-        console.warn("Invalid Umami shareURL");
-    }
-}
+const umamiEnabled = umamiConfig.enabled || false;
+const umamiWebsiteId = umamiConfig.scripts.match(/data-website-id="([^"]+)"/)?.[1] || "";
+const umamiApiKey = umamiConfig.apiKey || "";
+const umamiBaseUrl = umamiConfig.baseUrl || "";
 ---
 
 <div class="card-base p-3">
@@ -65,7 +51,7 @@ if (umamiShareURL) {
 </div>
 
 {umamiEnabled && (
-    <script define:vars={{ umamiBaseUrl, umamiShareId, umamiConfig }}>
+    <script define:vars={{ umamiBaseUrl, umamiApiKey, umamiWebsiteId, umamiConfig }}>
         // 客户端统计文案生成函数
         function generateStatsText(pageViews, visits) {
             return `浏览量 ${pageViews} · 访问次数 ${visits}`;
@@ -78,30 +64,12 @@ if (umamiShareURL) {
             }
             
             try {
-                // 调用全局工具获取 Umami 分享数据
-                const { websiteId, token } = await getUmamiShareData(umamiBaseUrl, umamiShareId);
+                // 调用全局工具获取 Umami 统计数据
+                const stats = await getUmamiWebsiteStats(umamiBaseUrl, umamiApiKey, umamiWebsiteId);
                 
-                // 第二步：获取统计数据
-                const currentTimestamp = Date.now();
-                const statsUrl = `${umamiBaseUrl}/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent('Asia/Shanghai')}&url=%2F&compare=false`;
-                
-                const statsResponse = await fetch(statsUrl, {
-                    headers: {
-                        'x-umami-share-token': token
-                    }
-                });
-                
-                if (!statsResponse.ok) {
-                    if (statsResponse.status === 401 && !isRetry) {
-                        clearUmamiShareCache();
-                        return fetchSiteStats(true);
-                    }
-                    throw new Error('获取统计数据失败');
-                }
-                
-                const statsData = await statsResponse.json();
-                const pageViews = statsData.pageviews?.value || 0;
-                const visits = statsData.visits?.value || 0;
+                // 从返回的数据中提取页面浏览量和访客数
+                const pageViews = stats.pageviews || 0;
+                const visits = stats.visits || 0;
                 
                 const displayElement = document.getElementById('site-stats-display');
                 if (displayElement) {

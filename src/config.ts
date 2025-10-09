@@ -497,9 +497,10 @@ export const widgetConfigs = {
 
 
 export const umamiConfig = {
-	enabled: false, // 是否显示Umami统计
-	shareURL: "https://us.umami.is/api/share/ABCD1234", //你的分享API,支持自建服务
+	enabled: true, // 是否显示Umami统计
+	apiKey: "api_aTjy44sBzBti04yP5o5fxHTNx9R9rPHL", // API密钥
+	baseUrl: "https://api.umami.is", // UmamiCloudAPI地址
 	scripts: `
-<script defer src="XXXX.XXX" data-website-id="ABCD1234"></script>
-  `.trim(), //上面填你要插入的Script,不用再去Layout中插入
+		<script defer src="https://cloud.umami.is/script.js" data-website-id="798a809d-3271-4a56-8d33-b55e68472f39"></script>
+	`.trim(), // 要插入的Script（不用再去Layout中插入）
 } as const;
