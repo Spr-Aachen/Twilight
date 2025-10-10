@@ -29,8 +29,8 @@ export const skillsData: Skill[] = [
 		category: "ai",
 		level: "intermediate",
 		experience: {years: 2, months: 6},
-		projects: ["Easy-Voice-Toolkit", "GPT-SoVITS", "Kohya-Trainer"],
-		color: "#F05032",
+		projects: ["Easy-Voice-Toolkit", "GPT-SoVITS", "Android-Screen-Defects-Detector", "Kohya-Trainer"],
+		color: "#EE4C2C",
 	},
 	{
 		id: "tensorflow",
@@ -42,7 +42,19 @@ export const skillsData: Skill[] = [
 		level: "beginner",
 		experience: {years: 0, months: 6},
 		projects: ["Android-Screen-Defects-Detector"],
-		color: "#FF9600",
+		color: "#FF6F00",
+	},
+	{
+		id: "colab",
+		name: "Colab",
+		description:
+			"A hosted Jupyter Notebook service that provides free access to computing resources.",
+		icon: "simple-icons:googlecolab",
+		category: "ai",
+		level: "advanced",
+		experience: {years: 3, months: 0},
+		projects: ["Easy-Voice-Toolkit", "GPT-SoVITS", "Kohya-Trainer"],
+		color: "#F9AB00",
 	},
 	// Server Skills
 	{
@@ -55,7 +67,7 @@ export const skillsData: Skill[] = [
 		level: "intermediate",
 		experience: {years: 1, months: 0},
 		projects: ["Easy-Voice-Toolkit", "LLM-PromptMaster"],
-		color: "#3776AB",
+		color: "#009688",
 	},
 	// Client Skills
 	{
@@ -68,7 +80,7 @@ export const skillsData: Skill[] = [
 		level: "advanced",
 		experience: {years: 2, months: 4},
 		projects: ["Easy-Voice-Toolkit", "LLM-PromptMaster", "Android-Screen-Defects-Detector"],
-		color: "#84da84",
+		color: "#41CD52",
 	},
 	{
 		id: "arkts",
@@ -93,7 +105,7 @@ export const skillsData: Skill[] = [
 		level: "beginner",
 		experience: {years: 0, months: 1},
 		projects: ["EasySite"],
-		color: "#9969cc",
+		color: "#BC52EE",
 	},
 	{
 		id: "tailwindcss",
@@ -166,7 +178,7 @@ export const skillsData: Skill[] = [
 		level: "intermediate",
 		experience: {years: 0, months: 9},
 		projects: ["MultiplayerMenuSystem", "BlasterProject"],
-		color: "#666666",
+		color: "#0E1128",
 	},
 	{
 		id: "blender",
@@ -178,7 +190,7 @@ export const skillsData: Skill[] = [
 		level: "intermediate",
 		experience: {years: 0, months: 9},
 		projects: ["MultiplayerMenuSystem", "BlasterProject"],
-		color: "#FF9600",
+		color: "#E87D0D",
 	},
 	// Others
 	{
