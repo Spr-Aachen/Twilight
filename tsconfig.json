@@ -9,6 +9,9 @@
 		"strictNullChecks": true,
 		"allowJs": false,
 		"declaration": true,
+		"resolveJsonModule": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
 		"plugins": [
 			{
 				"name": "@astrojs/ts-plugin"

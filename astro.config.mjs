@@ -1,11 +1,14 @@
+import { defineConfig } from "astro/config";
+import decapCmsOauth from "astro-decap-cms-oauth";
+import vercel from "@astrojs/vercel";
+import cloudflarePages from "@astrojs/cloudflare";
 import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
 import tailwind from "@astrojs/tailwind";
+import swup from "@swup/astro";
+import expressiveCode from "astro-expressive-code";
 import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
-import swup from "@swup/astro";
-import { defineConfig } from "astro/config";
-import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeComponents from "rehype-components"; /* Render the custom directive content */
@@ -28,12 +31,21 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 
 
 // https://astro.build/config
+// Choose adapter depending on deployment environment
+const adapter = process.env.CF_PAGES ? cloudflarePages() : vercel({ mode: "serverless" });
+
 export default defineConfig({
 	site: "https://twilight.spr-aachen.com",
 
 	base: "/",
 	trailingSlash: "always",
+	adapter: adapter,
 	integrations: [
+		decapCmsOauth({
+			decapCMSVersion: "3.3.3",
+			adminDisabled: false,
+			oauthDisabled: false,
+		}),
 		tailwind({
 			nesting: true,
 		}),
