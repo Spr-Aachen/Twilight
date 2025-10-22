@@ -49,14 +49,14 @@ const isBannerSrcObject = (
 	);
 };
 
-// 获取banner图片的辅助函数
+// 获取壁纸图片的辅助函数
 const getBannerImages = async () => {
-	let bannerSrc = siteConfig.banner.src;
+	let bannerSrc = siteConfig.wallpaper.src;
 
 	// 如果启用了图片API，获取API图片
-	if (siteConfig.banner.imageApi?.enable && siteConfig.banner.imageApi?.url) {
+	if (siteConfig.wallpaper.imageApi?.enable && siteConfig.wallpaper.imageApi?.url) {
 		try {
-			const response = await fetch(siteConfig.banner.imageApi.url);
+			const response = await fetch(siteConfig.wallpaper.imageApi.url);
 			const text = await response.text();
 			const apiImages = text.split("\n").filter((line) => line.trim());
 
@@ -103,23 +103,23 @@ const {
         series,
 } = Astro.props;
 const hasBannerCredit =
-	siteConfig.banner.enable && siteConfig.banner.credit.enable;
-const hasBannerLink = !!siteConfig.banner.credit.url;
+	siteConfig.wallpaper.mode === "banner" && siteConfig.wallpaper.banner?.credit?.enable;
+const hasBannerLink = !!siteConfig.wallpaper.banner?.credit?.url;
 
 // 检查是否为首页
 const isHomePage = Astro.url.pathname === "/" || Astro.url.pathname === "";
-const showHomeText = siteConfig.banner.homeText?.enable && isHomePage;
+const showHomeText = siteConfig.wallpaper.banner?.homeText?.enable && isHomePage;
 // 手机端非首页不显示banner的CSS类
 const mobileNonHomeBannerClass = !isHomePage ? "mobile-hide-banner" : "";
 
 // 计算主内容区域位置，考虑手机端非首页时banner被隐藏
-const mainPanelTop = siteConfig.banner.enable
+const mainPanelTop = siteConfig.wallpaper.mode === "banner"
 	? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
 	: "5.5rem";
 const mobileNonHomeMainTop = !isHomePage ? "5.5rem" : mainPanelTop;
 
 // 当banner被禁用时，主内容区域应该始终从顶栏下面开始
-const finalMainPanelTop = siteConfig.banner.enable ? mainPanelTop : "5.5rem";
+const finalMainPanelTop = siteConfig.wallpaper.mode === "banner" ? mainPanelTop : "5.5rem";
 
 // 检查侧边栏是否启用，动态调整网格布局
 // 全局启用状态
@@ -164,20 +164,20 @@ const mainContentClass = `
 	.replace(/\s+/g, " ");
 
 // 检查是否应该启用半透明效果
-const shouldEnableTransparency =
-	!siteConfig.banner.enable && fullscreenWallpaperConfig.enable;
+const shouldEnableTransparency = siteConfig.wallpaper.mode === "fullscreen";
 
 // 为组件添加半透明效果的CSS类
 const transparentClass = shouldEnableTransparency
 	? "wallpaper-transparent"
 	: "";
+
 ---
 
 <Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} postSlug={postSlug}>
 
-<!-- 全屏壁纸 - 仅在banner关闭且全屏壁纸启用时显示 -->
-{!siteConfig.banner.enable && fullscreenWallpaperConfig.enable && (
-	<FullscreenWallpaper config={fullscreenWallpaperConfig} />
+<!-- 全屏壁纸 - 仅在fullscreen模式时显示 -->
+{siteConfig.wallpaper.mode === "fullscreen" && (
+	<FullscreenWallpaper config={siteConfig.wallpaper} />
 )}
 
 <!-- 全局图标加载器 -->
@@ -199,7 +199,7 @@ const transparentClass = shouldEnableTransparency
 </div>
 
 <!-- Banner -->
-{siteConfig.banner.enable && <div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass}`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
+{siteConfig.wallpaper.mode === "banner" && <div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass}`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
     {(bannerImages.desktop && Array.isArray(bannerImages.desktop) && bannerImages.desktop.length > 1) || (bannerImages.mobile && Array.isArray(bannerImages.mobile) && bannerImages.mobile.length > 1) ? (
         <!-- Carousel mode for multiple images -->
         <div id="banner-carousel" class="relative h-full w-full">
@@ -228,7 +228,7 @@ const transparentClass = shouldEnableTransparency
                                     alt={`Mobile banner image ${index + 1}`} 
                                     class:list={["block lg:hidden object-cover h-full w-full transition-transform duration-500 ease-out"]}
                                     src={Array.isArray(bannerImages.mobile) ? bannerImages.mobile[index] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')} 
-                                    position={siteConfig.banner.position}
+                                    position={siteConfig.wallpaper.position}
                                 />
                             )}
                             <!-- Desktop: use desktop-specific images -->
@@ -237,7 +237,7 @@ const transparentClass = shouldEnableTransparency
                                     alt={`Desktop banner image ${index + 1}`} 
                                     class:list={["hidden lg:block object-cover h-full w-full transition-transform duration-500 ease-out"]}
                                     src={Array.isArray(bannerImages.desktop) ? bannerImages.desktop[index] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')} 
-                                    position={siteConfig.banner.position}
+                                    position={siteConfig.wallpaper.position}
                                 />
                             )}
                         </li>
@@ -253,7 +253,7 @@ const transparentClass = shouldEnableTransparency
                     alt="Mobile banner image of the blog" 
                     class:list={["block lg:hidden object-cover h-full w-full transition duration-700 opacity-100"]}
                     src={(Array.isArray(bannerImages.mobile) ? bannerImages.mobile[0] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')) || (Array.isArray(bannerImages.desktop) ? bannerImages.desktop[0] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')) || ''} 
-                    position={siteConfig.banner.position}
+                    position={siteConfig.wallpaper.position}
                 />
                 <!-- Desktop: use desktop-specific image -->
                 <ImageWrapper 
@@ -261,34 +261,34 @@ const transparentClass = shouldEnableTransparency
                     alt="Desktop banner image of the blog" 
                     class:list={["hidden lg:block object-cover h-full transition duration-700 opacity-100"]}
                     src={(Array.isArray(bannerImages.desktop) ? bannerImages.desktop[0] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')) || (Array.isArray(bannerImages.mobile) ? bannerImages.mobile[0] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')) || ''} 
-                    position={siteConfig.banner.position}
+                    position={siteConfig.wallpaper.position}
                 />
             </div>
     )}
     
     <!-- Home page text overlay -->
-    {siteConfig.banner.homeText?.enable && (
+    {siteConfig.wallpaper.banner?.homeText?.enable && (
         <div class={`banner-text-overlay absolute inset-0 z-20 flex items-center justify-center ${!showHomeText ? 'hidden' : ''}`}>
             <div class="w-4/5 lg:w-3/4 text-center mb-0">
                 <div class="flex flex-col">
-                    {siteConfig.banner.homeText?.title && (
+                    {siteConfig.wallpaper.banner?.homeText?.title && (
                         <h1 class="banner-title text-6xl lg:text-8xl text-white drop-shadow-lg mb-2 lg:mb-4">
-                            {siteConfig.banner.homeText.title}
+                            {siteConfig.wallpaper.banner.homeText.title}
                         </h1>
                     )}
-                    {siteConfig.banner.homeText?.subtitle && (
+                    {siteConfig.wallpaper.banner?.homeText?.subtitle && (
                         <h2 class="banner-subtitle text-xl lg:text-3xl text-white/90 drop-shadow-md">
-                            {siteConfig.banner.homeText.typewriter?.enable ? (
+                            {siteConfig.wallpaper.banner.homeText.typewriter?.enable ? (
                                 <TypewriterText 
-                                    text={siteConfig.banner.homeText.subtitle}
-                                    speed={siteConfig.banner.homeText.typewriter.speed}
-                                    deleteSpeed={siteConfig.banner.homeText.typewriter.deleteSpeed}
-                                    pauseTime={siteConfig.banner.homeText.typewriter.pauseTime}
+                                    text={siteConfig.wallpaper.banner.homeText.subtitle}
+                                    speed={siteConfig.wallpaper.banner.homeText.typewriter.speed}
+                                    deleteSpeed={siteConfig.wallpaper.banner.homeText.typewriter.deleteSpeed}
+                                    pauseTime={siteConfig.wallpaper.banner.homeText.typewriter.pauseTime}
                                 />
                             ) : (
-                                Array.isArray(siteConfig.banner.homeText.subtitle) 
-                                    ? siteConfig.banner.homeText.subtitle[0] 
-                                    : siteConfig.banner.homeText.subtitle
+                                Array.isArray(siteConfig.wallpaper.banner.homeText.subtitle) 
+                                    ? siteConfig.wallpaper.banner.homeText.subtitle[0] 
+                                    : siteConfig.wallpaper.banner.homeText.subtitle
                             )}
                         </h2>
                     )}
@@ -350,18 +350,18 @@ const transparentClass = shouldEnableTransparency
 </div>}
 
 <!-- Main content -->
-<div class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? 'mobile-main-no-banner' : ''} ${!siteConfig.banner.enable ? 'no-banner-layout' : ''} ${transparentClass}`} style={`top: ${finalMainPanelTop}`}>
+<div class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? 'mobile-main-no-banner' : ''} ${siteConfig.wallpaper.mode !== 'banner' ? 'no-banner-layout' : ''} ${transparentClass}`} style={`top: ${finalMainPanelTop}`}>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
         <div id="main-grid" class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!mobileShowSidebar ? 'mobile-no-sidebar' : ''}`}
         >
             <!-- Banner image credit -->
-            {hasBannerCredit && <a href={siteConfig.banner.credit.url} id="banner-credit" target="_blank" rel="noopener" aria-label="Visit image source"
+            {hasBannerCredit && <a href={siteConfig.wallpaper.banner?.credit?.url} id="banner-credit" target="_blank" rel="noopener" aria-label="Visit image source"
                                    class:list={["group onload-animation transition-all absolute flex justify-center items-center rounded-full " +
                                    "px-3 right-4 -top-[3.25rem] bg-black/60 hover:bg-black/70 h-9", {"hover:pr-9 active:bg-black/80": hasBannerLink}]}
             >
                 <Icon class="text-white/75 text-[1.25rem] mr-1" name="material-symbols:copyright-outline-rounded" ></Icon>
-                <div class="text-white/75 text-xs">{siteConfig.banner.credit.text}</div>
+                <div class="text-white/75 text-xs">{siteConfig.wallpaper.banner?.credit?.text}</div>
                 <Icon class:list={["transition absolute text-[oklch(0.75_0.14_var(--hue))] right-4 text-[0.75rem] opacity-0",
                     {"group-hover:opacity-100": hasBannerLink}]}
                       name="fa6-solid:arrow-up-right-from-square">
@@ -397,7 +397,7 @@ const transparentClass = shouldEnableTransparency
         <!-- TOC component -->
         {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden lg:block transition absolute top-0 w-[var(--toc-width)] items-center",
             sidebarLayoutConfig.position === "right" ? "-left-[var(--toc-width)]" : "-right-[var(--toc-width)]",
-            {"toc-hide": siteConfig.banner.enable}]}
+            {"toc-hide": siteConfig.wallpaper.mode === "banner"}]}
         >
             <div id="toc-inner-wrapper" class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar">
                 <div id="toc" class="w-full h-full transition-swup-fade ">       

@@ -50,14 +50,14 @@ const configHue = siteConfig.themeColor.hue;
 
 // 获取导航栏透明模式配置
 const navbarTransparentMode =
-	siteConfig.banner?.navbar?.transparentMode || "semi";
+	siteConfig.wallpaper.banner?.navbar?.transparentMode || "semi";
 // 判断是否应该显示顶部高光效果（只在full和semifull模式下显示）
 const shouldShowTopHighlight =
 	navbarTransparentMode === "full" || navbarTransparentMode === "semifull";
 
 // 获取默认banner图片的辅助函数
 const getDefaultBanner = (): string => {
-	const src = siteConfig.banner.src;
+	const src = siteConfig.wallpaper.src;
 	if (typeof src === "string") {
 		return src;
 	}
@@ -91,7 +91,7 @@ if (!banner || typeof banner !== "string" || banner.trim() === "") {
 // TODO don't use post cover as banner for now
 banner = getDefaultBanner();
 
-const enableBanner = siteConfig.banner.enable;
+const enableBanner = siteConfig.wallpaper.mode === "banner";
 
 let pageTitle: string;
 if (title) {
@@ -122,7 +122,7 @@ const bannerOffsetByPosition = {
 	bottom: "0",
 };
 const bannerOffset =
-	bannerOffsetByPosition[siteConfig.banner.position || "center"];
+	bannerOffsetByPosition[siteConfig.wallpaper.position || "center"];
 
 const umamiEnabled = umamiConfig.enabled || false;
 const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
@@ -821,7 +821,7 @@ function initCustomScrollbar() {
 }
 
 function showBanner() {
-	if (!siteConfig.banner.enable) return;
+	if (siteConfig.wallpaper.mode !== "banner") return;
 
 	// 使用requestAnimationFrame优化DOM操作
 	requestAnimationFrame(() => {
@@ -864,7 +864,7 @@ function initCarousel() {
 	});
 	
 	// Check if carousel is disabled but we have multiple images - show random image
-	if (validItems.length > 1 && !siteConfig.banner.carousel?.enable) {
+	if (validItems.length > 1 && !siteConfig.wallpaper.carousel?.enable) {
 		// Hide all images first
 		carouselItems.forEach((item, index) => {
 			item.classList.add('opacity-0', 'scale-110');
@@ -880,9 +880,9 @@ function initCarousel() {
 		return;
 	}
 	
-	if (validItems.length > 1 && siteConfig.banner.carousel?.enable) {
+	if (validItems.length > 1 && siteConfig.wallpaper.carousel?.enable) {
 		let currentIndex = 0;
-		const interval = siteConfig.banner.carousel?.interval || 6;
+		const interval = siteConfig.wallpaper.carousel?.interval || 6;
 		let carouselInterval;
 		let isPaused = false;
 

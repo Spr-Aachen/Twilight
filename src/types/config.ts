@@ -51,9 +51,11 @@ export type SiteConfig = {
 		userId?: string; // Bangumi用户ID
 	};
 
-
-	banner: {
-		enable: boolean;
+	// 壁纸模式配置：支持 fullscreen（全屏壁纸）、banner（横幅壁纸）、none（纯色背景）
+	wallpaper: {
+		mode: "fullscreen" | "banner" | "none"; // 壁纸显示模式
+		
+		// 壁纸图片源配置（fullscreen 和 banner 模式共享）
 		src:
 			| string
 			| string[]
@@ -61,33 +63,49 @@ export type SiteConfig = {
 					desktop?: string | string[];
 					mobile?: string | string[];
 			  }; // 支持单个图片、图片数组或分别设置桌面端和移动端图片
-		position?: "top" | "center" | "bottom";
+		
+		position?: "top" | "center" | "bottom"; // 壁纸位置，等同于 object-position
+		
+		// 轮播配置（fullscreen 和 banner 模式共享）
 		carousel?: {
 			enable: boolean; // 是否启用轮播
 			interval: number; // 轮播间隔时间（秒）
 		};
+		
+		// 图片 API 配置（fullscreen 和 banner 模式共享）
 		imageApi?: {
 			enable: boolean; // 是否启用图片API
 			url: string; // API地址，返回每行一个图片链接的文本
 		};
-		homeText?: {
-			enable: boolean; // 是否在首页显示自定义文字
-			title?: string; // 主标题
-			subtitle?: string | string[]; // 副标题，支持单个字符串或字符串数组
-			typewriter?: {
-				enable: boolean; // 是否启用打字机效果
-				speed: number; // 打字速度（毫秒）
-				deleteSpeed: number; // 删除速度（毫秒）
-				pauseTime: number; // 完整显示后的暂停时间（毫秒）
+		
+		// Banner 模式专属配置
+		banner?: {
+			homeText?: {
+				enable: boolean; // 是否在首页显示自定义文字
+				title?: string; // 主标题
+				subtitle?: string | string[]; // 副标题，支持单个字符串或字符串数组
+				typewriter?: {
+					enable: boolean; // 是否启用打字机效果
+					speed: number; // 打字速度（毫秒）
+					deleteSpeed: number; // 删除速度（毫秒）
+					pauseTime: number; // 完整显示后的暂停时间（毫秒）
+				};
+			};
+			credit?: {
+				enable: boolean;
+				text: string;
+				url?: string;
+			};
+			navbar?: {
+				transparentMode?: "semi" | "full" | "semifull"; // 导航栏透明模式
 			};
 		};
-		credit: {
-			enable: boolean;
-			text: string;
-			url?: string;
-		};
-		navbar?: {
-			transparentMode?: "semi" | "full" | "semifull"; // 导航栏透明模式
+		
+		// Fullscreen 模式专属配置
+		fullscreen?: {
+			zIndex?: number; // 层级，确保壁纸在背景层
+			opacity?: number; // 壁纸透明度，0-1之间
+			blur?: number; // 背景模糊程度，单位px
 		};
 	};
 	toc: {
@@ -287,23 +305,10 @@ export type ParticleConfig = {
 	zIndex: number; // 层级，确保粒子在合适的层级显示
 };
 
-export type FullscreenWallpaperConfig = {
-	enable: boolean; // 是否启用全屏壁纸功能
-	src:
-		| string
-		| string[]
-		| {
-				desktop?: string | string[];
-				mobile?: string | string[];
-			}; // 支持单个图片、图片数组或分别设置桌面端和移动端图片
-	position?: "top" | "center" | "bottom"; // 壁纸位置，等同于 object-position
-	carousel?: {
-		enable: boolean; // 是否启用轮播
-		interval: number; // 轮播间隔时间（秒）
-	};
-	zIndex?: number; // 层级，确保壁纸在合适的层级显示
-	opacity?: number; // 壁纸透明度，0-1之间
-	blur?: number; // 背景模糊程度，单位px
+// FullscreenWallpaperConfig 已废弃，现在集成到 SiteConfig.wallpaper 中
+// 为了向后兼容，保留类型别名
+export type FullscreenWallpaperConfig = SiteConfig["wallpaper"] & {
+	enable: boolean; // 已废弃：使用 wallpaper.mode 替代
 };
 
 /**

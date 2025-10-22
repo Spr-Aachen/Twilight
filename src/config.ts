@@ -43,28 +43,30 @@ export const siteConfig: SiteConfig = {
 	},
     defaultTheme: "dark", // "system" 跟随系统， "light" 浅色， "dark" 深色
 
-	banner: {
-		enable: true, // 是否启动Banner壁纸模式
+	// 壁纸配置：支持 fullscreen（全屏壁纸）、banner（横幅壁纸）、none（纯色背景）三种模式
+	wallpaper: {
+		mode: "banner", // 壁纸显示模式："banner" | "fullscreen" | "none"
 
+		// 壁纸图片源配置（fullscreen 和 banner 模式共享）
 		// 支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播
 		src: {
 			desktop: [
 				"/assets/desktop-banner/desktopBanner_1.webp",
-			], // 桌面横幅图片
+			], // 桌面壁纸图片
 			mobile: [
 				"/assets/mobile-banner/mobileBanner_1.webp",
-			], // 移动横幅图片
-		}, // 使用本地横幅图片
+			], // 移动壁纸图片
+		},
 
-		position: "center", // 等同于 object-position，仅支持 'top', 'center', 'bottom'。默认为 'center'
+		position: "center", // 壁纸位置，等同于 object-position，支持 'top', 'center', 'bottom'
 
+		// 轮播配置（fullscreen 和 banner 模式共享）
 		carousel: {
 			enable: true, // 为 true 时：为多张图片启用轮播。为 false 时：从数组中随机显示一张图片
-
 			interval: 3.3, // 轮播间隔时间（秒）
 		},
 
-		// PicFlow API支持(智能图片API)
+		// PicFlow API 支持（智能图片API，fullscreen 和 banner 模式共享）
 		imageApi: {
 			enable: false, // 启用图片API
 			url: "http://domain.com/api_v2.php?format=text&count=4", // API地址，返回每行一个图片链接的文本
@@ -73,30 +75,38 @@ export const siteConfig: SiteConfig = {
 		// 项目地址:https://github.com/matsuzaka-yuki/PicFlow-API
 		// 请自行搭建API
 
-		homeText: {
-			enable: true, // 在主页显示自定义文本
-			title: "Twilight", // 主页横幅主标题
-			subtitle: [
-				"Illuminate Our Paths",
-			],
-			typewriter: {
-				enable: true, // 启用副标题打字机效果
+		// Banner 模式专属配置
+		banner: {
+			homeText: {
+				enable: true, // 在主页显示自定义文本
+				title: "Twilight", // 主页横幅主标题
+				subtitle: [
+					"Illuminate Our Paths",
+				],
+				typewriter: {
+					enable: true, // 启用副标题打字机效果
+					speed: 111, // 打字速度（毫秒）
+					deleteSpeed: 51, // 删除速度（毫秒）
+					pauseTime: 3000, // 完全显示后的暂停时间（毫秒）
+				},
+			},
 
-				speed: 111, // 打字速度（毫秒）
-				deleteSpeed: 51, // 删除速度（毫秒）
-				pauseTime: 3000, // 完全显示后的暂停时间（毫秒）
+			credit: {
+				enable: false, // 显示横幅图片来源文本
+				text: "Describe", // 要显示的来源文本
+				url: "", // （可选）原始艺术品或艺术家页面的 URL 链接
+			},
+
+			navbar: {
+				transparentMode: "semifull", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
 			},
 		},
 
-		credit: {
-			enable: false, // 显示横幅图片来源文本
-
-			text: "Describe", // 要显示的来源文本
-			url: "", // （可选）原始艺术品或艺术家页面的 URL 链接
-		},
-
-		navbar: {
-			transparentMode: "semifull", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
+		// Fullscreen 模式专属配置
+		fullscreen: {
+			zIndex: -1, // 层级，确保壁纸在背景层
+			opacity: 0.9, // 壁纸透明度
+			blur: 1, // 背景模糊程度
 		},
 	},
 
@@ -134,17 +144,11 @@ export const siteConfig: SiteConfig = {
 };
 
 
+// fullscreenWallpaperConfig 已废弃，现在使用 siteConfig.wallpaper
+// 为了向后兼容，保留导出但使用新配置
 export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
-	enable: true, // 启用全屏壁纸功能,非Banner模式下生效
-	src: siteConfig.banner.src, // 使用本地横幅图片（默认与Banner相同）
-	position: "center", // 壁纸位置，等同于 object-position
-	carousel: {
-		enable: true, // 启用轮播
-		interval: 3.3, // 轮播间隔时间（秒）
-	},
-	zIndex: -1, // 层级，确保壁纸在背景层
-	opacity: 0.9, // 壁纸透明度
-	blur: 1, // 背景模糊程度
+	...siteConfig.wallpaper,
+	enable: siteConfig.wallpaper.mode === "fullscreen", // 兼容旧的 enable 属性
 };
 
 

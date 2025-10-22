@@ -1,17 +1,17 @@
 ---
 import { Image } from "astro:assets";
 import { siteConfig } from "../../config";
-import type { FullscreenWallpaperConfig } from "../../types/config";
+import type { SiteConfig } from "../../types/config";
 
 interface Props {
-	config: FullscreenWallpaperConfig;
+	config: SiteConfig["wallpaper"];
 	className?: string;
 }
 
 const { config, className } = Astro.props;
 
-// 如果全屏壁纸功能未启用，不渲染任何内容
-if (!config.enable) {
+// 如果不是fullscreen模式，不渲染任何内容
+if (config.mode !== "fullscreen") {
 	return null;
 }
 
@@ -20,14 +20,13 @@ if (!config.enable) {
 const getImageSources = async () => {
 	let srcConfig = config.src;
 
-	// 如果banner关闭且启用了图片API，使用API图片
+	// 如果启用了图片API，使用API图片
 	if (
-		!siteConfig.banner.enable &&
-		siteConfig.banner.imageApi?.enable &&
-		siteConfig.banner.imageApi?.url
+		siteConfig.wallpaper.imageApi?.enable &&
+		siteConfig.wallpaper.imageApi?.url
 	) {
 		try {
-			const response = await fetch(siteConfig.banner.imageApi.url);
+			const response = await fetch(siteConfig.wallpaper.imageApi.url);
 			const text = await response.text();
 			const apiImages = text.split("\n").filter((line) => line.trim());
 
@@ -73,7 +72,6 @@ const getImageSources = async () => {
 	};
 }
 
-
 const imageSources = await getImageSources();
 const hasDesktopImages = imageSources.desktop.length > 0;
 const hasMobileImages = imageSources.mobile.length > 0;
@@ -91,9 +89,9 @@ const carouselInterval = config.carousel?.interval || 5;
 
 // 样式相关
 const position = config.position || "center";
-const zIndex = config.zIndex || -1;
-const opacity = config.opacity || 0.8;
-const blur = config.blur || 0;
+const zIndex = config.fullscreen?.zIndex || -1;
+const opacity = config.fullscreen?.opacity || 0.8;
+const blur = config.fullscreen?.blur || 0;
 
 // 生成位置类名
 const getPositionClass = (pos: string) => {
