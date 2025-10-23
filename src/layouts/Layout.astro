@@ -26,6 +26,7 @@ import { umamiConfig } from '../config.ts';
 import "katex/dist/katex.css";
 import "../styles/mobile-navbar.css";
 import "../styles/wallpaper-navbar-transparent.css";
+import "../styles/banner-styles.css";
 
 interface Props {
 	title?: string;
@@ -84,9 +85,7 @@ const getDefaultBanner = (): string => {
 	return "";
 };
 
-if (!banner || typeof banner !== "string" || banner.trim() === "") {
-	banner = getDefaultBanner();
-}
+const carouselConfig = siteConfig.wallpaper.carousel || { enable: false, interval: 6 };
 
 // TODO don't use post cover as banner for now
 banner = getDefaultBanner();
@@ -232,20 +231,20 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 		  data-overlayscrollbars-initialize
 	>
 		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRX3XGVH" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-		
+
 		<!-- 页面顶部渐变高光效果 - 只在full和semifull模式下显示 -->
 		{shouldShowTopHighlight && <div class="top-gradient-highlight"></div>}
 		<ConfigCarrier></ConfigCarrier>
 		<slot />
-		
+
 		<!-- Music Player -->
 		<MusicPlayer client:load />
-		
+
 		<!-- Pio 看板娘组件 -->
 		<!-- 注意：Pio 组件需要放在 body 标签内，但要在其他内容之前 -->
 		<!-- 如果启用了侧边栏，可能需要调整 z-index -->
 		<Pio client:load />
-		
+
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
 		<div id="page-height-extend" class="hidden h-[300vh]"></div>
 
@@ -281,7 +280,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 						this.y = this.fn.y(this.y, this.y);
 						this.r = this.fn.r(this.r);
 						this.a = this.fn.a(this.a);
-						
+
 						// 如果粒子越界或完全透明，重新调整位置
 						if (
 							this.x > window.innerWidth ||
@@ -578,7 +577,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 					if (window.particleInitialized) {
 						return;
 					}
-					
+
 					// 初始化粒子特效的函数
 					const setupParticle = () => {
 						if (particleConfig.enable && !window.particleInitialized) {
@@ -586,7 +585,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 							window.particleInitialized = true;
 						}
 					};
-					
+
 					// 页面加载完成后初始化粒子特效
 					if (document.readyState === 'loading') {
 						document.addEventListener('DOMContentLoaded', setupParticle);
@@ -596,7 +595,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 				})();
 			</script>
 		)}
-		
+
 		<!-- Translate.js integration - lazy loading -->
 		{siteConfig.translate?.enable && (
 			<script>
@@ -610,7 +609,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 						window.translateScriptLoaded = true;
 						return Promise.resolve();
 					}
-					
+
 					return new Promise((resolve, reject) => {
 						const script = document.createElement('script');
 						script.src = '/translate.js';
@@ -665,7 +664,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 	.navbar-hidden {
 		@apply opacity-0 -translate-y-16
 	}
-	
+
 	/* Water waves animation */
 	.waves > .parallax use {
 		animation: wave 25s cubic-bezier(0.5, 0.5, 0.45, 0.5) infinite;
@@ -793,7 +792,7 @@ function initCustomScrollbar() {
 			scrollbar-width: thin;
 			scrollbar-color: rgba(0,0,0,0.3) transparent;
 		`;
-		
+
 		// 为webkit浏览器添加自定义滚动条样式
 		const style = document.createElement('style');
 		style.textContent = `
@@ -820,225 +819,40 @@ function initCustomScrollbar() {
 	});
 }
 
-function showBanner() {
-	if (siteConfig.wallpaper.mode !== "banner") return;
-
-	// 使用requestAnimationFrame优化DOM操作
-	requestAnimationFrame(() => {
-		// Handle single image banner (desktop)
-		const banner = document.getElementById('banner');
-		if (banner) {
-			banner.classList.remove('opacity-0', 'scale-105');
-		}
-
-		// Handle mobile single image banner - 使用与电脑端相同的逻辑
-		const mobileBanner = document.querySelector('.block.lg\\:hidden[alt="Mobile banner image of the blog"]');
-		if (mobileBanner && !document.getElementById('banner-carousel')) {
-			// 移动端使用与电脑端相同的初始化逻辑
-			mobileBanner.classList.remove('opacity-0', 'scale-105');
-			mobileBanner.classList.add('opacity-100');
-		}
-
-		// Handle carousel banner - 立即初始化，移除延迟
-		const carousel = document.getElementById('banner-carousel');
-		if (carousel) {
-			// 立即初始化轮播，移除延迟以改善流畅性
-			initCarousel();
-		}
-	});
-}
-
-function initCarousel() {
-	const carouselItems = document.querySelectorAll('.carousel-item');
-	
-	// 根据屏幕尺寸过滤有效的轮播项
-	const isMobile = window.innerWidth < 1024; // lg breakpoint
-	const validItems = Array.from(carouselItems).filter(item => {
-		if (isMobile) {
-			// 移动端：只显示有mobile图片的项目
-			return item.querySelector('.block.lg\\:hidden');
-		} else {
-			// 桌面端：只显示有desktop图片的项目
-			return item.querySelector('.hidden.lg\\:block');
-		}
-	});
-	
-	// Check if carousel is disabled but we have multiple images - show random image
-	if (validItems.length > 1 && !siteConfig.wallpaper.carousel?.enable) {
-		// Hide all images first
-		carouselItems.forEach((item, index) => {
-			item.classList.add('opacity-0', 'scale-110');
-			item.classList.remove('opacity-100', 'scale-100');
-		});
-		
-		// Show random valid image
-		const randomIndex = Math.floor(Math.random() * validItems.length);
-		const randomItem = validItems[randomIndex];
-		
-		randomItem.classList.add('opacity-100', 'scale-100');
-		randomItem.classList.remove('opacity-0', 'scale-110');
-		return;
-	}
-	
-	if (validItems.length > 1 && siteConfig.wallpaper.carousel?.enable) {
-		let currentIndex = 0;
-		const interval = siteConfig.wallpaper.carousel?.interval || 6;
-		let carouselInterval;
-		let isPaused = false;
-
-		// 移动端触摸手势支持
-		let startX = 0;
-		let startY = 0;
-		let isSwiping = false;
-		const carousel = document.getElementById('banner-carousel');
-
-		// 切换图片的函数 - 基于有效项目
-		function switchToSlide(index) {
-			// 隐藏当前图片
-			const currentItem = validItems[currentIndex];
-			currentItem.classList.remove('opacity-100', 'scale-100');
-			currentItem.classList.add('opacity-0', 'scale-110');
-
-			// 更新索引
-			currentIndex = index;
-			
-			// 显示新图片
-			const nextItem = validItems[currentIndex];
-			nextItem.classList.add('opacity-100', 'scale-100');
-			nextItem.classList.remove('opacity-0', 'scale-110');
-		}
-
-		// 初始化：隐藏所有图片，只显示第一张有效图片
-		carouselItems.forEach((item) => {
-			item.classList.add('opacity-0', 'scale-110');
-			item.classList.remove('opacity-100', 'scale-100');
-		});
-		
-		// 显示第一张有效图片
-		if (validItems.length > 0) {
-			validItems[0].classList.add('opacity-100', 'scale-100');
-			validItems[0].classList.remove('opacity-0', 'scale-110');
-		}
-
-		// 移动端触摸事件
-		if (carousel && 'ontouchstart' in window) {
-			carousel.addEventListener('touchstart', (e) => {
-				startX = e.touches[0].clientX;
-				startY = e.touches[0].clientY;
-				isSwiping = false;
-				isPaused = true;
-				clearInterval(carouselInterval);
-			}, { passive: true });
-
-			carousel.addEventListener('touchmove', (e) => {
-				if (!startX || !startY) return;
-				
-				const diffX = Math.abs(e.touches[0].clientX - startX);
-				const diffY = Math.abs(e.touches[0].clientY - startY);
-				
-				// 判断是否为水平滑动
-				if (diffX > diffY && diffX > 30) {
-					isSwiping = true;
-					e.preventDefault();
-				}
-			}, { passive: false });
-
-			carousel.addEventListener('touchend', (e) => {
-				if (!startX || !startY || !isSwiping) {
-					isPaused = false;
-					startCarousel();
-					return;
-				}
-				
-				const endX = e.changedTouches[0].clientX;
-				const diffX = startX - endX;
-				
-				// 滑动距离超过50px才切换
-				if (Math.abs(diffX) > 50) {
-					if (diffX > 0) {
-					// 向左滑动，显示下一张
-					const nextIndex = (currentIndex + 1) % validItems.length;
-					switchToSlide(nextIndex);
-				} else {
-					// 向右滑动，显示上一张
-					const prevIndex = (currentIndex - 1 + validItems.length) % validItems.length;
-					switchToSlide(prevIndex);
-				}
-				}
-				
-				startX = 0;
-				startY = 0;
-				isSwiping = false;
-				isPaused = false;
-				
-				// 重新开始自动轮播
-				startCarousel();
-			}, { passive: true });
-		}
-
-		// 开始轮播的函数
-		function startCarousel() {
-			clearInterval(carouselInterval);
-			carouselInterval = setInterval(() => {
-				if (!isPaused) {
-					const nextIndex = (currentIndex + 1) % validItems.length;
-					switchToSlide(nextIndex);
-				}
-			}, interval * 1000);
-		}
-
-		// 鼠标悬停暂停（桌面端）
-		if (carousel) {
-			carousel.addEventListener('mouseenter', () => {
-				isPaused = true;
-				clearInterval(carouselInterval);
-			});
-
-			carousel.addEventListener('mouseleave', () => {
-				isPaused = false;
-				startCarousel();
-			});
-		}
-
-		// 开始自动轮播
-		startCarousel();
-	}
-}
-
 function initTranslate() {
 	if (!siteConfig.translate?.enable || !window.translate || window.translateInitialized) return;
-	
+
 	// 配置translate.js
 	if (siteConfig.translate.service) {
 		window.translate.service.use(siteConfig.translate.service);
 	}
-	
+
 	if (siteConfig.translate.defaultLanguage) {
 		window.translate.language.setLocal(siteConfig.translate.defaultLanguage);
 	}
-	
+
 	if (siteConfig.translate.autoDiscriminate) {
 		window.translate.setAutoDiscriminateLocalLanguage();
 	}
-	
+
 	// 设置忽略的类名和标签
 	if (siteConfig.translate.ignoreClasses) {
 		siteConfig.translate.ignoreClasses.forEach(className => {
 			window.translate.ignore.class.push(className);
 		});
 	}
-	
+
 	if (siteConfig.translate.ignoreTags) {
 		siteConfig.translate.ignoreTags.forEach(tagName => {
 			window.translate.ignore.tag.push(tagName);
 		});
 	}
-	
+
 	// 不显示默认的select选择框
 	if (siteConfig.translate.showSelectTag === false) {
 		window.translate.selectLanguageTag.show = false;
 	}
-	
+
 	// 禁用自动保存翻译状态到localStorage
 	window.translate.storage.set = function() {
 		// 空函数，阻止保存状态
@@ -1049,7 +863,7 @@ function initTranslate() {
 
 	// 标记已初始化
 	window.translateInitialized = true;
-	
+
 	// 执行翻译初始化
 	window.translate.execute();
 }
@@ -1057,7 +871,7 @@ function initTranslate() {
 // 懒加载并初始化翻译功能
 async function loadAndInitTranslate() {
 	if (!siteConfig.translate?.enable) return;
-	
+
 	try {
 		await window.loadTranslateScript();
 		initTranslate();
@@ -1108,11 +922,11 @@ const setup = () => {
 	window.swup.hooks.on('content:replace', () => {
 		// 只处理新的katex元素的滚动条，使用原生CSS滚动条
 		initCustomScrollbar();
-		
+
 		// 检查当前页面是否为文章页面（有TOC元素）
 		const tocWrapper = document.getElementById('toc-wrapper');
 		const isArticlePage = tocWrapper !== null;
-		
+
 		// 只在文章页面重新初始化 TOC 组件
 		if (isArticlePage) {
 			const tocElement = document.querySelector('table-of-contents');
@@ -1121,7 +935,7 @@ const setup = () => {
 					(tocElement as any).init();
 				}, 100);
 			}
-			
+
 			// 重新初始化移动端 TOC 组件
 			if (typeof (window as any).mobileTOCInit === 'function') {
 				setTimeout(() => {
@@ -1129,7 +943,7 @@ const setup = () => {
 				}, 100);
 			}
 		}
-		
+
 		// 页面内容替换后重新执行翻译（仅在翻译已加载时）
 		if (siteConfig.translate?.enable && window.translateInitialized && window.translate) {
 			// 使用requestAnimationFrame优化性能，减少延迟
@@ -1137,12 +951,12 @@ const setup = () => {
 				window.translate.execute();
 			});
 		}
-		
+
 		// 重新初始化semifull模式的滚动检测
 		const navbar = document.getElementById('navbar')
 		if (navbar) {
 			const transparentMode = navbar.getAttribute('data-transparent-mode')
-			
+
 			if (transparentMode === 'semifull') {
 				// 重新调用初始化函数来重新绑定滚动事件
 				if (typeof (window as any).initSemifullScrollDetection === 'function') {
@@ -1155,7 +969,7 @@ const setup = () => {
 		// change banner height immediately when a link is clicked
 		const bodyElement = document.querySelector('body')
 		const isHomePage = pathsEqual(visit.to.url, url('/'))
-		
+
 		if (isHomePage) {
 			bodyElement!.classList.add('lg:is-home');
 		} else {
@@ -1176,7 +990,7 @@ const setup = () => {
 		const navbar = document.getElementById('navbar')
 		if (navbar) {
 			navbar.setAttribute('data-is-home', isHomePage.toString())
-			
+
 			// 重新初始化semifull模式的滚动检测
 			const transparentMode = navbar.getAttribute('data-transparent-mode')
 			if (transparentMode === 'semifull') {
@@ -1190,7 +1004,7 @@ const setup = () => {
 		// Control mobile banner visibility based on page with improved staging animation
 		const bannerWrapper = document.getElementById('banner-wrapper')
 		const mainContentWrapper = document.querySelector('.absolute.w-full.z-30')
-		
+
 		if (bannerWrapper && mainContentWrapper) {
 			if (isHomePage) {
 				// 首页：延迟移除隐藏类，让banner和内容优雅地出现
@@ -1228,13 +1042,13 @@ const setup = () => {
 		if (heightExtend) {
 			heightExtend.classList.remove('hidden')
 		}
-		
+
 		// 确保页面滚动到顶部，特别是移动端banner关闭时
 		window.scrollTo({
 			top: 0,
 			behavior: 'instant'
 		});
-		
+
 		// 检查当前页面是否为文章页面，如果是则触发自定义事件用于初始化评论系统
 		setTimeout(() => {
 			if (document.getElementById('tcomment')) {
@@ -1315,7 +1129,7 @@ function scrollFunction() {
 			const isHome = document.body.classList.contains('lg:is-home') && window.innerWidth >= 1024;
 			const currentBannerHeight = isHome ? BANNER_HEIGHT_HOME : BANNER_HEIGHT;
 			const threshold = window.innerHeight * (currentBannerHeight / 100) - 88;
-			
+
 			if (scrollTop >= threshold) {
 				navbar.classList.add('navbar-hidden')
 			} else {
@@ -1333,15 +1147,6 @@ window.onresize = () => {
 	let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
 	offset = offset - offset % 4;
 	document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
-}
-
-// 页面加载完成后初始化banner和轮播图
-if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', () => {
-		showBanner();
-	});
-} else {
-	showBanner();
 }
 
 </script>
@@ -1408,4 +1213,3 @@ if (window.swup) {
 	document.addEventListener("swup:enable", setup)
 }
 </script>
-
