@@ -37,6 +37,11 @@ export const ja: Translation = {
 	[Key.darkMode]: "ダーク",
 	[Key.systemMode]: "システム",
 
+	[Key.wallpaperMode]: "壁紙モード",
+	[Key.wallpaperFullscreen]: "全画面",
+	[Key.wallpaperBanner]: "バナー",
+	[Key.wallpaperNone]: "なし",
+
 	[Key.more]: "もっと",
 
 	[Key.author]: "著者",

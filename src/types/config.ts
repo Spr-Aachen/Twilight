@@ -1,4 +1,4 @@
-import type { SYSTEM_MODE, DARK_MODE, LIGHT_MODE } from "../constants/constants";
+import type { SYSTEM_MODE, DARK_MODE, LIGHT_MODE, WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "../constants/constants";
 
 export type SiteConfig = {
 	title: string;
@@ -182,6 +182,11 @@ export type LIGHT_DARK_MODE =
 	| typeof LIGHT_MODE
 	| typeof DARK_MODE
 	| typeof SYSTEM_MODE;
+
+export type WALLPAPER_MODE =
+	| typeof WALLPAPER_FULLSCREEN
+	| typeof WALLPAPER_BANNER
+	| typeof WALLPAPER_NONE;
 
 export type BlogPostData = {
 	body: string;

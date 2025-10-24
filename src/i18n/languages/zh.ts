@@ -37,6 +37,11 @@ export const zh: Translation = {
 	[Key.darkMode]: "暗色",
 	[Key.systemMode]: "跟随系统",
 
+	[Key.wallpaperMode]: "壁纸模式",
+	[Key.wallpaperFullscreen]: "全屏壁纸",
+	[Key.wallpaperBanner]: "横幅壁纸",
+	[Key.wallpaperNone]: "纯色背景",
+
 	[Key.more]: "更多",
 
 	[Key.author]: "作者",

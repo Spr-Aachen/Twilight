@@ -6,14 +6,12 @@ import type { SiteConfig } from "../../types/config";
 interface Props {
 	config: SiteConfig["wallpaper"];
 	className?: string;
+	class?: string; // Add class prop to support visibility control
 }
 
-const { config, className } = Astro.props;
+const { config, className, class: classProp } = Astro.props;
 
-// 如果不是fullscreen模式，不渲染任何内容
-if (config.mode !== "fullscreen") {
-	return null;
-}
+// Always render but use CSS classes for visibility control
 
 // 获取当前设备类型的图片源
 // 相应地，你需要修改 getImageSources 函数来处理新的类型
@@ -76,10 +74,7 @@ const imageSources = await getImageSources();
 const hasDesktopImages = imageSources.desktop.length > 0;
 const hasMobileImages = imageSources.mobile.length > 0;
 
-// 如果没有任何图片源，不渲染
-if (!hasDesktopImages && !hasMobileImages) {
-	return null;
-}
+// Always render but use CSS classes for visibility control
 
 // 轮播相关逻辑
 const isCarouselEnabled =
@@ -108,17 +103,17 @@ const getPositionClass = (pos: string) => {
 const positionClass = getPositionClass(position);
 ---
 
-<div 
+<div
 	class:list={[
 		"fixed inset-0 w-full h-full overflow-hidden pointer-events-none",
-		className
+		className,
+		classProp
 	]}
 	style={`z-index: ${zIndex}; opacity: ${opacity};`}
 	data-fullscreen-wallpaper
 >
 	<!-- 桌面端壁纸 -->
-	{hasDesktopImages && (
-		<div class="hidden lg:block w-full h-full relative">
+	<div class="hidden lg:block w-full h-full relative">
 			{imageSources.desktop.map((src, index) => {
 				const isLocal = !src.startsWith("http");
 				const imageClass = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${positionClass}`;
@@ -147,11 +142,9 @@ const positionClass = getPositionClass(position);
 				}
 			})}
 		</div>
-	)}
 
 	<!-- 移动端壁纸 -->
-	{hasMobileImages && (
-		<div class="block lg:hidden w-full h-full relative">
+	<div class="block lg:hidden w-full h-full relative">
 			{imageSources.mobile.map((src, index) => {
 				const isLocal = !src.startsWith("http");
 				const imageClass = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${positionClass}`;
@@ -180,10 +173,9 @@ const positionClass = getPositionClass(position);
 				}
 			})}
 		</div>
-	)}
 </div>
 
-{isCarouselEnabled && (
+{(isCarouselEnabled && (imageSources.desktop.length > 1 || imageSources.mobile.length > 1)) && (
 	<script define:vars={{ carouselInterval }}>
 		// 全屏壁纸轮播逻辑
 		function initFullscreenWallpaperCarousel() {
@@ -197,7 +189,7 @@ const positionClass = getPositionClass(position);
 				if (items.length <= 1) return;
 
 				let currentIndex = 0;
-				
+
 				// 初始化：显示第一张，隐藏其他
 				items.forEach((item, index) => {
 					item.style.opacity = index === 0 ? '1' : '0';
@@ -207,10 +199,10 @@ const positionClass = getPositionClass(position);
 				setInterval(() => {
 					// 隐藏当前图片
 					items[currentIndex].style.opacity = '0';
-					
+
 					// 切换到下一张
 					currentIndex = (currentIndex + 1) % items.length;
-					
+
 					// 显示下一张图片
 					items[currentIndex].style.opacity = '1';
 				}, carouselInterval * 1000);

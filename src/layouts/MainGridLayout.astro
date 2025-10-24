@@ -176,10 +176,8 @@ const transparentClass = shouldEnableTransparency
 
 <Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} postSlug={postSlug}>
 
-<!-- 全屏壁纸 - 仅在fullscreen模式时显示 -->
-{siteConfig.wallpaper.mode === "fullscreen" && (
-	<FullscreenWallpaper config={siteConfig.wallpaper} />
-)}
+<!-- 全屏壁纸 - 总是渲染但通过CSS控制可见性 -->
+<FullscreenWallpaper config={siteConfig.wallpaper} class={siteConfig.wallpaper.mode === "fullscreen" ? "" : "hidden"} />
 
 <!-- 全局图标加载器 -->
 <IconifyLoader />
@@ -199,16 +197,15 @@ const transparentClass = shouldEnableTransparency
     </div>
 </div>
 
-<!-- Banner - 使用 Banner 组件 -->
-{siteConfig.wallpaper.mode === "banner" && (
-	<Banner 
-		config={siteConfig.wallpaper} 
-		bannerImages={bannerImages}
-		isHomePage={isHomePage}
-		mobileNonHomeBannerClass={mobileNonHomeBannerClass}
-		carouselConfig={siteConfig.wallpaper.carousel}
-	/>
-)}
+<!-- Banner - 总是渲染但通过CSS控制可见性 -->
+<Banner
+	config={siteConfig.wallpaper}
+	bannerImages={bannerImages}
+	isHomePage={isHomePage}
+	mobileNonHomeBannerClass={mobileNonHomeBannerClass}
+	carouselConfig={siteConfig.wallpaper.carousel}
+	class={siteConfig.wallpaper.mode === "banner" ? "" : "hidden"}
+/>
 
 <!-- Main content -->
 <div class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? 'mobile-main-no-banner' : ''} ${siteConfig.wallpaper.mode !== 'banner' ? 'no-banner-layout' : ''} ${transparentClass}`} style={`top: ${finalMainPanelTop}`}>

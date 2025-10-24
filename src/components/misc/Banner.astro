@@ -18,9 +18,10 @@ interface Props {
 				enable?: boolean;
 				interval?: number;
 			};
+			class?: string;
 		}
 
-const { config, bannerImages, isHomePage, mobileNonHomeBannerClass, carouselConfig } = Astro.props;
+const { config, bannerImages, isHomePage, mobileNonHomeBannerClass, carouselConfig, class: className } = Astro.props;
 
 // 检查是否显示首页文本
 const showHomeText = config.banner?.homeText?.enable && isHomePage;
@@ -33,7 +34,7 @@ const hasBannerLink = !!config.banner?.credit?.url;
 <!-- Banner Wrapper -->
 <div 
 	id="banner-wrapper" 
-	class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass}`} 
+	class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass} ${className || ''}`} 
 	style={`top: -${BANNER_HEIGHT_EXTEND}vh`}
 >
 	{/* 检查是否为轮播模式 */}
