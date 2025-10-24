@@ -90,13 +90,11 @@ export const siteConfig: SiteConfig = {
 					pauseTime: 3000, // 完全显示后的暂停时间（毫秒）
 				},
 			},
-
 			credit: {
 				enable: false, // 显示横幅图片来源文本
 				text: "Describe", // 要显示的来源文本
 				url: "", // （可选）原始艺术品或艺术家页面的 URL 链接
 			},
-
 			navbar: {
 				transparentMode: "semifull", // 导航栏透明模式："semi" 半透明加圆角，"full" 完全透明，"semifull" 动态透明
 			},
@@ -107,6 +105,9 @@ export const siteConfig: SiteConfig = {
 			zIndex: -1, // 层级，确保壁纸在背景层
 			opacity: 0.9, // 壁纸透明度
 			blur: 1, // 背景模糊程度
+			navbar: {
+				transparentMode: "semi", // 导航栏透明模式：使用半透明模式而不是完全透明
+			},
 		},
 	},
 

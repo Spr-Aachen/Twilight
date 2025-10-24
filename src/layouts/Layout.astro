@@ -209,39 +209,13 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 			offset = offset - offset % 4;
 			document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
 
-			// Initialize wallpaper mode
-			const wallpaperMode = localStorage.getItem('wallpaperMode') || 'banner';
-			document.documentElement.setAttribute('data-wallpaper-mode', wallpaperMode);
-
-			// // Set initial visibility classes based on wallpaper mode
-			// setTimeout(() => {
-			// 	const bannerWrapper = document.getElementById('banner-wrapper');
-			// 	const fullscreenContainer = document.querySelector('[data-fullscreen-wallpaper]');
-
-			// 	if (wallpaperMode === 'banner') {
-			// 		if (bannerWrapper) {
-			// 			bannerWrapper.classList.remove('hidden');
-			// 		}
-			// 		if (fullscreenContainer) {
-			// 			fullscreenContainer.classList.add('hidden');
-			// 		}
-			// 	} else if (wallpaperMode === 'fullscreen') {
-			// 		if (bannerWrapper) {
-			// 			bannerWrapper.classList.add('hidden');
-			// 		}
-			// 		if (fullscreenContainer) {
-			// 			fullscreenContainer.classList.remove('hidden');
-			// 		}
-			// 	} else {
-			// 		// none mode
-			// 		if (bannerWrapper) {
-			// 			bannerWrapper.classList.add('hidden');
-			// 		}
-			// 		if (fullscreenContainer) {
-			// 			fullscreenContainer.classList.add('hidden');
-			// 		}
-			// 	}
-			// }, 100);
+			// Initialize wallpaper mode using the proper initialization function
+			setTimeout(() => {
+				// Import and call the proper wallpaper initialization
+				import('../utils/setting-utils').then(({ initWallpaperMode }) => {
+					initWallpaperMode();
+				});
+			}, 100);
 
 			// Banner carousel initialization function
 			window.initBannerCarousel = function() {

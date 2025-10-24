@@ -106,6 +106,9 @@ export type SiteConfig = {
 			zIndex?: number; // 层级，确保壁纸在背景层
 			opacity?: number; // 壁纸透明度，0-1之间
 			blur?: number; // 背景模糊程度，单位px
+			navbar?: {
+				transparentMode?: "semi" | "full" | "semifull"; // 导航栏透明模式
+			};
 		};
 	};
 	toc: {

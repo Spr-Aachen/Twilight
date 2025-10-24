@@ -165,7 +165,7 @@ const mainContentClass = `
 	.replace(/\s+/g, " ");
 
 // 检查是否应该启用半透明效果
-const shouldEnableTransparency = siteConfig.wallpaper.mode === "fullscreen";
+const shouldEnableTransparency = siteConfig.wallpaper.mode === "banner" || siteConfig.wallpaper.mode === "fullscreen";
 
 // 为组件添加半透明效果的CSS类
 const transparentClass = shouldEnableTransparency

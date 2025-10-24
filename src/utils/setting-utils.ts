@@ -239,17 +239,15 @@ function showBannerMode() {
 	adjustMainContentPosition('banner');
 
 	// 调整导航栏透明度
-	const navbar = document.getElementById('navbar-wrapper');
+	const navbar = document.getElementById('navbar');
 	if (navbar) {
-		// 获取导航栏透明模式配置
-		const transparentMode = (window as any).siteConfig?.wallpaper?.banner?.navbar?.transparentMode || 'semi';
-		navbar.classList.remove('navbar-transparent-semi', 'navbar-transparent-full', 'navbar-transparent-semifull');
-		if (transparentMode === 'semi') {
-			navbar.classList.add('navbar-transparent-semi');
-		} else if (transparentMode === 'full') {
-			navbar.classList.add('navbar-transparent-full');
-		} else if (transparentMode === 'semifull') {
-			navbar.classList.add('navbar-transparent-semifull');
+		// 获取导航栏透明模式配置（banner模式）
+		const transparentMode = siteConfig.wallpaper.banner?.navbar?.transparentMode || 'semi';
+		navbar.setAttribute('data-transparent-mode', transparentMode);
+
+		// 重新初始化半透明模式滚动检测（如果需要）
+		if (transparentMode === 'semifull' && typeof window.initSemifullScrollDetection === 'function') {
+			window.initSemifullScrollDetection();
 		}
 	}
 }
@@ -349,28 +347,27 @@ function hideAllWallpapers() {
  * @param {WALLPAPER_MODE} mode 壁纸模式
  */
 function updateNavbarTransparency(mode: WALLPAPER_MODE) {
-	const navbar = document.getElementById('navbar-wrapper');
+	const navbar = document.getElementById('navbar');
 	if (!navbar) return;
 
-	// 获取导航栏透明模式配置
-	const transparentMode = siteConfig.wallpaper.banner?.navbar?.transparentMode || 'semi';
+	// 根据当前壁纸模式获取透明模式配置
+	let transparentMode;
+	if (mode === WALLPAPER_FULLSCREEN) {
+		transparentMode = siteConfig.wallpaper.fullscreen?.navbar?.transparentMode || 'semi';
+	} else {
+		// banner 和 none 模式使用 banner 配置
+		transparentMode = siteConfig.wallpaper.banner?.navbar?.transparentMode || 'semi';
+	}
 
-	// 移除现有的透明模式类
+	// 更新导航栏的透明模式属性
+	navbar.setAttribute('data-transparent-mode', transparentMode);
+
+	// 移除现有的透明模式类（如果有的话）
 	navbar.classList.remove('navbar-transparent-semi', 'navbar-transparent-full', 'navbar-transparent-semifull');
 
-	// 根据模式和配置添加透明类
-	if (mode === WALLPAPER_BANNER || mode === WALLPAPER_FULLSCREEN) {
-		switch (transparentMode) {
-			case 'semi':
-				navbar.classList.add('navbar-transparent-semi');
-				break;
-			case 'full':
-				navbar.classList.add('navbar-transparent-full');
-				break;
-			case 'semifull':
-				navbar.classList.add('navbar-transparent-semifull');
-				break;
-		}
+	// 重新初始化半透明模式滚动检测（如果需要）
+	if (transparentMode === 'semifull' && typeof window.initSemifullScrollDetection === 'function') {
+		window.initSemifullScrollDetection();
 	}
 }
 
