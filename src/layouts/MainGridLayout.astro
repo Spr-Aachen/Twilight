@@ -229,7 +229,7 @@ const transparentClass = shouldEnableTransparency
             {(mobileShowSidebar || tabletShowSidebar || desktopShowSidebar) && <SideBar class={`${sidebarClass} ${transparentClass}`} headings={headings} series={ series }></SideBar>}
 
             <main id="swup-container" class={`${mainContentClass} transition-main`}>
-                <div id="content-wrapper" class="onload-animation transition-leaving">
+                <div id="content-wrapper" class="onload-animation transition-leaving px-3 md:px-0">
                     <!-- the overflow-hidden here prevent long text break the layout-->
                     <!-- make id different from windows.swup global property -->
                     <slot></slot>
