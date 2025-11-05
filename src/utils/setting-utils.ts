@@ -5,6 +5,8 @@ import {
 	WALLPAPER_FULLSCREEN,
 	WALLPAPER_BANNER,
 	WALLPAPER_NONE,
+	BANNER_HEIGHT,
+	MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
 } from "@constants/constants";
 import { siteConfig } from "@/config";
 import type { LIGHT_DARK_MODE, WALLPAPER_MODE } from "@/types/config";
@@ -14,6 +16,7 @@ declare global {
 	interface Window {
 		initBannerCarousel?: () => void;
 		initFullscreenWallpaperCarousel?: () => void;
+		initSemifullScrollDetection?: () => void;
 	}
 }
 
@@ -42,11 +45,11 @@ export function setHue(hue: number): void {
 
 
 export function applyThemeToDocument(theme: LIGHT_DARK_MODE) {
-    // 获取当前主题状态的完整信息
-    const currentIsDark = document.documentElement.classList.contains("dark");
-    const currentTheme = document.documentElement.getAttribute("data-theme");
+	// 获取当前主题状态的完整信息
+	const currentIsDark = document.documentElement.classList.contains("dark");
+	const currentTheme = document.documentElement.getAttribute("data-theme");
 
-    // 计算目标主题状态
+	// 计算目标主题状态
 	let targetIsDark: boolean;
 	switch (theme) {
 		case LIGHT_MODE:
@@ -63,12 +66,12 @@ export function applyThemeToDocument(theme: LIGHT_DARK_MODE) {
 			break;
 	}
 
-    // 检测是否真的需要主题切换：
-    // 1. dark类状态是否改变
-    // 2. expressiveCode主题是否需要更新
-    const needsThemeChange = currentIsDark !== targetIsDark;
-    const targetTheme = targetIsDark ? "github-dark" : "github-light";
-    const needsCodeThemeUpdate = currentTheme !== targetTheme;
+	// 检测是否真的需要主题切换：
+	// 1. dark类状态是否改变
+	// 2. expressiveCode主题是否需要更新
+	const needsThemeChange = currentIsDark !== targetIsDark;
+	const targetTheme = targetIsDark ? "github-dark" : "github-light";
+	const needsCodeThemeUpdate = currentTheme !== targetTheme;
 
 	// 如果既不需要主题切换也不需要代码主题更新，直接返回
 	if (!needsThemeChange && !needsCodeThemeUpdate) {
@@ -91,28 +94,28 @@ export function applyThemeToDocument(theme: LIGHT_DARK_MODE) {
 			}
 		}
 
-        // Set the theme for Expressive Code based on current mode
-        document.documentElement.setAttribute("data-theme", targetTheme);
+		// Set the theme for Expressive Code based on current mode
+		document.documentElement.setAttribute("data-theme", targetTheme);
 
-        // 在下一帧快速移除保护类，使用微任务确保DOM更新完成
+		// 在下一帧快速移除保护类，使用微任务确保DOM更新完成
 		if (needsThemeChange) {
 			// 使用 requestAnimationFrame 确保在下一帧移除过渡保护类
 			requestAnimationFrame(() => {
-                document.documentElement.classList.remove("is-theme-transitioning");
-            });
-        }
-    });
+				document.documentElement.classList.remove("is-theme-transitioning");
+			});
+		}
+	});
 }
 
 
 export function setTheme(theme: LIGHT_DARK_MODE): void {
-    localStorage.setItem("theme", theme);
-    applyThemeToDocument(theme);
+	localStorage.setItem("theme", theme);
+	applyThemeToDocument(theme);
 }
 
 
 export function getStoredTheme(): LIGHT_DARK_MODE {
-    return (localStorage.getItem("theme") as LIGHT_DARK_MODE) || siteConfig.defaultTheme;
+	return (localStorage.getItem("theme") as LIGHT_DARK_MODE) || siteConfig.defaultTheme;
 }
 
 
@@ -182,9 +185,25 @@ function showBannerMode() {
 	// 显示banner壁纸（通过CSS类控制）
 	const bannerWrapper = document.getElementById('banner-wrapper');
 	if (bannerWrapper) {
-		bannerWrapper.classList.remove('hidden');
-		bannerWrapper.classList.remove('opacity-0');
-		bannerWrapper.classList.add('opacity-100');
+		// 首页或桌面端正常显示banner，否则保持banner隐藏
+		const isMobile = window.innerWidth < 1024;
+		const isHome = location.pathname === '/' || location.pathname === '';
+		const mainContentWrapper = document.querySelector('.absolute.w-full.z-30') as HTMLElement | null;
+		if (!(isMobile && !isHome)) {
+			bannerWrapper.classList.remove('hidden');
+			bannerWrapper.classList.remove('opacity-0');
+			bannerWrapper.classList.add('opacity-100');
+			bannerWrapper.classList.remove('mobile-hide-banner');
+			if (mainContentWrapper) {
+				mainContentWrapper.classList.remove('mobile-main-no-banner');
+			}
+		} else {
+			bannerWrapper.classList.add('mobile-hide-banner');
+			if (mainContentWrapper) {
+				mainContentWrapper.classList.add('mobile-main-no-banner');
+				mainContentWrapper.style.top = '5.5rem';
+			}
+		}
 
 		// 重新初始化轮播
 		const carousel = document.getElementById('banner-carousel');
@@ -380,8 +399,17 @@ function adjustMainContentPosition(mode: WALLPAPER_MODE | 'banner' | 'none' | 'f
 
 	switch (mode) {
 		case 'banner':
-			// Banner模式：主内容在banner下方
-			mainContent.style.top = 'calc(var(--banner-height) - 3rem)';
+			// Banner模式：桌面端主内容在banner下方，其他情况下不预留banner空间
+			const isMobile = window.innerWidth < 1024;
+			const isHome = location.pathname === '/' || location.pathname === '';
+			const bannerWrapper = document.getElementById('banner-wrapper');
+			const bannerHiddenForMobile = isMobile && !isHome || (bannerWrapper?.classList.contains('mobile-hide-banner') ?? false); // 若banner被隐藏（移动端非首页），则视为无banner布局
+			if (!bannerHiddenForMobile) {
+				mainContent.style.top = `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`;
+			} else {
+				mainContent.classList.add('mobile-main-no-banner');
+				mainContent.style.top = '5.5rem';
+			}
 			break;
 		case 'fullscreen':
 			// Fullscreen模式：使用紧凑布局，主内容从导航栏下方开始
