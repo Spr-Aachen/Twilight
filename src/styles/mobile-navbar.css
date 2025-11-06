@@ -470,8 +470,25 @@
 }
 
 /* 响应式按钮布局优化 */
+/* 小屏幕优化 - 减少按钮间距 */
+@media (min-width: 361px) and (max-width: 480px) {
+    #navbar-buttons {
+        gap: 0.123rem !important;
+    }
+    /* Only size direct button children; do not affect nested buttons inside panels */
+    #navbar-buttons > button {
+        width: 2.4rem !important;
+        height: 2.4rem !important;
+        padding: 0 !important;
+    }
+    /* Hide home button text (keep icon) */
+    #navbar > div > a:first-child > div {
+        font-size: 0 !important;
+    }
+}
+
 /* 超小屏幕优化 - 只显示菜单按钮 */
-@media (max-width: 359px) {
+@media (max-width: 360px) {
     #navbar-buttons {
         gap: 0 !important;
         justify-content: flex-end !important;
@@ -486,19 +503,5 @@
         width: 2.75rem !important;
         height: 2.75rem !important;
         margin-left: auto !important;
-    }
-}
-
-/* 超小屏幕优化 - 进一步减少按钮间距 */
-@media (min-width: 360px) and (max-width: 480px) {
-    #navbar-buttons {
-        gap: 0.125rem !important;
-    }
-
-    #navbar-buttons button,
-    #navbar-buttons > * {
-        width: 2.5rem !important;
-        height: 2.5rem !important;
-        padding: 0 !important;
     }
 }
