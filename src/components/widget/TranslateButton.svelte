@@ -124,12 +124,12 @@ onDestroy(() => {
         <div class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
             {#each languages as lang}
                 <button
-                    class="btn-plain flex items-center gap-3 p-2 rounded-lg transition-colors text-left w-full"
+                    class="btn-plain flex items-center gap-3 p-2 rounded-lg transition-colors w-full"
                     class:current-theme-btn={currentLanguage === lang.code}
                     on:click={() => changeLanguage(lang.code)}
                 >
                     <span class="text-lg transition">{lang.icon}</span>
-                    <span class="text-sm transition">{lang.name}</span>
+                    <span class="text-sm transition flex-grow text-left">{lang.name}</span>
                     {#if currentLanguage === lang.code}
                         <span class="ml-auto">✓</span>
                     {/if}
