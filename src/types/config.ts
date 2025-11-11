@@ -99,6 +99,9 @@ export type SiteConfig = {
 			navbar?: {
 				transparentMode?: "semi" | "full" | "semifull"; // 导航栏透明模式
 			};
+			waves?: {
+				enable: boolean; // 是否启用水波纹效果
+			};
 		};
 		
 		// Fullscreen 模式专属配置
