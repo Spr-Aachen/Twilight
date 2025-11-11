@@ -452,6 +452,20 @@
 /* ================================
    水波纹显示优化
    ================================ */
+
+.waves > .parallax use {
+    animation: wave 25s cubic-bezier(0.5, 0.5, 0.45, 0.5) infinite;
+}
+
+@keyframes wave {
+    0% {
+        transform: translate3d(-90px, 0, 0);
+    }
+    100% {
+        transform: translate3d(85px, 0, 0);
+    }
+}
+
 .waves {
     /* 确保水波纹完整显示 */
     overflow: visible;
