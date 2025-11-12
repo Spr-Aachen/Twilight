@@ -453,47 +453,7 @@
    水波纹显示优化
    ================================ */
 
-.waves > .parallax use {
-    animation: wave 25s cubic-bezier(0.5, 0.5, 0.45, 0.5) infinite;
-}
-
-@keyframes wave {
-    0% {
-        transform: translate3d(-90px, 0, 0);
-    }
-    100% {
-        transform: translate3d(85px, 0, 0);
-    }
-}
-
-.waves {
-    /* 确保水波纹完整显示 */
-    overflow: visible;
-    z-index: 5;
-    /* 硬件加速，确保与背景同步渲染 */
-    transform: translateZ(0);
-    will-change: transform;
-    /* 确保与页面背景在同一合成层 */
-    contain: layout style paint;
-}
-
-.waves svg {
-    /* 确保SVG完整渲染 */
-    width: 100%;
-    height: 100%;
-    display: block;
-    /* SVG硬件加速 */
-    transform: translateZ(0);
-    backface-visibility: hidden;
-}
-
-/* 波浪填充色主题切换优化 */
-.waves use {
-    /* 确保填充色与页面背景同步更新 */
-    will-change: fill;
-}
-
-/* 波浪与背景同步切换优化 - 解决交界线闪烁 */
+/* 波浪与背景同步切换优化 */
 #header-waves {
     /* 确保波浪容器与页面背景在同一合成层 */
     isolation: isolate;
@@ -501,6 +461,54 @@
     contain: layout style paint;
     /* 精确对齐 */
     margin-bottom: -1px;
+}
+
+/* 统一波浪动画 */
+#header-waves .parallax use {
+    animation-name: wave;
+    animation-duration: 25s;
+    animation-timing-function: cubic-bezier(0.5, 0.5, 0.45, 0.5);
+    animation-iteration-count: infinite;
+}
+
+/* 分层动画时序（替代内联 style） */
+#header-waves .parallax use:nth-child(1) {
+    animation-duration: 7s;
+    animation-delay: -2s;
+}
+#header-waves .parallax use:nth-child(2) {
+    animation-duration: 10s;
+    animation-delay: -3s;
+}
+#header-waves .parallax use:nth-child(3) {
+    animation-duration: 13s;
+    animation-delay: -4s;
+}
+#header-waves .parallax use:nth-child(4) {
+    animation-duration: 20s;
+    animation-delay: -5s;
+}
+
+#header-waves .waves {
+    /* 确保SVG完整渲染（svg 本身即为 .waves） */
+    width: 100%;
+    height: 100%;
+    display: block;
+    /* 确保水波纹完整显示 */
+    overflow: visible;
+    z-index: 5;
+    /* 硬件加速，确保与背景同步渲染 */
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    /* 确保与页面背景在同一合成层 */
+    contain: layout style paint;
+}
+
+/* 波浪填充色主题切换优化 */
+#header-waves .waves use {
+    /* 确保填充色与页面背景同步更新 */
+    will-change: fill;
 }
 
 /* 主题切换时的额外保护 */
@@ -531,24 +539,18 @@
         transition: transform 0.25s ease-in, opacity 0.15s ease-in;
     }
     
-    .waves svg {
+    #header-waves .waves {
         /* 移动端SVG优化 */
         min-height: 60px;
     }
-    
-    /* 确保水波纹在banner底部正确定位 */
-    .waves {
-        bottom: -1px !important;
-        position: absolute !important;
-    }
 }
 
-/* 超小屏幕水波纹优化 */
-@media (max-width: 360px) {
-    .waves {
-        height: 6vh !important;
-        min-height: 50px !important;
-        max-height: 70px !important;
+@keyframes wave {
+    0% {
+        transform: translate3d(-90px, 0, 0);
+    }
+    100% {
+        transform: translate3d(85px, 0, 0);
     }
 }
 
