@@ -73,13 +73,6 @@
         line-height: 1.3 !important;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
     }
-    
-    /* 波浪效果高度调整 */
-    .waves {
-        height: 8vh !important;
-        min-height: 60px !important;
-        max-height: 80px !important;
-    }
 }
 
 /* ================================
@@ -123,13 +116,6 @@
         line-height: 1.4 !important;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
     }
-    
-    /* 波浪效果高度调整 */
-    .waves {
-        height: 10vh !important;
-        min-height: 70px !important;
-        max-height: 100px !important;
-    }
 }
 
 /* ================================
@@ -171,13 +157,6 @@
         font-size: 1.5rem !important;
         line-height: 1.4 !important;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
-    }
-    
-    /* 波浪效果高度调整 */
-    .waves {
-        height: 12vh !important;
-        min-height: 80px !important;
-        max-height: 120px !important;
     }
 }
 
@@ -226,13 +205,6 @@
     /* 确保轮播容器有正确的overflow设置 */
     #banner-carousel {
         overflow: hidden !important;
-    }
-    
-    /* 波浪效果恢复默认 */
-    .waves {
-        height: 15vh !important;
-        min-height: 80px !important;
-        max-height: 150px !important;
     }
 }
 
@@ -583,11 +555,6 @@
         line-height: 1.2 !important;
     }
     
-    .waves {
-        height: 5vh !important;
-        min-height: 40px !important;
-        max-height: 50px !important;
-    }
 }
 
 /* 小高度屏幕 (高度 501px - 600px) */
@@ -613,12 +580,6 @@
     .banner-subtitle {
         font-size: 1rem !important;
         line-height: 1.3 !important;
-    }
-    
-    .waves {
-        height: 6vh !important;
-        min-height: 50px !important;
-        max-height: 60px !important;
     }
 }
 
@@ -646,12 +607,6 @@
         font-size: 1.125rem !important;
         line-height: 1.4 !important;
     }
-    
-    .waves {
-        height: 8vh !important;
-        min-height: 60px !important;
-        max-height: 80px !important;
-    }
 }
 
 /* 横屏模式特殊处理 - 优先显示banner */
@@ -677,11 +632,5 @@
     .banner-subtitle {
         font-size: 1rem !important;
         line-height: 1.2 !important;
-    }
-    
-    .waves {
-        height: 4vh !important;
-        min-height: 30px !important;
-        max-height: 40px !important;
     }
 }
