@@ -6,7 +6,7 @@ import "@fontsource/roboto/700.css";
 import ConfigCarrier from "@components/ConfigCarrier.astro";
 import MusicPlayer from "@components/widget/MusicPlayer.svelte";
 import Pio from "@components/widget/Pio.svelte"; // 使用 Svelte 版本的 Pio 组件
-import { profileConfig, siteConfig } from "@/config";
+import { profileConfig, siteConfig, musicPlayerConfig, pioConfig } from "@/config";
 import { widgetConfigs } from "../config";
 import {
 	BANNER_HEIGHT,
@@ -27,6 +27,7 @@ import "katex/dist/katex.css";
 import "../styles/navbar.css";
 import "../styles/wallpaper-navbar-transparent.css";
 import "../styles/banner.css";
+
 
 interface Props {
 	title?: string;
@@ -340,15 +341,15 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 
 		<slot name="head"></slot>
 
-		<!-- Pio 看板娘样式 -->
-		<link rel="stylesheet" href="/pio/static/pio.css" />
+		<!-- Pio 看板娘样式 - 仅在启用时加载 -->
+		{pioConfig.enable && <link rel="stylesheet" href="/pio/static/pio.css" />}
 
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 
 		<!-- Umami Analytics -->
 		{umamiEnabled && umamiScripts && <Fragment set:html={umamiScripts} />}
-
 </head>
+
 	<body class=" min-h-screen " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner, "zen-maru-gothic-enabled": siteConfig.font.zenMaruGothic.enable, "hanalei-enabled": siteConfig.font.hanalei.enable}]}
 		  data-overlayscrollbars-initialize
 	>
@@ -359,13 +360,13 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 		<ConfigCarrier></ConfigCarrier>
 		<slot />
 
-		<!-- Music Player -->
-		<MusicPlayer client:load />
+		<!-- Music Player - 仅在启用时加载 -->
+		{musicPlayerConfig.enable && <MusicPlayer client:load />}
 
 		<!-- Pio 看板娘组件 -->
 		<!-- 注意：Pio 组件需要放在 body 标签内，但要在其他内容之前 -->
 		<!-- 如果启用了侧边栏，可能需要调整 z-index -->
-		<Pio client:load />
+		{pioConfig.enable && <Pio client:load />}
 
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
 		<div id="page-height-extend" class="hidden h-[300vh]"></div>
