@@ -105,6 +105,7 @@ export const siteConfig: SiteConfig = {
 			},
 			waves: {
 				enable: true, // 启用水波纹效果
+				performanceMode: true, // 启用性能模式（简化波浪效果以提升性能）
 			},
 		},
 

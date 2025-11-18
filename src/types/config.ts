@@ -104,6 +104,7 @@ export type SiteConfig = {
 			};
 			waves?: {
 				enable: boolean; // 是否启用水波纹效果
+				performanceMode?: boolean; // 是否启用性能模式（简化波浪效果以提升性能）
 			};
 		};
 		
