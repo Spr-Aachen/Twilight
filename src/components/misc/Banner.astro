@@ -1,25 +1,23 @@
 ---
-import { Icon } from "astro-icon/components";
 import ImageWrapper from "./ImageWrapper.astro";
 import TypewriterText from "../TypewriterText.astro";
-import { siteConfig } from "../../config";
 import { BANNER_HEIGHT_EXTEND } from "../../constants/constants";
 import type { SiteConfig } from "../../types/config";
 
 interface Props {
-			config: SiteConfig["wallpaper"];
-			bannerImages: {
-				desktop: string | string[];
-				mobile: string | string[];
-			};
-			isHomePage: boolean;
-			mobileNonHomeBannerClass: string;
-			carouselConfig?: {
-				enable?: boolean;
-				interval?: number;
-			};
-			class?: string;
-		}
+	config: SiteConfig["wallpaper"];
+	bannerImages: {
+		desktop: string | string[];
+		mobile: string | string[];
+	};
+	isHomePage: boolean;
+	mobileNonHomeBannerClass: string;
+	carouselConfig?: {
+		enable?: boolean;
+		interval?: number;
+	};
+	class?: string;
+}
 
 const { config, bannerImages, isHomePage, mobileNonHomeBannerClass, carouselConfig, class: className } = Astro.props;
 
@@ -178,30 +176,30 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
 					) : (
 						// 正常模式：渲染四个波浪层
 						<>
-					<use
-						xlink:href="#gentle-wave"
-						x="48"
-						y="0"
-						class="opacity-25 fill-[var(--page-bg)]"
-					></use>
-					<use
-						xlink:href="#gentle-wave"
-						x="48"
-						y="3"
-						class="opacity-50 fill-[var(--page-bg)]"
-					></use>
-					<use
-						xlink:href="#gentle-wave"
-						x="48"
-						y="5"
-						class="opacity-75 fill-[var(--page-bg)]"
-					></use>
-					<use
-						xlink:href="#gentle-wave"
-						x="48"
-						y="7"
-						class="fill-[var(--page-bg)]"
-					></use>
+							<use
+								xlink:href="#gentle-wave"
+								x="48"
+								y="0"
+								class="opacity-25 fill-[var(--page-bg)]"
+							></use>
+							<use
+								xlink:href="#gentle-wave"
+								x="48"
+								y="3"
+								class="opacity-50 fill-[var(--page-bg)]"
+							></use>
+							<use
+								xlink:href="#gentle-wave"
+								x="48"
+								y="5"
+								class="opacity-75 fill-[var(--page-bg)]"
+							></use>
+							<use
+								xlink:href="#gentle-wave"
+								x="48"
+								y="7"
+								class="fill-[var(--page-bg)]"
+							></use>
 						</>
 					)}
 				</g>
