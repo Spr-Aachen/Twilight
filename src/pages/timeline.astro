@@ -174,8 +174,11 @@ const subtitle = i18n(I18nKey.timelineSubtitle);
                             href={link.url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            class="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium"
+                            class="inline-flex items-center px-3 py-1.5 rounded-md border border-[var(--primary)] text-[var(--primary)] bg-[color-mix(in_oklch,_var(--primary)_8%,_transparent)] hover:bg-[color-mix(in_oklch,_var(--primary)_14%,_transparent)] active:bg-[color-mix(in_oklch,_var(--primary)_20%,_transparent)] text-sm font-medium"
                           >
+                            {link.type === 'certificate' && '🏆'}
+                            {link.type === 'project' && '📑'}
+                            {link.type === 'other' && '🔗'}
                             {link.name}
                           </a>
                         ))}
@@ -291,11 +294,11 @@ const subtitle = i18n(I18nKey.timelineSubtitle);
                           href={link.url} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center gap-1"
+                          class="inline-flex items-center px-3 py-1.5 rounded-md border border-[var(--primary)] text-[var(--primary)] bg-[color-mix(in_oklch,_var(--primary)_8%,_transparent)] hover:bg-[color-mix(in_oklch,_var(--primary)_14%,_transparent)] active:bg-[color-mix(in_oklch,_var(--primary)_20%,_transparent)] text-sm font-medium flex items-center gap-1"
                         >
                           {link.type === 'certificate' && '🏆'}
-                          {link.type === 'project' && '🔗'}
-                          {link.type === 'website' && '🌐'}
+                          {link.type === 'project' && '📑'}
+                          {link.type === 'other' && '🔗'}
                           {link.name}
                         </a>
                       ))}
