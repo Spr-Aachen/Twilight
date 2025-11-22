@@ -120,7 +120,6 @@ export type SiteConfig = {
 	};
 	generateOgImages: boolean;
 	favicon: Favicon[];
-	showLastModified: boolean; // 控制“上次编辑”卡片显示的开关
 };
 
 export type Favicon = {
@@ -194,6 +193,7 @@ export type BlogPostData = {
 };
 
 export type PostConfig = {
+	showLastModified: boolean;
 	showCoverInContent: boolean;
 	expressiveCode: {
 		theme: string;

@@ -136,9 +136,6 @@ export const siteConfig: SiteConfig = {
 			enable: false, // 启用 Hanalei 字体作为全局字体，适合中文去使用
 		},
 	},
-
-	showLastModified: true, // 控制“上次编辑”卡片显示的开关
-
 	bangumi: {
 		userId: "your-bangumi-id", // 在此处设置你的Bangumi用户ID，可以设置为 "sai" 测试
 	},
@@ -210,6 +207,7 @@ export const profileConfig: ProfileConfig = {
 
 
 export const postConfig: PostConfig = {
+	showLastModified: true,
 	showCoverInContent: false,
 	expressiveCode: {
 		// 注意：某些样式（如背景颜色）已被覆盖，请参阅 astro.config.mjs 文件。
