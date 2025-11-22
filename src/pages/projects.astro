@@ -13,6 +13,7 @@ import {
 import { i18n } from "../i18n/translation";
 import I18nKey from "../i18n/i18nKey";
 import { UNCATEGORIZED } from "../constants/constants";
+import ProjectCard from "../components/widget/ProjectCard.astro";
 
 const { lang } = Astro.props;
 
@@ -55,6 +56,7 @@ const getCategoryText = (category: string) => {
 			return category;
 	}
 };
+
 ---
 
 <MainGridLayout title={title} description={subtitle}>
@@ -98,72 +100,7 @@ const getCategoryText = (category: string) => {
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {featuredProjects.map((project) => (
-              <div class="bg-white dark:bg-gray-800 rounded-lg border border-black/10 dark:border-white/10 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                {project.image && (
-                  <div class="aspect-video overflow-hidden">
-                    <img 
-                      src={project.image} 
-                      alt={project.title}
-                      class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
-                <div class="p-6">
-                  <div class="flex items-start justify-between mb-3">
-                    <h3 class="text-xl font-semibold text-black/90 dark:text-white/90">
-                      {project.title}
-                    </h3>
-                    <span class={`px-2 py-1 text-xs rounded-full ${
-                      project.status === 'completed' 
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                        : project.status === 'in-progress'
-                        ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                        : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
-                    }`}>
-                      {i18n(project.status === 'completed' ? I18nKey.projectsCompleted : 
-                            project.status === 'in-progress' ? I18nKey.projectsInProgress : 
-                            I18nKey.projectsPlanned)}
-                    </span>
-                  </div>
-                  <p class="text-black/60 dark:text-white/60 mb-4 line-clamp-2">
-                    {project.description}
-                  </p>
-                  <div class="flex flex-wrap gap-2 mb-4">
-                    {project.techStack.slice(0, 4).map((tech) => (
-                      <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded">
-                        {tech}
-                      </span>
-                    ))}
-                    {project.techStack.length > 4 && (
-                      <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 rounded">
-                        +{project.techStack.length - 4}
-                      </span>
-                    )}
-                  </div>
-                  <div class="flex gap-3">
-                    {project.demoUrl && (
-                      <a 
-                        href={project.demoUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50/60 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-sm font-medium transition-colors"
-                      >
-                        {i18n(I18nKey.projectsDemo)}
-                      </a>
-                    )}
-                    {project.sourceUrl && (
-                      <a 
-                        href={project.sourceUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-400 text-gray-700 dark:border-gray-500 dark:text-gray-200 bg-gray-50/80 dark:bg-gray-800/60 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium transition-colors"
-                      >
-                        {i18n(I18nKey.projectsSource)}
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <ProjectCard project={project} size="large" showImage={true} maxTechStack={4} />
             ))}
           </div>
         </div>
@@ -185,72 +122,7 @@ const getCategoryText = (category: string) => {
               </h2>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {categoryProjects.map((project) => (
-                  <div class="bg-white dark:bg-gray-800 rounded-lg border border-black/10 dark:border-white/10 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    {project.image && (
-                      <div class="aspect-video overflow-hidden">
-                        <img 
-                          src={project.image} 
-                          alt={project.title}
-                          class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    )}
-                    <div class="p-4">
-                      <div class="flex items-start justify-between mb-2">
-                        <h3 class="text-lg font-semibold text-black/90 dark:text-white/90 line-clamp-1">
-                          {project.title}
-                        </h3>
-                        <span class={`px-2 py-1 text-xs rounded-full shrink-0 ml-2 ${
-                          project.status === 'completed' 
-                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                            : project.status === 'in-progress'
-                            ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                            : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
-                        }`}>
-                          {i18n(project.status === 'completed' ? I18nKey.projectsCompleted : 
-                                project.status === 'in-progress' ? I18nKey.projectsInProgress : 
-                                I18nKey.projectsPlanned)}
-                        </span>
-                      </div>
-                      <p class="text-black/60 dark:text-white/60 mb-3 text-sm line-clamp-2">
-                        {project.description}
-                      </p>
-                      <div class="flex flex-wrap gap-1 mb-3">
-                        {project.techStack.slice(0, 3).map((tech) => (
-                          <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded">
-                            {tech}
-                          </span>
-                        ))}
-                        {project.techStack.length > 3 && (
-                          <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 rounded">
-                            +{project.techStack.length - 3}
-                          </span>
-                        )}
-                      </div>
-                      <div class="flex gap-3 text-sm">
-                        {project.demoUrl && (
-                          <a 
-                            href={project.demoUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            class="inline-flex items-center px-3 py-1.5 rounded-md border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50/60 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-medium transition-colors"
-                          >
-                            {i18n(I18nKey.projectsDemo)}
-                          </a>
-                        )}
-                        {project.sourceUrl && (
-                          <a 
-                            href={project.sourceUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-400 text-gray-700 dark:border-gray-500 dark:text-gray-200 bg-gray-50/80 dark:bg-gray-800/60 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium transition-colors"
-                          >
-                            {i18n(I18nKey.projectsSource)}
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  <ProjectCard project={project} size="medium" showImage={true} maxTechStack={3} />
                 ))}
               </div>
             </div>
