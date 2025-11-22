@@ -118,10 +118,6 @@ export type SiteConfig = {
 			};
 		};
 	};
-	toc: {
-		enable: boolean;
-		depth: 1 | 2 | 3;
-	};
 	generateOgImages: boolean;
 	favicon: Favicon[];
 	showLastModified: boolean; // 控制“上次编辑”卡片显示的开关
@@ -201,6 +197,10 @@ export type PostConfig = {
 	showCoverInContent: boolean;
 	expressiveCode: {
 		theme: string;
+	};
+	toc: {
+		enable: boolean;
+		depth: 1 | 2 | 3;
 	};
 	license: {
 		enable: boolean;

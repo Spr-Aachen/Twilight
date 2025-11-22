@@ -1,6 +1,6 @@
 ---
 import type { MarkdownHeading } from "astro";
-import { siteConfig } from "../../config";
+import { postConfig } from "../../config";
 import { url } from "../../utils/url-utils";
 
 interface Props {
@@ -31,7 +31,7 @@ const removeTailingHash = (text: string) => {
 
 let heading1Count = 1;
 
-const maxLevel = siteConfig.toc.depth;
+const maxLevel = postConfig.toc.depth;
 ---
 <table-of-contents class:list={[className, "group"]} id="toc">
     <!-- TOC内容将由JavaScript动态生成 -->
@@ -283,7 +283,7 @@ class TableOfContents extends HTMLElement {
         }
         // 重新生成TOC HTML
         const minDepth = Math.min(...headings.map(h => h.depth));
-        const maxLevel = 3; // siteConfig.toc.depth
+        const maxLevel = 3; // postConfig.toc.depth
         let heading1Count = 1;
         const tocHTML = headings
             .filter(heading => heading.depth < minDepth + maxLevel)

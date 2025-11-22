@@ -116,12 +116,6 @@ export const siteConfig: SiteConfig = {
 			},
 		},
 	},
-
-	toc: {
-		enable: true, // 启用目录功能
-		depth: 3, // 目录深度，1-6，1 表示只显示 h1 标题，2 表示显示 h1 和 h2 标题，依此类推
-	},
-
 	generateOgImages: false, // 启用生成OpenGraph图片功能,注意开启后要渲染很长时间，不建议本地调试的时候开启
 
 	favicon: [
@@ -220,6 +214,10 @@ export const postConfig: PostConfig = {
 	expressiveCode: {
 		// 注意：某些样式（如背景颜色）已被覆盖，请参阅 astro.config.mjs 文件。
 		theme: "github-dark", // 请选择深色主题，因为此博客主题目前仅支持深色背景
+	},
+	toc: {
+		enable: true, // 启用目录功能
+		depth: 3, // 目录深度，1-6，1 表示只显示 h1 标题，2 表示显示 h1 和 h2 标题，依此类推
 	},
 	license: {
 		enable: true,

@@ -10,8 +10,9 @@ import Banner from "../components/misc/Banner.astro";
 import IconifyLoader from "../components/misc/IconifyLoader.astro";
 import TOC from "../components/widget/TOC.astro";
 import {
-	sidebarLayoutConfig,
 	siteConfig,
+	sidebarLayoutConfig,
+	postConfig,
 } from "../config";
 import {
 	BANNER_HEIGHT,
@@ -251,7 +252,7 @@ const transparentClass = shouldEnableTransparency
 <div class="absolute w-full z-0 hidden xl:block">
     <div class="relative max-w-[var(--page-width)] mx-auto">
         <!-- TOC component -->
-        {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden lg:block transition absolute top-0 w-[var(--toc-width)] items-center",
+        {postConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden lg:block transition absolute top-0 w-[var(--toc-width)] items-center",
             sidebarLayoutConfig.position === "right" ? "-left-[var(--toc-width)]" : "-right-[var(--toc-width)]",
             {"toc-hide": siteConfig.wallpaper.mode === "banner"}]}
         >
@@ -263,7 +264,7 @@ const transparentClass = shouldEnableTransparency
         </div>}
 
         <!-- #toc needs to exist for Swup to work normally -->
-        {!siteConfig.toc.enable && <div id="toc"></div>}
+        {!postConfig.toc.enable && <div id="toc"></div>}
     </div>
 </div>
 </Layout>
