@@ -2,7 +2,6 @@ import type {
 	PostConfig,
 	AnnouncementConfig,
 	FooterConfig,
-	FullscreenWallpaperConfig,
 	MusicPlayerConfig,
 	NavBarConfig,
 	ProfileConfig,
@@ -149,14 +148,6 @@ export const siteConfig: SiteConfig = {
 	bangumi: {
 		userId: "your-bangumi-id", // 在此处设置你的Bangumi用户ID，可以设置为 "sai" 测试
 	},
-};
-
-
-// fullscreenWallpaperConfig 已废弃，现在使用 siteConfig.wallpaper
-// 为了向后兼容，保留导出但使用新配置
-export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
-	...siteConfig.wallpaper,
-	enable: siteConfig.wallpaper.mode === "fullscreen", // 兼容旧的 enable 属性
 };
 
 
@@ -463,7 +454,6 @@ export const widgetConfigs = {
 	music: musicPlayerConfig,
 	layout: sidebarLayoutConfig,
 	particle: particleConfig,
-	fullscreenWallpaper: fullscreenWallpaperConfig,
 	pio: pioConfig, // 添加 pio 配置
 } as const;
 

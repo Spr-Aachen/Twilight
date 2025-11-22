@@ -318,12 +318,6 @@ export type ParticleConfig = {
 	zIndex: number; // 层级，确保粒子在合适的层级显示
 };
 
-// FullscreenWallpaperConfig 已废弃，现在集成到 SiteConfig.wallpaper 中
-// 为了向后兼容，保留类型别名
-export type FullscreenWallpaperConfig = SiteConfig["wallpaper"] & {
-	enable: boolean; // 已废弃：使用 wallpaper.mode 替代
-};
-
 /**
  * Pio 看板娘配置
  */
