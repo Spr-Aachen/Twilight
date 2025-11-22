@@ -13,7 +13,7 @@ import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import MainGridLayout from "../layouts/MainGridLayout.astro";
 import IconifyLoader from "../components/misc/IconifyLoader.astro";
-import Icon from "../components/misc/Icon.astro";
+import SkillCard from "../components/widget/SkillCard.astro";
 
 const { lang } = Astro.props;
 
@@ -97,6 +97,7 @@ const subtitle = i18n(I18nKey.skillsSubtitle);
 
 // 收集所有技能图标用于预加载
 const allIcons = skillsData.map((skill) => skill.icon).filter(Boolean);
+
 ---
 
 <MainGridLayout title={title} description={subtitle}>
@@ -144,60 +145,7 @@ const allIcons = skillsData.map((skill) => skill.icon).filter(Boolean);
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {advancedSkills.map((skill) => (
-              <div class="bg-white dark:bg-gray-800 rounded-lg border border-black/10 dark:border-white/10 p-6 hover:shadow-lg transition-shadow duration-300">
-                <div class="flex items-start gap-4">
-                  {skill.icon && (
-                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style={`background-color: ${skill.color || 'rgb(99 102 241)'}20`}>
-                      <Icon 
-                        icon={skill.icon} 
-                        class="text-2xl" 
-                        color={skill.color || 'rgb(99 102 241)'}
-                        fallback={skill.name.charAt(0)}
-                        loading="eager"
-                      />
-                    </div>
-                  )}
-                  <div class="flex-1">
-                    <div class="flex items-center justify-between mb-2">
-                      <h3 class="text-xl font-semibold text-black/90 dark:text-white/90">
-                        {skill.name}
-                      </h3>
-                      <span class={`px-2 py-1 text-xs rounded-full ${getLevelColor(skill.level)}`}>
-                        {i18n(skill.level === 'expert' ? I18nKey.skillsExpert :
-                              skill.level === 'advanced' ? I18nKey.skillsAdvanced :
-                              skill.level === 'intermediate' ? I18nKey.skillsIntermediate :
-                              I18nKey.skillsBeginner)}
-                      </span>
-                    </div>
-                    <p class="text-black/60 dark:text-white/60 mb-3 text-sm">
-                      {skill.description}
-                    </p>
-                    <div class="mb-3">
-                      <div class="flex justify-between text-sm mb-1">
-                        <span class="text-black/60 dark:text-white/60">{i18n(I18nKey.skillExperience)}</span>
-                        <span class="text-black/80 dark:text-white/80">
-                          {skill.experience.years}{i18n(I18nKey.skillYears)}{skill.experience.months > 0 ? ` ${skill.experience.months}${i18n(I18nKey.skillMonths)}` : ''}
-                        </span>
-                      </div>
-                      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div 
-                            class="h-2 rounded-full transition-all duration-300"
-                            style={`width: ${getLevelWidth(skill.level)}; background-color: ${skill.color || 'rgb(99 102 241)'}`}
-                          ></div>
-                      </div>
-                    </div>
-                    {skill.certifications && skill.certifications.length > 0 && (
-                      <div class="flex flex-wrap gap-1">
-                        {skill.certifications.map((cert) => (
-                          <span class="px-2 py-1 text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded">
-                            {cert}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <SkillCard skill={skill} size="large" showProgress={true} showIcon={true} />
             ))}
           </div>
         </div>
@@ -219,56 +167,7 @@ const allIcons = skillsData.map((skill) => skill.icon).filter(Boolean);
               </h2>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categorySkills.map((skill) => (
-                  <div class="bg-white dark:bg-gray-800 rounded-lg border border-black/10 dark:border-white/10 p-4 hover:shadow-lg transition-shadow duration-300">
-                    <div class="flex items-start gap-3">
-                      {skill.icon && (
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={`background-color: ${skill.color || 'rgb(99 102 241)'}20`}>
-                          <Icon 
-                            icon={skill.icon} 
-                            class="text-lg" 
-                            color={skill.color || 'rgb(99 102 241)'}
-                            fallback={skill.name.charAt(0)}
-                            loading="eager"
-                          />
-                        </div>
-                      )}
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between mb-1">
-                          <h3 class="text-lg font-semibold text-black/90 dark:text-white/90 truncate">
-                            {skill.name}
-                          </h3>
-                          <span class={`px-2 py-1 text-xs rounded-full shrink-0 ml-2 ${getLevelColor(skill.level)}`}>
-                            {i18n(skill.level === 'expert' ? I18nKey.skillsExpert :
-                                  skill.level === 'advanced' ? I18nKey.skillsAdvanced :
-                                  skill.level === 'intermediate' ? I18nKey.skillsIntermediate :
-                                  I18nKey.skillsBeginner)}
-                          </span>
-                        </div>
-                        <p class="text-black/60 dark:text-white/60 mb-2 text-sm line-clamp-2">
-                          {skill.description}
-                        </p>
-                        <div class="mb-2">
-                          <div class="flex justify-between text-xs mb-1">
-                            <span class="text-black/60 dark:text-white/60">{i18n(I18nKey.skillExperience)}</span>
-                            <span class="text-black/80 dark:text-white/80">
-                              {skill.experience.years}{i18n(I18nKey.skillYears)}{skill.experience.months > 0 ? ` ${skill.experience.months}${i18n(I18nKey.skillMonths)}` : ''}
-                            </span>
-                          </div>
-                          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                            <div 
-                              class="h-1.5 rounded-full transition-all duration-300"
-                              style={`width: ${getLevelWidth(skill.level)}; background-color: ${skill.color || 'rgb(99 102 241)'}`}
-                            ></div>
-                          </div>
-                        </div>
-                        {skill.projects && skill.projects.length > 0 && (
-                          <div class="text-xs text-black/60 dark:text-white/60">
-                            {i18n(I18nKey.skillsProjects)}: {skill.projects.length}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  <SkillCard skill={skill} size="medium" showProgress={true} showIcon={true} />
                 ))}
               </div>
             </div>

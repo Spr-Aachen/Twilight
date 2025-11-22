@@ -11,7 +11,7 @@ export interface Props {
 		icon?: string;
 		category: string;
 		level: "beginner" | "intermediate" | "advanced" | "expert";
-		experience: string;
+		experience: string | { years: number; months: number };
 		relatedProjects?: string[];
 		certifications?: string[];
 		color?: string;
@@ -114,6 +114,18 @@ const getSizeClasses = (size: string) => {
 
 const sizeClasses = getSizeClasses(size);
 const skillColor = skill.color || "#3B82F6";
+
+// 经验展示文本
+const getExperienceText = (experience: Props["skill"]["experience"]) => {
+	if (typeof experience === "string") return experience;
+	const yearsText = `${experience.years}${i18n(I18nKey.skillYears)}`;
+	const monthsText =
+		experience.months > 0
+			? ` ${experience.months}${i18n(I18nKey.skillMonths)}`
+			: "";
+	return `${yearsText}${monthsText}`;
+};
+
 ---
 
 <div class="bg-white dark:bg-slate-800/50 rounded-lg border border-black/10 dark:border-white/10 overflow-hidden hover:shadow-lg transition-all duration-300 group">
@@ -161,8 +173,8 @@ const skillColor = skill.color || "#3B82F6";
         {showProgress && (
           <div class="mb-3">
             <div class="flex justify-between text-sm mb-1">
-              <span class="text-black/60 dark:text-white/60">{i18n(I18nKey.skillsExperience)}</span>
-              <span class="text-black/80 dark:text-white/80">{skill.experience}</span>
+              <span class="text-black/60 dark:text-white/60">{i18n(I18nKey.skillExperience)}</span>
+              <span class="text-black/80 dark:text-white/80">{getExperienceText(skill.experience)}</span>
             </div>
             <div class={`w-full bg-gray-200 dark:bg-gray-700 rounded-full ${sizeClasses.progress}`}>
               <div 
