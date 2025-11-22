@@ -19,7 +19,7 @@ export interface Props {
 		links?: {
 			name: string;
 			url: string;
-			type: "website" | "certificate" | "project" | "other";
+			type: "certificate" | "project" | "other";
 		}[];
 		icon?: string;
 		color?: string;
@@ -92,7 +92,7 @@ const getLinkIcon = (type: string) => {
 			return "🏆";
 		case "project":
 			return "🔗";
-		case "website":
+		case "other":
 			return "🌐";
 		default:
 			return "📄";
@@ -262,7 +262,7 @@ const itemColor = item.color || "#3B82F6";
                 href={link.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                class={`inline-flex items-center px-3 py-1.5 rounded-md border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50/60 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-medium transition-colors flex items-center gap-1 ${sizeClasses.meta}`}
+                class={`inline-flex items-center px-3 py-1.5 rounded-md border border-[var(--primary)] text-[var(--primary)] bg-[color-mix(in_oklch,_var(--primary)_8%,_transparent)] hover:bg-[color-mix(in_oklch,_var(--primary)_14%,_transparent)] active:bg-[color-mix(in_oklch,_var(--primary)_20%,_transparent)] text-sm font-medium transition-colors flex items-center gap-1 ${sizeClasses.meta}`}
               >
                 {getLinkIcon(link.type)}
                 {link.name}
@@ -363,7 +363,7 @@ const itemColor = item.color || "#3B82F6";
                 href={link.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                class={`inline-flex items-center px-3 py-1.5 rounded-md border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50/60 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-medium transition-colors ${sizeClasses.meta}`}
+                class={`inline-flex items-center px-3 py-1.5 rounded-md border border-[var(--primary)] text-[var(--primary)] bg-[color-mix(in_oklch,_var(--primary)_8%,_transparent)] hover:bg-[color-mix(in_oklch,_var(--primary)_14%,_transparent)] active:bg-[color-mix(in_oklch,_var(--primary)_20%,_transparent)] text-sm font-medium transition-colors ${sizeClasses.meta}`}
               >
                 {getLinkIcon(link.type)} {link.name}
               </a>
