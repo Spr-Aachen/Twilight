@@ -160,7 +160,7 @@ const jsonLd = {
             <!-- metadata -->
             <div class="onload-animation">
                 <PostMetadata
-                    class="mb-5"
+                    className="mb-5"
                     published={entry.data.published}
                     updated={entry.data.updated}
                     tags={entry.data.tags}
@@ -168,7 +168,7 @@ const jsonLd = {
                     slug={entry.slug}
                 />
                 {
-                    !entry.data.image && (
+                    (!entry.data.image || (entry.data.image && !postConfig.showCoverInContent)) && (
                         <div class="mt-4 border-[var(--line-divider)] border-dashed border-b-[1px] mb-5" />
                     )
                 }
@@ -177,7 +177,7 @@ const jsonLd = {
             <!-- always show cover as long as it has one -->
 
             {
-                entry.data.image && (
+                entry.data.image && postConfig.showCoverInContent && (
                     <>
                         <div class="mt-4" />
                         <ImageWrapper
@@ -208,8 +208,6 @@ const jsonLd = {
                                 pubDate={entry.data.published}
                                 author={entry.data.author}
                                 sourceLink={entry.data.sourceLink}
-                                licenseName={postConfig.license.name}
-                                licenseUrl={postConfig.license.url}
                                 licenseName={entry.data.licenseName}
                                 licenseUrl={entry.data.licenseUrl}
                                 class="mb-6 rounded-xl license-container onload-animation"

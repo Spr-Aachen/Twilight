@@ -198,6 +198,7 @@ export type BlogPostData = {
 };
 
 export type PostConfig = {
+	showCoverInContent: boolean;
 	expressiveCode: {
 		theme: string;
 	};
