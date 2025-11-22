@@ -1,10 +1,8 @@
 import type {
+	PostConfig,
 	AnnouncementConfig,
-	CommentConfig,
-	ExpressiveCodeConfig,
 	FooterConfig,
 	FullscreenWallpaperConfig,
-	LicenseConfig,
 	MusicPlayerConfig,
 	NavBarConfig,
 	ProfileConfig,
@@ -226,24 +224,22 @@ export const profileConfig: ProfileConfig = {
 };
 
 
-export const licenseConfig: LicenseConfig = {
-	enable: true,
-	name: "CC BY-NC-SA 4.0",
-	url: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
-};
-
-
-export const expressiveCodeConfig: ExpressiveCodeConfig = {
-	// 注意：某些样式（如背景颜色）已被覆盖，请参阅 astro.config.mjs 文件。
-	theme: "github-dark", // 请选择深色主题，因为此博客主题目前仅支持深色背景
-};
-
-
-export const commentConfig: CommentConfig = {
-	enable: false, // 启用评论功能。当设置为 false 时，评论组件将不会显示在文章区域。
-	twikoo: {
-		envId: "https://twikoo.vercel.app",
-		lang: "en", // 设置 Twikoo 评论系统语言为英文
+export const postConfig: PostConfig = {
+	expressiveCode: {
+		// 注意：某些样式（如背景颜色）已被覆盖，请参阅 astro.config.mjs 文件。
+		theme: "github-dark", // 请选择深色主题，因为此博客主题目前仅支持深色背景
+	},
+	license: {
+		enable: true,
+		name: "CC BY-NC-SA 4.0",
+		url: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+	},
+	comment: {
+		enable: false, // 启用评论功能。当设置为 false 时，评论组件将不会显示在文章区域。
+		twikoo: {
+			envId: "https://twikoo.vercel.app",
+			lang: "en", // 设置 Twikoo 评论系统语言为英文
+		},
 	},
 };
 

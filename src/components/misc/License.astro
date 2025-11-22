@@ -1,6 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-import { licenseConfig, profileConfig } from "../../config";
+import { postConfig, profileConfig } from "../../config";
 import I18nKey from "../../i18n/i18nKey";
 import { i18n } from "../../i18n/translation";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
@@ -20,7 +20,7 @@ const { title, pubDate, author, sourceLink, licenseName, licenseUrl } =
 	Astro.props;
 const className = Astro.props.class;
 const profileConf = profileConfig;
-const licenseConf = licenseConfig;
+const licenseConf = postConfig.license;
 const postUrl = sourceLink || decodeURIComponent(Astro.url.toString());
 ---
 <div class={`relative transition overflow-hidden bg-[var(--license-block-bg)] py-5 px-6 ${className}`}>

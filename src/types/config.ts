@@ -170,24 +170,6 @@ export type ProfileConfig = {
 
 };
 
-export type LicenseConfig = {
-	enable: boolean;
-	name: string;
-	url: string;
-};
-// 评论配置
-
-export type CommentConfig = {
-	enable: boolean; // 是否启用评论功能
-	twikoo?: TwikooConfig;
-};
-
-type TwikooConfig = {
-	envId: string;
-	region?: string;
-	lang?: string;
-};
-
 export type LIGHT_DARK_MODE =
 	| typeof LIGHT_MODE
 	| typeof DARK_MODE
@@ -215,8 +197,23 @@ export type BlogPostData = {
 	series?: string;
 };
 
-export type ExpressiveCodeConfig = {
-	theme: string;
+export type PostConfig = {
+	expressiveCode: {
+		theme: string;
+	};
+	license: {
+		enable: boolean;
+		name: string;
+		url: string;
+	};
+	comment: {
+		enable: boolean; // 是否启用评论功能
+		twikoo?: {
+			envId: string;
+			region?: string;
+			lang?: string;
+		};
+	};
 };
 
 export type AnnouncementConfig = {
