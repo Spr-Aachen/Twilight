@@ -280,7 +280,13 @@ const itemColor = item.color || "#3B82F6";
       <!-- 图标和标题 -->
       <div class="flex items-start gap-4 mb-3">
         <div class={`rounded-lg flex items-center justify-center shrink-0 ${sizeClasses.node}`} style={`background-color: ${itemColor}20`}>
-          <iconify-icon icon={item.icon || getTypeIcon(item.type)} class={sizeClasses.nodeIcon} style={`color: ${itemColor}`}></iconify-icon>
+          <Icon 
+            icon={item.icon || getTypeIcon(item.type)} 
+            class={sizeClasses.nodeIcon} 
+            color={itemColor}
+            fallback={item.title.charAt(0)}
+            loading="eager"
+          />
         </div>
         <div class="flex-1">
           <div class="flex items-start justify-between mb-2">
@@ -374,13 +380,3 @@ const itemColor = item.color || "#3B82F6";
     </div>
   </div>
 )}
-
-<script>
-  // 加载 Iconify 图标库
-  if (typeof window !== 'undefined' && !window.iconifyLoaded) {
-    const script = document.createElement('script');
-    script.src = 'https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js';
-    document.head.appendChild(script);
-    window.iconifyLoaded = true;
-  }
-</script>
