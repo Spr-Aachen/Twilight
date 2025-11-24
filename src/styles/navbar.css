@@ -17,6 +17,15 @@
     flex-shrink: 0;
 }
 
+/* 桌面端将导航区域绝对居中 */
+@media (min-width: 768px) {
+    #navbar .navbar-nav-links {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
 /* 无banner时使用原始card-base样式，不添加额外的透明效果 */
 /* 确保导航栏在没有banner时有基本的背景色和圆角（低优先级，不覆盖card-base） */
 #navbar > div {
