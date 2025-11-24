@@ -4,6 +4,7 @@ import { navBarConfig, siteConfig } from "../config";
 import { LinkPresets } from "../constants/link-presets";
 import { LinkPreset, type NavBarLink } from "../types/config";
 import { url } from "../utils/url-utils";
+import { getNavbarTransparentModeForWallpaperMode } from "../utils/setting-utils";
 import LightDarkSwitch from "./LightDarkSwitch.svelte";
 import MobileTOC from "./MobileTOC.svelte";
 import Search from "./Search.svelte";
@@ -16,21 +17,18 @@ import TranslateButton from "./widget/TranslateButton.svelte";
 const className = Astro.props.class;
 
 // 获取导航栏透明模式配置 - 根据当前壁纸模式读取正确的配置
-const navbarTransparentMode =
-	siteConfig.wallpaper.mode === "fullscreen"
-		? (siteConfig.wallpaper.fullscreen?.navbar?.transparentMode || "semi")
-		: (siteConfig.wallpaper.banner?.navbar?.transparentMode || "semi");
+const navbarTransparentMode = getNavbarTransparentModeForWallpaperMode(siteConfig.wallpaper.mode);
 
 // 检查是否为首页
 const isHomePage = Astro.url.pathname === "/" || Astro.url.pathname === "";
 
 let links: NavBarLink[] = navBarConfig.links.map(
-	(item: NavBarLink | LinkPreset): NavBarLink => {
-		if (typeof item === "number") {
-			return LinkPresets[item];
-		}
-		return item;
-	},
+    (item: NavBarLink | LinkPreset): NavBarLink => {
+        if (typeof item === "number") {
+            return LinkPresets[item];
+        }
+        return item;
+    },
 );
 
 ---
@@ -73,36 +71,21 @@ let links: NavBarLink[] = navBarConfig.links.map(
 </div>
 
 <script>
-function switchTheme() {
-    if (localStorage.theme === 'dark') {
-        document.documentElement.classList.remove('dark');
-        localStorage.theme = 'light';
-    } else {
-        document.documentElement.classList.add('dark');
-        localStorage.theme = 'dark';
-    }
+function bindToggleButton(buttonId, panelId) {
+    const button = document.getElementById(buttonId);
+    if (!button || (button as any)._boundToggle) return;
+    (button as any)._boundToggle = true;
+    button.onclick = function () {
+        const panel = document.getElementById(panelId);
+        if (panel) {
+            panel.classList.toggle("float-panel-closed");
+        }
+    };
 }
 
 function loadButtonScript() {
-    let settingBtn = document.getElementById("display-settings-switch");
-    if (settingBtn) {
-        settingBtn.onclick = function () {
-            let settingPanel = document.getElementById("display-setting");
-            if (settingPanel) {
-                settingPanel.classList.toggle("float-panel-closed");
-            }
-        };
-    }
-
-    let menuBtn = document.getElementById("nav-menu-switch");
-    if (menuBtn) {
-        menuBtn.onclick = function () {
-            let menuPanel = document.getElementById("nav-menu-panel");
-            if (menuPanel) {
-                menuPanel.classList.toggle("float-panel-closed");
-            }
-        };
-    }
+    bindToggleButton("display-settings-switch", "display-setting");
+    bindToggleButton("nav-menu-switch", "nav-menu-panel");
 }
 
 loadButtonScript();
