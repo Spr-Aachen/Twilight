@@ -12,48 +12,6 @@ import type {
  * 
  */
 
-export type WidgetComponentType =
-    | "profile"
-    | "announcement"
-    | "categories"
-    | "tags"
-    | "toc"
-    | "music-player"
-    | "pio"
-    | "series"
-    | "custom";
-
-
-export type WidgetComponentConfig = {
-    // 组件类型
-    type: WidgetComponentType;
-    // 启用该组件
-    enable: boolean;
-    // 显示顺序，数字越小越靠前
-    order: number;
-    // 组件位置
-    position: "top" | "sticky"; // 顶部固定区域或粘性区域
-    // 自定义CSS类名
-    class?: string; 
-    // 自定义内联样式
-    style?: string; 
-    // 动画延迟时间 (ms) 
-    animationDelay?: number; 
-    // 响应式配置
-    responsive?: {
-        // 在指定设备上隐藏
-        hidden?: ("mobile" | "tablet" | "desktop")[];
-        // 折叠阈值
-        collapseThreshold?: number;
-    };
-    // 自定义属性
-    customProps?: Record<string, any>; 
-};
-
-/**
- * 
- */
-
 // Favicon 配置
 export type Favicon = {
     src: string;
@@ -267,12 +225,49 @@ export type NavBarConfig = {
  * 
  */
 
+export type WidgetComponentType =
+    | "profile"
+    | "announcement"
+    | "categories"
+    | "tags"
+    | "toc"
+    | "music-player"
+    | "pio"
+    | "series"
+    | "custom";
+
+
+export type WidgetComponentConfig = {
+    // 组件类型
+    type: WidgetComponentType;
+    // 启用该组件
+    enable: boolean;
+    // 组件所属侧边栏
+    side: "left" | "right"; // 左侧栏或右侧栏
+    // 显示顺序，数字越小越靠前
+    order: number;
+    // 组件位置
+    position: "top" | "sticky"; // 顶部固定区域或粘性区域
+    // 自定义CSS类名
+    class?: string; 
+    // 自定义内联样式
+    style?: string; 
+    // 动画延迟时间 (ms) 
+    animationDelay?: number; 
+    // 响应式配置
+    responsive?: {
+        // 在指定设备上隐藏
+        hidden?: ("mobile" | "tablet" | "desktop")[];
+        // 折叠阈值
+        collapseThreshold?: number;
+    };
+    // 自定义属性
+    customProps?: Record<string, any>; 
+};
+
+
 // 侧边栏布局配置
 export type SidebarLayoutConfig = {
-    // 启用侧边栏功能
-    enable: boolean;
-    // 侧边栏位置
-    position: "left" | "right"; // 左侧或右侧
     // 侧边栏组件配置列表
     components: WidgetComponentConfig[];
     // 默认动画配置

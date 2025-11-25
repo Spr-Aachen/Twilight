@@ -239,10 +239,6 @@ export const navBarConfig: NavBarConfig = {
 
 // 侧边栏布局配置
 export const sidebarLayoutConfig: SidebarLayoutConfig = {
-    // 启用侧边栏功能
-    enable: true,
-    // 侧边栏位置（左侧或右侧）
-    position: "left",
     // 侧边栏组件配置列表
     components: [
         {
@@ -250,6 +246,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             type: "profile", // 用户资料组件
             // 是否启用该组件
             enable: true,
+            // 组件所属侧边栏
+            side: "left",
             // 组件显示顺序 (数字越小越靠前)
             order: 1,
             // 组件位置
@@ -264,6 +262,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             type: "announcement", // 公告组件
             // 是否启用该组件 (现在通过统一配置控制)
             enable: true,
+            // 组件所属侧边栏
+            side: "left",
             // 组件显示顺序
             order: 2,
             // 组件位置
@@ -278,6 +278,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             type: "categories", // 分类组件
             // 是否启用该组件
             enable: true,
+            // 组件所属侧边栏
+            side: "right",
             // 组件显示顺序
             order: 3,
             // 组件位置
@@ -297,10 +299,12 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             type: "series", // 系列组件
             // 是否启用该组件
             enable: true,
+            // 组件所属侧边栏
+            side: "right",
             // 组件显示顺序
             order: 4,
             // 组件位置
-            position: "sticky", // 粘性定位
+            position: "sticky", // 粘性定位，可滚动
             // CSS 类名
             class: "onload-animation",
             // 动画延迟时间
@@ -316,10 +320,12 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             type: "tags", // 标签组件
             // 是否启用该组件
             enable: true,
+            // 组件所属侧边栏
+            side: "right",
             // 组件显示顺序
             order: 5,
             // 组件位置
-            position: "sticky", // 粘性定位
+            position: "sticky", // 粘性定位，可滚动
             // CSS 类名
             class: "onload-animation",
             // 动画延迟时间

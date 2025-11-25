@@ -10,101 +10,102 @@ import Banner from "../components/misc/Banner.astro";
 import IconifyLoader from "../components/misc/IconifyLoader.astro";
 import TOC from "../components/widget/TOC.astro";
 import {
-	siteConfig,
-	sidebarLayoutConfig,
-	postConfig,
+    siteConfig,
+    sidebarLayoutConfig,
+    postConfig,
 } from "../config";
 import {
-	BANNER_HEIGHT,
-	BANNER_HEIGHT_EXTEND,
-	MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
+    BANNER_HEIGHT,
+    BANNER_HEIGHT_EXTEND,
+    MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
 } from "../constants/constants";
 import { widgetManager } from "../utils/widget-manager";
 import Layout from "./Layout.astro";
 
+/**
+ * Wallpaper
+ */
+
 interface Props {
-	title?: string;
-	banner?: string;
-	description?: string;
-	lang?: string;
-	setOGTypeArticle?: boolean;
-	postSlug?: string;
-	headings?: MarkdownHeading[];
-        series?: string;
+    title?: string;
+    banner?: string;
+    description?: string;
+    lang?: string;
+    setOGTypeArticle?: boolean;
+    postSlug?: string;
+    headings?: MarkdownHeading[];
+    series?: string;
 }
 
 // 类型守卫函数
 const isBannerSrcObject = (
-	src:
-		| string
-		| string[]
-		| { desktop?: string | string[]; mobile?: string | string[] },
+    src:
+        | string
+        | string[]
+        | { desktop?: string | string[]; mobile?: string | string[] },
 ): src is { desktop?: string | string[]; mobile?: string | string[] } => {
-	return (
-		typeof src === "object" &&
-		src !== null &&
-		!Array.isArray(src) &&
-		("desktop" in src || "mobile" in src)
-	);
+    return (
+        typeof src === "object" &&
+        src !== null &&
+        !Array.isArray(src) &&
+        ("desktop" in src || "mobile" in src)
+    );
 };
 
 // 获取壁纸图片的辅助函数
-const getBannerImages = async (): Promise<{ desktop: string | string[]; mobile: string | string[] }> => {
-	let bannerSrc = siteConfig.wallpaper.src;
+const getBannerImages = async (): Promise<{
+    desktop: string | string[];
+    mobile: string | string[];
+}> => {
+    let bannerSrc = siteConfig.wallpaper.src;
 
-	// 如果启用了图片API，获取API图片
-	if (siteConfig.wallpaper.imageApi?.enable && siteConfig.wallpaper.imageApi?.url) {
-		try {
-			const response = await fetch(siteConfig.wallpaper.imageApi.url);
-			const text = await response.text();
-			const apiImages = text.split("\n").filter((line) => line.trim());
+    // 如果启用了图片API，获取API图片
+    if (siteConfig.wallpaper.imageApi?.enable && siteConfig.wallpaper.imageApi?.url) {
+        try {
+            const response = await fetch(siteConfig.wallpaper.imageApi.url);
+            const text = await response.text();
+            const apiImages = text.split("\n").filter((line) => line.trim());
 
-			if (apiImages.length > 0) {
-				bannerSrc = apiImages;
-			}
-		} catch (error) {
-			console.warn("Failed to fetch images from API:", error);
-		}
-	}
+            if (apiImages.length > 0) {
+                bannerSrc = apiImages;
+            }
+        } catch (error) {
+            console.warn("Failed to fetch images from API:", error);
+        }
+    }
 
-	// 检查是否为对象类型（包含desktop和mobile属性）
-	if (
-		typeof bannerSrc === "object" &&
-		bannerSrc !== null &&
-		!Array.isArray(bannerSrc) &&
-		("desktop" in bannerSrc || "mobile" in bannerSrc)
-	) {
-		const srcObj = bannerSrc as {
-			desktop?: string | string[];
-			mobile?: string | string[];
-		};
-		// 确保返回正确的类型
-		return {
-			desktop: srcObj.desktop || srcObj.mobile || "",
-			mobile: srcObj.mobile || srcObj.desktop || "",
-		};
-	}
-	// 如果是字符串或字符串数组，同时用于桌面端和移动端
-	return {
-		desktop: bannerSrc as string | string[],
-		mobile: bannerSrc as string | string[],
-	};
+    // 检查是否为对象类型（包含desktop和mobile属性）
+    if (typeof bannerSrc === "object" && bannerSrc !== null && !Array.isArray(bannerSrc) && ("desktop" in bannerSrc || "mobile" in bannerSrc)) {
+        const srcObj = bannerSrc as {
+            desktop?: string | string[];
+            mobile?: string | string[];
+        };
+        // 确保返回正确的类型
+        return {
+            desktop: srcObj.desktop || srcObj.mobile || "",
+            mobile: srcObj.mobile || srcObj.desktop || "",
+        };
+    }
+    // 如果是字符串或字符串数组，同时用于桌面端和移动端
+    return {
+        desktop: bannerSrc as string | string[],
+        mobile: bannerSrc as string | string[],
+    };
 };
 
 const bannerImages = await getBannerImages();
 
 const {
-	title,
-	banner,
-	description,
-	lang,
-	setOGTypeArticle,
-	postSlug,
-	headings = [],
-        series,
+    title,
+    banner,
+    description,
+    lang,
+    setOGTypeArticle,
+    postSlug,
+    headings = [],
+    series,
 } = Astro.props;
-const hasBannerCredit =
-	siteConfig.wallpaper.mode === "banner" && siteConfig.wallpaper.banner?.credit?.enable;
+const hasBannerCredit = siteConfig.wallpaper.mode === "banner" && siteConfig.wallpaper.banner?.credit?.enable;
 const hasBannerLink = !!siteConfig.wallpaper.banner?.credit?.url;
 
 // 检查是否为首页
@@ -115,279 +116,452 @@ const mobileNonHomeBannerClass = !isHomePage ? "mobile-hide-banner" : "";
 
 // 计算主内容区域位置，考虑手机端非首页时banner被隐藏
 const mainPanelTop = siteConfig.wallpaper.mode === "banner"
-	? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
-	: "5.5rem";
+    ? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
+    : "5.5rem";
 const mobileNonHomeMainTop = !isHomePage ? "5.5rem" : mainPanelTop;
 
 // 当banner被禁用时，主内容区域应该始终从顶栏下面开始
 const finalMainPanelTop = siteConfig.wallpaper.mode === "banner" ? mainPanelTop : "5.5rem";
 
-// 检查侧边栏是否启用，动态调整网格布局
-// 全局启用状态
-const globalSidebarEnabled = sidebarLayoutConfig.enable;
-// 侧边栏位置配置
-const sidebarPosition = sidebarLayoutConfig.position || "left";
-// 响应式配置：不同设备上的侧边栏显示状态
-const mobileShowSidebar =
-	globalSidebarEnabled && widgetManager.shouldShowSidebar("mobile");
-const tabletShowSidebar =
-	globalSidebarEnabled && widgetManager.shouldShowSidebar("tablet");
-const desktopShowSidebar =
-	globalSidebarEnabled && widgetManager.shouldShowSidebar("desktop");
-
-// 动态网格布局类名 - 根据侧边栏位置调整列宽
-const gridCols = `
-	${mobileShowSidebar ? "grid-cols-1" : "grid-cols-1"}
-	${tabletShowSidebar ? (sidebarPosition === "right" ? "md:grid-cols-[1fr_17.5rem]" : "md:grid-cols-[17.5rem_1fr]") : "md:grid-cols-1"}
-	${desktopShowSidebar ? (sidebarPosition === "right" ? "lg:grid-cols-[1fr_17.5rem]" : "lg:grid-cols-[17.5rem_1fr]") : "lg:grid-cols-1"}
-`
-	.trim()
-	.replace(/\s+/g, " ");
-
-// 侧边栏容器类名 - 根据位置调整grid-column
-const sidebarClass = `
-	mb-4 row-start-2 row-end-3 col-span-2 onload-animation
-	${mobileShowSidebar ? "block" : "hidden"}
-	${tabletShowSidebar ? `md:block md:row-start-1 md:row-end-2 md:max-w-[17.5rem] ${sidebarPosition === "right" ? "md:col-start-2 md:col-end-3" : "md:col-start-1 md:col-end-2"}` : "md:hidden"}
-	${desktopShowSidebar ? `lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] ${sidebarPosition === "right" ? "lg:col-start-2 lg:col-end-3" : "lg:col-start-1 lg:col-end-2"}` : "lg:hidden"}
-`
-	.trim()
-	.replace(/\s+/g, " ");
-
-// 主内容区域类名 - 根据侧边栏位置调整grid-column
-const mainContentClass = `
-	transition-swup-fade overflow-hidden w-full
-	${mobileShowSidebar ? "col-span-2" : "col-span-1"}
-	${tabletShowSidebar ? `${sidebarPosition === "right" ? "md:col-start-1 md:col-end-2" : "md:col-start-2 md:col-end-3"}` : "md:col-span-1"}
-	${desktopShowSidebar ? `${sidebarPosition === "right" ? "lg:col-start-1 lg:col-end-2" : "lg:col-start-2 lg:col-end-3"}` : "lg:col-span-1"}
-`
-	.trim()
-	.replace(/\s+/g, " ");
-
 // 检查是否应该启用半透明效果
 const shouldEnableTransparency = siteConfig.wallpaper.mode === "banner" || siteConfig.wallpaper.mode === "fullscreen";
 
 // 为组件添加半透明效果的CSS类
-const transparentClass = shouldEnableTransparency
-	? "wallpaper-transparent"
-	: "";
+const transparentClass = shouldEnableTransparency ? "wallpaper-transparent" : "";
+
+/**
+ * SideBar
+ */
+
+// 检查侧边栏是否启用，动态调整网格布局
+// 判断左右侧边栏是否有启用组件
+const hasLeftSidebar = widgetManager.hasEnabledSidebarOnSide("left");
+const hasRightSidebar = widgetManager.hasEnabledSidebarOnSide("right");
+// 响应式配置：不同设备上的侧边栏显示状态（只要任一侧存在组件且布局为 sidebar 即视为显示）
+const mobileShowSidebar =
+    (hasLeftSidebar || hasRightSidebar) &&
+    widgetManager.shouldShowSidebar("mobile");
+const tabletShowSidebar =
+    (hasLeftSidebar || hasRightSidebar) &&
+    widgetManager.shouldShowSidebar("tablet");
+const desktopShowSidebar =
+    (hasLeftSidebar || hasRightSidebar) &&
+    widgetManager.shouldShowSidebar("desktop");
+
+// 动态网格布局类名 - 根据左右侧边栏情况调整列宽
+// 手机端：单列布局，主内容在上，侧栏在下
+// 平板端：双列布局，左侧栏+右侧栏（上下堆叠）在左列，主内容在右列
+// 桌面端：三列布局，左侧栏 | 主内容 | 右侧栏
+const gridCols = `
+    grid-cols-1
+    ${
+        tabletShowSidebar
+            ? hasLeftSidebar || hasRightSidebar
+                ? "md:grid-cols-[17.5rem_1fr]"
+                : "md:grid-cols-1"
+            : "md:grid-cols-1"
+    }
+    ${
+        desktopShowSidebar
+            ? hasLeftSidebar && hasRightSidebar
+                ? "lg:grid-cols-[17.5rem_1fr_17.5rem]"
+                : hasLeftSidebar
+                  ? "lg:grid-cols-[17.5rem_1fr]"
+                  : hasRightSidebar
+                    ? "lg:grid-cols-[1fr_17.5rem]"
+                    : "lg:grid-cols-1"
+            : "lg:grid-cols-1"
+    }
+`
+    .trim()
+    .replace(/\s+/g, " ");
+
+// 左侧侧边栏容器类名
+// 手机端：显示在主内容下方
+// 平板端：显示在左列第1行
+// 桌面端：显示在第1列
+const leftSidebarClass = `
+    mb-0 col-span-1 onload-animation order-2
+    ${mobileShowSidebar && hasLeftSidebar ? "block row-start-2 row-end-3" : "hidden"}
+    ${tabletShowSidebar && hasLeftSidebar ? "md:block md:row-start-1 md:row-end-2 md:max-w-[17.5rem] md:col-start-1 md:col-end-2 md:order-none" : "md:hidden"}
+    ${desktopShowSidebar && hasLeftSidebar ? "lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] lg:col-start-1 lg:col-end-2" : "lg:hidden"}
+`
+    .trim()
+    .replace(/\s+/g, " ");
+
+// 右侧侧边栏容器类名
+// 手机端：显示在左侧栏下方
+// 平板端：显示在左列第2行（左侧栏下方）
+// 桌面端：显示在第3列（右侧）
+const rightSidebarClass = `
+    mb-0 col-span-1 onload-animation order-3
+    ${mobileShowSidebar && hasRightSidebar ? "block row-start-3 row-end-4" : "hidden"}
+    ${
+        tabletShowSidebar && hasRightSidebar
+            ? "md:block md:row-start-2 md:row-end-3 md:max-w-[17.5rem] md:col-start-1 md:col-end-2 md:order-none"
+            : "md:hidden"
+    }
+    ${
+        desktopShowSidebar && hasRightSidebar
+            ? hasLeftSidebar
+                ? "lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] lg:col-start-3 lg:col-end-4"
+                : "lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] lg:col-start-2 lg:col-end-3"
+            : "lg:hidden"
+    }
+`
+    .trim()
+    .replace(/\s+/g, " ");
+
+// 主内容区域类名
+// 手机端：主内容在第1行
+// 平板端：主内容在右列，纵向跨越所有侧栏行
+// 桌面端：主内容在第2列
+const mainContentClass = `
+    transition-swup-fade overflow-hidden w-full order-1
+    col-span-1 row-start-1 row-end-2
+    ${
+        tabletShowSidebar
+            ? hasLeftSidebar || hasRightSidebar
+                ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-3 md:order-none"
+                : "md:col-span-1"
+            : "md:col-span-1"
+    }
+    ${
+        desktopShowSidebar
+            ? hasLeftSidebar && hasRightSidebar
+                ? "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
+                : hasLeftSidebar
+                  ? "lg:col-start-2 lg:col-end-3"
+                  : hasRightSidebar
+                    ? "lg:col-start-1 lg:col-end-2"
+                    : "lg:col-span-1"
+            : "lg:col-span-1"
+    }
+`
+    .trim()
+    .replace(/\s+/g, " ");
 
 ---
 
-<Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} postSlug={postSlug}>
+<Layout
+    title={title}
+    banner={banner}
+    description={description}
+    lang={lang}
+    setOGTypeArticle={setOGTypeArticle}
+    postSlug={postSlug}
+>
+    <!-- 全屏壁纸 - 总是渲染但通过CSS控制可见性 -->
+    <FullscreenWallpaper
+        config={siteConfig.wallpaper}
+        class={siteConfig.wallpaper.mode === "fullscreen" ? "" : "hidden"}
+    />
 
-<!-- 全屏壁纸 - 总是渲染但通过CSS控制可见性 -->
-<FullscreenWallpaper config={siteConfig.wallpaper} class={siteConfig.wallpaper.mode === "fullscreen" ? "" : "hidden"} />
+    <!-- 全局图标加载器 -->
+    <IconifyLoader />
 
-<!-- 全局图标加载器 -->
-<IconifyLoader />
+    <!-- 为全屏壁纸模式添加body类 -->
+    {
+        shouldEnableTransparency && (
+            <script>
+                document.body.classList.add('wallpaper-transparent');
+            </script>
+        )
+    }
 
-<!-- 为全屏壁纸模式添加body类 -->
-{shouldEnableTransparency && (
-	<script>
-		document.body.classList.add('wallpaper-transparent');
-	</script>
-)}
-
-<!-- Navbar -->
-<slot slot="head" name="head"></slot>
-<div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 max-w-[var(--page-width)] px-0 md:px-4 mx-auto" class:list={[""]}>
-    <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all">
-        <Navbar></Navbar>
-    </div>
-</div>
-
-<!-- Banner - 总是渲染但通过CSS控制可见性 -->
-<Banner
-	config={siteConfig.wallpaper}
-	bannerImages={bannerImages}
-	isHomePage={isHomePage}
-	mobileNonHomeBannerClass={mobileNonHomeBannerClass}
-	carouselConfig={siteConfig.wallpaper.carousel}
-	class={siteConfig.wallpaper.mode === "banner" ? "" : "hidden"}
-/>
-
-<!-- Main content -->
-<div class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? 'mobile-main-no-banner' : ''} ${siteConfig.wallpaper.mode !== 'banner' ? 'no-banner-layout' : ''} ${transparentClass}`} style={`top: ${finalMainPanelTop}`}>
-    <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
-    <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
-        <div id="main-grid" class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!mobileShowSidebar ? 'mobile-no-sidebar' : ''}`}
+    <!-- Navbar -->
+    <slot slot="head" name="head" />
+    <div
+        id="top-row"
+        class="z-50 pointer-events-none relative transition-all duration-700 max-w-[var(--page-width)] px-0 md:px-4 mx-auto"
+        class:list={[""]}
+    >
+        <div
+            id="navbar-wrapper"
+            class="pointer-events-auto sticky top-0 transition-all"
         >
-            <!-- Banner image credit -->
-            {hasBannerCredit && <a href={siteConfig.wallpaper.banner?.credit?.url} id="banner-credit" target="_blank" rel="noopener" aria-label="Visit image source"
-                                   class:list={["group onload-animation transition-all absolute flex justify-center items-center rounded-full " +
-                                   "px-3 right-4 -top-[3.25rem] bg-black/60 hover:bg-black/70 h-9", {"hover:pr-9 active:bg-black/80": hasBannerLink}]}
-            >
-                <Icon class="text-white/75 text-[1.25rem] mr-1" name="material-symbols:copyright-outline-rounded" ></Icon>
-                <div class="text-white/75 text-xs">{siteConfig.wallpaper.banner?.credit?.text}</div>
-                <Icon class:list={["transition absolute text-[oklch(0.75_0.14_var(--hue))] right-4 text-[0.75rem] opacity-0",
-                    {"group-hover:opacity-100": hasBannerLink}]}
-                      name="fa6-solid:arrow-up-right-from-square">
-                </Icon>
-            </a>}
-
-            {(mobileShowSidebar || tabletShowSidebar || desktopShowSidebar) && <SideBar class={`${sidebarClass} ${transparentClass}`} headings={headings} series={ series }></SideBar>}
-
-            <main id="swup-container" class={`${mainContentClass} transition-main`}>
-                <div id="content-wrapper" class="onload-animation transition-leaving px-3 md:px-0">
-                    <!-- the overflow-hidden here prevent long text break the layout-->
-                    <!-- make id different from windows.swup global property -->
-                    <slot></slot>
-                    <div class="footer col-span-2 onload-animation hidden lg:block">
-                        <Footer></Footer>
-                    </div>
-                </div>
-            </main>
-
-            <div class="footer col-span-2 onload-animation block lg:hidden">
-                <Footer></Footer>
-            </div>
+            <Navbar />
         </div>
-
-        <BackToTop></BackToTop>
     </div>
-</div>
 
-<!-- The things that should be under the banner, only the TOC for now -->
-<div class="absolute w-full z-0 hidden xl:block">
-    <div class="relative max-w-[var(--page-width)] mx-auto">
-        <!-- TOC component -->
-        {postConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden lg:block transition absolute top-0 w-[var(--toc-width)] items-center",
-            sidebarLayoutConfig.position === "right" ? "-left-[var(--toc-width)]" : "-right-[var(--toc-width)]",
-            {"toc-hide": siteConfig.wallpaper.mode === "banner"}]}
+    <!-- Banner - 总是渲染但通过CSS控制可见性 -->
+    <Banner
+        config={siteConfig.wallpaper}
+        bannerImages={bannerImages}
+        isHomePage={isHomePage}
+        mobileNonHomeBannerClass={mobileNonHomeBannerClass}
+        carouselConfig={siteConfig.wallpaper.carousel}
+        class={siteConfig.wallpaper.mode === "banner" ? "" : "hidden"}
+    />
+
+    <!-- Main content -->
+    <div
+        class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? "mobile-main-no-banner" : ""} ${siteConfig.wallpaper.mode !== "banner" ? "no-banner-layout" : ""} ${transparentClass}`}
+        style={`top: ${finalMainPanelTop}`}
+    >
+        <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
+        <div
+            class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto"
         >
-            <div id="toc-inner-wrapper" class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar">
-                <div id="toc" class="w-full h-full transition-swup-fade ">       
-                    <TOC headings={headings}></TOC>
+            <div
+                id="main-grid"
+                class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!mobileShowSidebar ? "mobile-no-sidebar" : ""}`}
+            >
+                <!-- Banner image credit -->
+                {
+                    hasBannerCredit && (
+                        <a
+                            href={siteConfig.wallpaper.banner?.credit?.url}
+                            id="banner-credit"
+                            target="_blank"
+                            rel="noopener"
+                            aria-label="Visit image source"
+                            class:list={[
+                                "group onload-animation transition-all absolute flex justify-center items-center rounded-full " +
+                                    "px-3 right-4 -top-[3.25rem] bg-black/60 hover:bg-black/70 h-9",
+                                {
+                                    "hover:pr-9 active:bg-black/80":
+                                        hasBannerLink,
+                                },
+                            ]}
+                        >
+                            <Icon
+                                class="text-white/75 text-[1.25rem] mr-1"
+                                name="material-symbols:copyright-outline-rounded"
+                            />
+                            <div class="text-white/75 text-xs">
+                                {siteConfig.wallpaper.banner?.credit?.text}
+                            </div>
+                            <Icon
+                                class:list={[
+                                    "transition absolute text-[oklch(0.75_0.14_var(--hue))] right-4 text-[0.75rem] opacity-0",
+                                    {
+                                        "group-hover:opacity-100":
+                                            hasBannerLink,
+                                    },
+                                ]}
+                                name="fa6-solid:arrow-up-right-from-square"
+                            ></Icon>
+                        </a>
+                    )
+                }
+
+                {
+                    (mobileShowSidebar ||
+                        tabletShowSidebar ||
+                        desktopShowSidebar) &&
+                        hasLeftSidebar && (
+                            <SideBar
+                                side="left"
+                                class={`${leftSidebarClass} ${transparentClass}`}
+                                headings={headings}
+                                series={series}
+                            />
+                        )
+                }
+                {
+                    (mobileShowSidebar ||
+                        tabletShowSidebar ||
+                        desktopShowSidebar) &&
+                        hasRightSidebar && (
+                            <SideBar
+                                side="right"
+                                class={`${rightSidebarClass} ${transparentClass}`}
+                                headings={headings}
+                                series={series}
+                            />
+                        )
+                }
+
+                <main
+                    id="swup-container"
+                    class={`${mainContentClass} transition-main order-1`}
+                >
+                    <div
+                        id="content-wrapper"
+                        class="onload-animation transition-leaving px-3 md:px-0"
+                    >
+                        <!-- the overflow-hidden here prevent long text break the layout-->
+                        <!-- make id different from windows.swup global property -->
+                        <slot />
+                        <div
+                            class="footer col-span-2 onload-animation hidden lg:block order-4"
+                        >
+                            <Footer />
+                        </div>
+                    </div>
+                </main>
+
+                <div
+                    class="footer col-span-2 onload-animation block lg:hidden order-4"
+                >
+                    <Footer />
                 </div>
             </div>
-        </div>}
 
-        <!-- #toc needs to exist for Swup to work normally -->
-        {!postConfig.toc.enable && <div id="toc"></div>}
+            <BackToTop />
+        </div>
     </div>
-</div>
+
+    <!-- The things that should be under the banner, only the TOC for now -->
+    <div class="absolute w-full z-0 hidden xl:block">
+        <div class="relative max-w-[var(--page-width)] mx-auto">
+            <!-- TOC component -->
+            {
+                postConfig.toc.enable && (
+                    <div
+                        id="toc-wrapper"
+                        class:list={[
+                            "hidden lg:block transition absolute top-0 w-[var(--toc-width)] items-center",
+                            hasRightSidebar && !hasLeftSidebar
+                                ? "-left-[var(--toc-width)]"
+                                : "-right-[var(--toc-width)]",
+                            {
+                                "toc-hide":
+                                    siteConfig.wallpaper.mode === "banner",
+                            },
+                        ]}
+                    >
+                        <div
+                            id="toc-inner-wrapper"
+                            class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar"
+                        >
+                            <div
+                                id="toc"
+                                class="w-full h-full transition-swup-fade "
+                            >
+                                <TOC headings={headings} />
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            <!-- #toc needs to exist for Swup to work normally -->
+            {!postConfig.toc.enable && <div id="toc" />}
+        </div>
+    </div>
 </Layout>
 
 <style>
-/* 移动端无侧边栏布局优化 */
-@media (max-width: 768px) {
-    .mobile-no-sidebar {
-        display: block !important;
-        width: 100% !important;
-    }
-    
-    .mobile-no-sidebar main {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
-    
-    .mobile-no-sidebar #content-wrapper {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-    }
-}
+    /* 移动端无侧边栏布局优化 */
+    @media (max-width: 768px) {
+        .mobile-no-sidebar {
+            display: block !important;
+            width: 100% !important;
+        }
 
-/* 主内容区域位置调整样式 */
-@media (max-width: 480px) {
-    .absolute.w-full.z-30 {
-        top: 70vh !important;
-        min-height: calc(100vh - 70vh) !important;
-    }
-}
+        .mobile-no-sidebar main {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
 
-/* 移动端横幅优化 - 大屏手机 (481px - 640px) */
-@media (min-width: 481px) and (max-width: 640px) {
-    /* 主内容区域位置调整 - 确保在banner下面 */
-    .absolute.w-full.z-30 {
-        top: 75vh !important; /* 与banner高度对应 */
-        min-height: calc(100vh - 75vh) !important;
+        .mobile-no-sidebar #content-wrapper {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+        }
     }
-}
 
-/* 平板设备横幅优化 (641px - 1023px) */
-@media (min-width: 641px) and (max-width: 1023px) {
-    /* 主内容区域位置调整 - 确保在banner下面 */
-    .absolute.w-full.z-30 {
-        top: 70vh !important; /* 与banner高度对应 */
-        min-height: calc(100vh - 70vh) !important;
+    /* 主内容区域位置调整样式 */
+    @media (max-width: 480px) {
+        .absolute.w-full.z-30 {
+            top: 70vh !important;
+            min-height: calc(100vh - 70vh) !important;
+        }
     }
-}
 
-/* 手机端非首页隐藏banner - 改进的分阶段动画 */
-@media (max-width: 1023px) {
-    /* 手机端非首页时主内容区域从顶部开始 - 延迟出现的动画 */
-    .absolute.w-full.z-30 {
-        transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
-        /* 硬件加速优化 */
-        will-change: top;
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
+    /* 移动端横幅优化 - 大屏手机 (481px - 640px) */
+    @media (min-width: 481px) and (max-width: 640px) {
+        /* 主内容区域位置调整 - 确保在banner下面 */
+        .absolute.w-full.z-30 {
+            top: 75vh !important; /* 与banner高度对应 */
+            min-height: calc(100vh - 75vh) !important;
+        }
     }
-    
-    .absolute.w-full.z-30.mobile-main-no-banner {
+
+    /* 平板设备横幅优化 (641px - 1023px) */
+    @media (min-width: 641px) and (max-width: 1023px) {
+        /* 主内容区域位置调整 - 确保在banner下面 */
+        .absolute.w-full.z-30 {
+            top: 70vh !important; /* 与banner高度对应 */
+            min-height: calc(100vh - 70vh) !important;
+        }
+    }
+
+    /* 手机端非首页隐藏banner - 改进的分阶段动画 */
+    @media (max-width: 1023px) {
+        /* 手机端非首页时主内容区域从顶部开始 - 延迟出现的动画 */
+        .absolute.w-full.z-30 {
+            transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
+            /* 硬件加速优化 */
+            will-change: top;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+
+        .absolute.w-full.z-30.mobile-main-no-banner {
+            top: 5.5rem !important;
+            min-height: calc(100vh - 5.5rem) !important;
+            /* 内容区域快速上移 */
+            transition: top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s !important;
+        }
+    }
+
+    /* 移动端导航栏与banner的协调 */
+    @media (max-width: 1023px) {
+        #navbar-wrapper {
+            /* 移除覆盖样式，让Navbar.astro的圆角和半透明效果生效 */
+        }
+
+        /* 暗色主题下的导航栏 */
+        :root.dark #navbar-wrapper {
+            /* 移除覆盖样式，让Navbar.astro的圆角和半透明效果生效 */
+        }
+    }
+
+    /* 当banner被禁用时的布局样式 */
+    .no-banner-layout {
         top: 5.5rem !important;
         min-height: calc(100vh - 5.5rem) !important;
-        /* 内容区域快速上移 */
-        transition: top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s !important;
     }
-}
 
-/* 移动端导航栏与banner的协调 */
-@media (max-width: 1023px) {
-    #navbar-wrapper {
-        /* 移除覆盖样式，让Navbar.astro的圆角和半透明效果生效 */
+    /* 移动端当banner被禁用时的布局样式 */
+    @media (max-width: 1023px) {
+        .absolute.w-full.z-30.no-banner-layout {
+            top: 5.5rem !important;
+            min-height: calc(100vh - 5.5rem) !important;
+            transition: none !important; /* 移除过渡动画，立即应用位置 */
+        }
     }
-    
-    /* 暗色主题下的导航栏 */
-    :root.dark #navbar-wrapper {
-        /* 移除覆盖样式，让Navbar.astro的圆角和半透明效果生效 */
-    }
-}
 
-/* 当banner被禁用时的布局样式 */
-.no-banner-layout {
-    top: 5.5rem !important;
-    min-height: calc(100vh - 5.5rem) !important;
-}
-
-/* 移动端当banner被禁用时的布局样式 */
-@media (max-width: 1023px) {
-    .absolute.w-full.z-30.no-banner-layout {
-        top: 5.5rem !important;
-        min-height: calc(100vh - 5.5rem) !important;
-        transition: none !important; /* 移除过渡动画，立即应用位置 */
+    /* 小屏手机当banner被禁用时的布局样式 */
+    @media (max-width: 480px) {
+        .absolute.w-full.z-30.no-banner-layout {
+            top: 5.5rem !important;
+            min-height: calc(100vh - 5.5rem) !important;
+            transition: none !important;
+        }
     }
-}
 
-/* 小屏手机当banner被禁用时的布局样式 */
-@media (max-width: 480px) {
-    .absolute.w-full.z-30.no-banner-layout {
-        top: 5.5rem !important;
-        min-height: calc(100vh - 5.5rem) !important;
-        transition: none !important;
+    /* 平板设备当banner被禁用时的布局样式 */
+    @media (min-width: 641px) and (max-width: 1023px) {
+        .absolute.w-full.z-30.no-banner-layout {
+            top: 5.5rem !important;
+            min-height: calc(100vh - 5.5rem) !important;
+            transition: none !important;
+        }
     }
-}
 
-/* 平板设备当banner被禁用时的布局样式 */
-@media (min-width: 641px) and (max-width: 1023px) {
-    .absolute.w-full.z-30.no-banner-layout {
-        top: 5.5rem !important;
-        min-height: calc(100vh - 5.5rem) !important;
-        transition: none !important;
+    /* 移动端横屏优化 */
+    @media (max-width: 1023px) and (orientation: landscape) {
+        /* 主内容区域位置调整 - 确保在banner下面，但不影响非首页 */
+        .absolute.w-full.z-30:not(.mobile-main-no-banner) {
+            top: 60vh !important; /* 与banner高度对应 */
+            min-height: calc(100vh - 60vh) !important;
+        }
     }
-}
-
-/* 移动端横屏优化 */
-@media (max-width: 1023px) and (orientation: landscape) {
-    /* 主内容区域位置调整 - 确保在banner下面，但不影响非首页 */
-    .absolute.w-full.z-30:not(.mobile-main-no-banner) {
-        top: 60vh !important; /* 与banner高度对应 */
-        min-height: calc(100vh - 60vh) !important;
-    }
-}
 </style>

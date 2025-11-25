@@ -50,12 +50,34 @@ export class WidgetManager {
 	}
 
 	/**
+	 * 获取指定侧边栏上启用的组件列表
+	 * @param side 侧边栏位置：'left' | 'right'
+	 */
+	getEnabledComponentsBySide(side: "left" | "right"): WidgetComponentConfig[] {
+		return this.enabledComponents.filter((component) => component.side === side);
+	}
+
+	/**
 	 * 根据位置获取组件列表
 	 * @param position 组件位置：'top' | 'sticky'
 	 */
 	getComponentsByPosition(position: "top" | "sticky"): WidgetComponentConfig[] {
 		return this.enabledComponents.filter(
 			(component) => component.position === position,
+		);
+	}
+
+	/**
+	 * 根据侧边栏和位置获取组件列表
+	 * @param side 侧边栏位置：'left' | 'right'
+	 * @param position 组件位置：'top' | 'sticky'
+	 */
+	getComponentsBySideAndPosition(
+		side: "left" | "right",
+		position: "top" | "sticky",
+	): WidgetComponentConfig[] {
+		return this.enabledComponents.filter(
+			(component) => component.side === side && component.position === position,
 		);
 	}
 
@@ -159,12 +181,21 @@ export class WidgetManager {
 	 * @param deviceType 设备类型
 	 */
 	shouldShowSidebar(deviceType: "mobile" | "tablet" | "desktop"): boolean {
-		if (!this.config.enable) {
+		// 如果没有任何启用的组件，则不显示侧边栏
+		if (this.enabledComponents.length === 0) {
 			return false;
 		}
 
 		const layoutMode = this.config.responsive.layout[deviceType];
 		return layoutMode === "sidebar";
+	}
+
+	/**
+	 * 检查指定侧边栏是否有启用的组件
+	 * @param side 侧边栏位置：'left' | 'right'
+	 */
+	hasEnabledSidebarOnSide(side: "left" | "right"): boolean {
+		return this.getEnabledComponentsBySide(side).length > 0;
 	}
 
 	/**

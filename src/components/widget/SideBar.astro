@@ -9,75 +9,78 @@ import TOC from "./TOC.astro";
 import MusicPlayer from "./MusicPlayer.svelte";
 import Series from './Series.astro';
 
+
 interface Props {
-	class?: string;
-	headings?: MarkdownHeading[];
-        series?: string;
+    class?: string;
+    headings?: MarkdownHeading[];
+    series?: string;
+    side: "left" | "right";
 }
 
-const { class: className, headings, series } = Astro.props;
+const { class: className, headings, series, side } = Astro.props;
 
-// 获取配置的组件列表
-const topComponents = widgetManager.getComponentsByPosition("top");
-const stickyComponents = widgetManager.getComponentsByPosition("sticky");
+// 获取配置的组件列表（按侧边栏和位置划分）
+const topComponents = widgetManager.getComponentsBySideAndPosition(side, "top");
+const stickyComponents = widgetManager.getComponentsBySideAndPosition(side, "sticky");
 
 // 组件映射表
 const componentMap = {
-	profile: Profile,
-	announcement: Announcement,
-	categories: Categories,
-	tags: Tags,
-	toc: TOC,
-	"music-player": MusicPlayer,
-	series: Series,
+    profile: Profile,
+    announcement: Announcement,
+    categories: Categories,
+    tags: Tags,
+    toc: TOC,
+    "music-player": MusicPlayer,
+    series: Series,
 };
 
 // 渲染组件的辅助函数
 function renderComponent(component: any, index: number, components: any[]) {
-	const ComponentToRender =
-		componentMap[component.type as keyof typeof componentMap];
-	if (!ComponentToRender) return null;
+    const ComponentToRender =
+        componentMap[component.type as keyof typeof componentMap];
+    if (!ComponentToRender) return null;
 
-	const componentClass = widgetManager.getComponentClass(component, index);
-	const componentStyle = widgetManager.getComponentStyle(component, index);
+    const componentClass = widgetManager.getComponentClass(component, index);
+    const componentStyle = widgetManager.getComponentStyle(component, index);
 
-	return {
-		Component: ComponentToRender,
-		props: {
-			class: componentClass,
-			style: componentStyle,
-			headings: component.type === "toc" ? headings : undefined,
-			series: component.type === "series" ? series : undefined,
-			...component.customProps,
-		},
-	};
+    return {
+        Component: ComponentToRender,
+        props: {
+            class: componentClass,
+            style: componentStyle,
+            headings: component.type === "toc" ? headings : undefined,
+            series: component.type === "series" ? series : undefined,
+            ...component.customProps,
+        },
+    };
 }
+
 ---
 
 <div id="sidebar" class:list={[className, "w-full px-3 md:px-0"]}>
-	<!-- 顶部固定组件区域 -->
-	{topComponents.length > 0 && (
-		<div class="flex flex-col w-full gap-4 mb-4">
-			{topComponents.map((component, index) => {
-				const renderData = renderComponent(component, index, topComponents);
-				if (!renderData) return null;
-				
-				const { Component, props } = renderData;
-				return <Component {...props} />;
-			})}
-		</div>
-	)}
-	
-	<!-- 粘性组件区域 -->
-	{stickyComponents.length > 0 && (
-		<div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 top-4 sticky top-4">
-			{stickyComponents.map((component, index) => {
-				const renderData = renderComponent(component, index, stickyComponents);
-				if (!renderData) return null;
-				
-				const { Component, props } = renderData;
-				return <Component {...props} />;
-			})}
-		</div>
-	)}
+    <!-- 顶部固定组件区域 -->
+    {topComponents.length > 0 && (
+        <div class:list={["flex flex-col w-full gap-4", { "mb-4": stickyComponents.length > 0 }]}>
+            {topComponents.map((component, index) => {
+                const renderData = renderComponent(component, index, topComponents);
+                if (!renderData) return null;
+
+                const { Component, props } = renderData;
+                return <Component {...props} />;
+            })}
+        </div>
+    )}
+
+    <!-- 粘性组件区域 -->
+    {stickyComponents.length > 0 && (
+        <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 sticky top-4">
+            {stickyComponents.map((component, index) => {
+                const renderData = renderComponent(component, index, stickyComponents);
+                if (!renderData) return null;
+
+                const { Component, props } = renderData;
+                return <Component {...props} />;
+            })}
+        </div>
+    )}
 </div>
