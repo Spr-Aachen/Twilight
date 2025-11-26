@@ -199,13 +199,6 @@ export class WidgetManager {
 	}
 
 	/**
-	 * 获取设备断点配置
-	 */
-	getBreakpoints() {
-		return this.config.responsive.breakpoints;
-	}
-
-	/**
 	 * 更新组件配置
 	 * @param newConfig 新的配置
 	 */
