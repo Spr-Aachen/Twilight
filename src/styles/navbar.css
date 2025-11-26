@@ -272,7 +272,7 @@
 }
 
 /* 小屏手机优化 */
-@media (max-width: 480px) {
+@media (max-width: 512px) {
     #navbar > div {
         border-radius: 0.5rem !important;
         margin: 0 !important;
@@ -284,7 +284,7 @@
 }
 
 /* 小屏幕优化 - 减少按钮间距 */
-@media (min-width: 361px) and (max-width: 480px) {
+@media (min-width: 361px) and (max-width: 512px) {
     #navbar-buttons {
         gap: 0.123rem !important;
     }

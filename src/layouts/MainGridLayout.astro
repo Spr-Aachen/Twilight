@@ -467,15 +467,15 @@ const mainContentClass = `
     }
 
     /* 主内容区域位置调整样式 */
-    @media (max-width: 480px) {
+    @media (max-width: 512px) {
         .absolute.w-full.z-30 {
             top: 70vh !important;
             min-height: calc(100vh - 70vh) !important;
         }
     }
 
-    /* 移动端横幅优化 - 大屏手机 (481px - 640px) */
-    @media (min-width: 481px) and (max-width: 640px) {
+    /* 移动端横幅优化 - 大屏手机 (513px - 640px) */
+    @media (min-width: 513px) and (max-width: 640px) {
         /* 主内容区域位置调整 - 确保在banner下面 */
         .absolute.w-full.z-30 {
             top: 75vh !important; /* 与banner高度对应 */
@@ -539,7 +539,7 @@ const mainContentClass = `
     }
 
     /* 小屏手机当banner被禁用时的布局样式 */
-    @media (max-width: 480px) {
+    @media (max-width: 512px) {
         .absolute.w-full.z-30.no-banner-layout {
             top: 5.5rem !important;
             min-height: calc(100vh - 5.5rem) !important;
