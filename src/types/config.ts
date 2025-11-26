@@ -281,15 +281,6 @@ export type SidebarLayoutConfig = {
     };
     // 响应式布局配置
     responsive: {
-        // 断点配置
-        breakpoints: {
-            // 移动端断点 (px)
-            mobile: number; 
-            // 平板端断点 (px)
-            tablet: number; 
-            // 桌面端断点 (px)
-            desktop: number;
-        };
         // 不同设备的布局模式
         layout: {
             // 移动端

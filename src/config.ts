@@ -348,15 +348,6 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
     },
     // 响应式布局配置
     responsive: {
-        // 断点配置
-        breakpoints: {
-            // 移动端断点 (像素值)
-            mobile: 768, // 屏幕宽度小于768px
-            // 平板端断点 (像素值)
-            tablet: 1024, // 屏幕宽度小于1024px
-            // 桌面端断点 (像素值)
-            desktop: 1280, // 屏幕宽度小于1280px
-        },
         // 不同设备的布局模式 ("hidden" 不显示侧边栏 | "drawer" 抽屉模式 | "sidebar" 显示侧边栏)
         layout: {
             // 移动端
