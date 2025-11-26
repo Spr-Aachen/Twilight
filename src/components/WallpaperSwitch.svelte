@@ -2,6 +2,7 @@
 
 import { WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "@constants/constants.ts";
 import Icon from "@iconify/svelte";
+import { BREAKPOINT_LG } from "@/constants/breakpoints";
 import {
     getStoredWallpaperMode,
     setWallpaperMode,
@@ -48,7 +49,7 @@ function hidePanel() {
 
 <!-- z-50 make the panel higher than other float panels -->
 <div class="relative z-50" role="menu" tabindex="-1" onmouseleave={hidePanel}>
-    <button aria-label="Wallpaper Mode" role="menuitem" class="relative btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="wallpaper-mode-switch" onmouseenter={showPanel} onclick={() => { if (window.innerWidth < 1024) { showPanel(); } else { toggleWallpaperMode(); } }}>
+    <button aria-label="Wallpaper Mode" role="menuitem" class="relative btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="wallpaper-mode-switch" onmouseenter={showPanel} onclick={() => { if (window.innerWidth < BREAKPOINT_LG) { showPanel(); } else { toggleWallpaperMode(); } }}>
         <div class="absolute" class:opacity-0={mode !== WALLPAPER_BANNER}>
             <Icon icon="material-symbols:image-outline" class="text-[1.25rem]"></Icon>
         </div>

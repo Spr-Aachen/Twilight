@@ -7,7 +7,7 @@ import ConfigCarrier from "@components/ConfigCarrier.astro";
 import MusicPlayer from "@components/widget/MusicPlayer.svelte";
 import Pio from "@components/widget/Pio.svelte"; // 使用 Svelte 版本的 Pio 组件
 import { profileConfig, siteConfig, musicPlayerConfig, pioConfig } from "@/config";
-import { widgetConfigs } from "../config";
+import { BREAKPOINT_LG } from "@/constants/breakpoints";
 import {
 	BANNER_HEIGHT,
 	BANNER_HEIGHT_EXTEND,
@@ -187,7 +187,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 		))}
 
 		<!-- Set the theme before the page is rendered to avoid a flash -->
-		<script is:inline define:vars={{LIGHT_MODE, DARK_MODE, SYSTEM_MODE, BANNER_HEIGHT_EXTEND, PAGE_WIDTH, configHue, defaultTheme: siteConfig.defaultTheme}}>
+		<script is:inline define:vars={{BREAKPOINT_LG, LIGHT_MODE, DARK_MODE, SYSTEM_MODE, BANNER_HEIGHT_EXTEND, PAGE_WIDTH, configHue, defaultTheme: siteConfig.defaultTheme}}>
 			// Load the theme from local storage
 			const theme = localStorage.getItem('theme') || defaultTheme;
 			// Apply the theme to the document
@@ -240,7 +240,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 				const carouselItems = document.querySelectorAll('.carousel-item');
 
 				// 根据屏幕尺寸过滤有效的轮播项
-				const isMobile = window.innerWidth < 1024; // lg breakpoint
+				const isMobile = window.innerWidth < BREAKPOINT_LG;
 				const validItems = Array.from(carouselItems).filter(item => {
 					if (isMobile) {
 						// 移动端：只显示有mobile图片的项目
@@ -452,6 +452,7 @@ import {
 } from 'overlayscrollbars';
 import {getHue, getStoredTheme, setHue, setTheme} from "../utils/setting-utils";
 import {pathsEqual, url} from "../utils/url-utils";
+import { BREAKPOINT_LG } from "@/constants/breakpoints";
 import {
 	BANNER_HEIGHT,
 	BANNER_HEIGHT_HOME,
@@ -484,12 +485,12 @@ function disableAnimation() {
 	css.appendChild(
 		document.createTextNode(
 			`*{
-              -webkit-transition:none!important;
-              -moz-transition:none!important;
-              -o-transition:none!important;
-              -ms-transition:none!important;
-              transition:none!important
-              }`
+			  -webkit-transition:none!important;
+			  -moz-transition:none!important;
+			  -o-transition:none!important;
+			  -ms-transition:none!important;
+			  transition:none!important
+			  }`
 		)
 	)
 	document.head.appendChild(css)
@@ -847,12 +848,12 @@ const setup = () => {
 				heightExtend.classList.add('hidden')
 			}
 
-            // Just make the transition looks better
-            const toc = document.getElementById('toc-wrapper');
-            if (toc) {
-                toc.classList.remove('toc-not-ready')
-            }
-        }, 200)
+			// Just make the transition looks better
+			const toc = document.getElementById('toc-wrapper');
+			if (toc) {
+				toc.classList.remove('toc-not-ready')
+			}
+		}, 200)
 	});
 }
 if (window?.swup?.hooks) {
@@ -902,7 +903,7 @@ function scrollFunction() {
 		}
 
 		if (bannerEnabled && navbar) {
-			const isHome = document.body.classList.contains('lg:is-home') && window.innerWidth >= 1024;
+			const isHome = document.body.classList.contains('lg:is-home') && window.innerWidth >= BREAKPOINT_LG;
 			const currentBannerHeight = isHome ? BANNER_HEIGHT_HOME : BANNER_HEIGHT;
 			const threshold = window.innerHeight * (currentBannerHeight / 100) - 88;
 

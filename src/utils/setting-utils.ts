@@ -1,3 +1,4 @@
+import { BREAKPOINT_LG } from "@/constants/breakpoints";
 import {
     SYSTEM_MODE,
     DARK_MODE,
@@ -222,7 +223,7 @@ function showBannerMode() {
             mainContentWrapper.style.top = ''; // 重置top样式
         }
         // 在移动端非首页时隐藏banner
-        const isMobile = window.innerWidth < 1024;
+        const isMobile = window.innerWidth < BREAKPOINT_LG;
         const navbar = document.getElementById('navbar');
         const dataIsHome = navbar?.getAttribute('data-is-home');
         const isHome = dataIsHome != null ? dataIsHome === 'true' : (location.pathname === '/' || location.pathname === '');
@@ -366,7 +367,7 @@ function adjustMainContentPosition(mode: WALLPAPER_MODE | 'banner' | 'none' | 'f
     switch (mode) {
         case 'banner':
             // Banner模式：桌面端主内容在banner下方，其他情况下不预留banner空间
-            const isMobile = window.innerWidth < 1024;
+            const isMobile = window.innerWidth < BREAKPOINT_LG;
 
             // 优先从 navbar 的 data 属性读取是否首页，避免与 SSR 逻辑不一致
             const navbar = document.getElementById('navbar');

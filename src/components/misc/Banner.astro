@@ -209,6 +209,8 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
 </div>
 
 <script>
+	import { BREAKPOINT_LG } from "../../constants/breakpoints";
+
 	// 轮播图初始化函数
 	function initCarousel() {
 		const carousel = document.getElementById('banner-carousel');
@@ -218,7 +220,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
 		const carouselItems = document.querySelectorAll('.carousel-item');
 		
 		// 根据屏幕尺寸过滤有效的轮播项
-		const isMobile = window.innerWidth < 1024; // lg breakpoint
+		const isMobile = window.innerWidth < BREAKPOINT_LG; // lg breakpoint
 		const validItems = Array.from(carouselItems).filter(item => {
 			if (isMobile) {
 				// 移动端：只显示有mobile图片的项目
