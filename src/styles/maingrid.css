@@ -1,10 +1,9 @@
-/* 移动端无侧边栏布局优化 */
+/* 手机端无侧边栏布局优化 */
 @media (max-width: 768px) {
     .mobile-no-sidebar {
         display: block !important;
         width: 100% !important;
     }
-
     .mobile-no-sidebar main {
         width: 100% !important;
         max-width: 100% !important;
@@ -12,29 +11,47 @@
         padding-left: 0 !important;
         padding-right: 0 !important;
     }
-
     .mobile-no-sidebar #content-wrapper {
         width: 100% !important;
         max-width: 100% !important;
         margin: 0 !important;
     }
-    
+
     /* 修复双侧边栏模式在移动端的布局问题 */
     .mobile-both-sidebar {
         /* 确保在移动端使用单列布局 */
         grid-template-columns: 1fr !important;
         /* 确保左右padding对称 */
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
     }
-    
     /* 确保移动端主内容区域居中且全宽 */
     .mobile-both-sidebar main {
         grid-column: 1 / -1 !important;
         width: 100% !important;
         margin: 0 auto !important;
     }
-    
+    /* 移动端footer也要居中 */
+    .mobile-both-sidebar .footer {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+/* 小屏手机无侧边栏布局优化 */
+@media (max-width: 512px) {/* 修复双侧边栏模式在移动端的布局问题 */
+    .mobile-both-sidebar {
+        /* 确保在移动端使用单列布局 */
+        grid-template-columns: 1fr !important;
+        /* 确保左右padding对称 */
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+    /* 确保移动端主内容区域居中且全宽 */
+    .mobile-both-sidebar main {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
     /* 移动端footer也要居中 */
     .mobile-both-sidebar .footer {
         grid-column: 1 / -1 !important;

@@ -183,10 +183,22 @@ const gridCols = `
 // 平板端：显示在左列第1行
 // 桌面端：显示在第1列
 const leftSidebarClass = `
-    mb-0 col-span-1 onload-animation order-2
-    ${mobileShowSidebar && hasLeftSidebar ? "block row-start-2 row-end-3" : "hidden"}
-    ${tabletShowSidebar && hasLeftSidebar ? "md:block md:row-start-1 md:row-end-2 md:max-w-[17.5rem] md:col-start-1 md:col-end-2 md:order-none" : "md:hidden"}
-    ${desktopShowSidebar && hasLeftSidebar ? "lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] lg:col-start-1 lg:col-end-2" : "lg:hidden"}
+    mb-0 col-span-1 onload-animation
+    ${
+        mobileShowSidebar && hasLeftSidebar
+            ? "block row-start-2 row-end-3"
+            : "hidden"
+    }
+    ${
+        tabletShowSidebar && hasLeftSidebar
+            ? "md:block md:row-start-1 md:row-end-2 md:max-w-[17.5rem] md:col-start-1 md:col-end-2"
+            : "md:hidden"
+    }
+    ${
+        desktopShowSidebar && hasLeftSidebar
+            ? "lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] lg:col-start-1 lg:col-end-2"
+            : "lg:hidden"
+    }
 `
     .trim()
     .replace(/\s+/g, " ");
@@ -196,11 +208,15 @@ const leftSidebarClass = `
 // 平板端：显示在左列第2行（左侧栏下方）
 // 桌面端：显示在第3列（右侧）
 const rightSidebarClass = `
-    mb-0 col-span-1 onload-animation order-3
-    ${mobileShowSidebar && hasRightSidebar ? "block row-start-3 row-end-4" : "hidden"}
+    mb-0 col-span-1 onload-animation
+    ${
+        mobileShowSidebar && hasRightSidebar
+            ? "block row-start-3 row-end-4"
+            : "hidden"
+    }
     ${
         tabletShowSidebar && hasRightSidebar
-            ? "md:block md:row-start-2 md:row-end-3 md:max-w-[17.5rem] md:col-start-1 md:col-end-2 md:order-none"
+            ? "md:block md:row-start-2 md:row-end-3 md:max-w-[17.5rem] md:col-start-1 md:col-end-2"
             : "md:hidden"
     }
     ${
@@ -219,12 +235,12 @@ const rightSidebarClass = `
 // 平板端：主内容在右列，纵向跨越所有侧栏行
 // 桌面端：主内容在第2列
 const mainContentClass = `
-    transition-swup-fade overflow-hidden w-full order-1
+    transition-swup-fade overflow-hidden w-full
     col-span-1 row-start-1 row-end-2
     ${
         tabletShowSidebar
             ? hasLeftSidebar || hasRightSidebar
-                ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-3 md:order-none"
+                ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-3"
                 : "md:col-span-1"
             : "md:col-span-1"
     }
@@ -242,7 +258,6 @@ const mainContentClass = `
 `
     .trim()
     .replace(/\s+/g, " ");
-
 ---
 
 <Layout
@@ -307,7 +322,7 @@ const mainContentClass = `
         >
             <div
                 id="main-grid"
-                class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!mobileShowSidebar ? "mobile-no-sidebar" : ""}`}
+                class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!mobileShowSidebar ? "mobile-no-sidebar" : ""} ${(hasLeftSidebar || hasRightSidebar) ? "mobile-both-sidebar" : ""}`}
             >
                 <!-- Banner image credit -->
                 {
@@ -343,7 +358,7 @@ const mainContentClass = `
                                     },
                                 ]}
                                 name="fa6-solid:arrow-up-right-from-square"
-                            ></Icon>
+                            />
                         </a>
                     )
                 }
@@ -377,26 +392,24 @@ const mainContentClass = `
 
                 <main
                     id="swup-container"
-                    class={`${mainContentClass} transition-main order-1`}
+                    class={`${mainContentClass} transition-main`}
                 >
                     <div
                         id="content-wrapper"
-                        class="onload-animation transition-leaving px-3 md:px-0"
+                        class="onload-animation transition-leaving"
                     >
                         <!-- the overflow-hidden here prevent long text break the layout-->
                         <!-- make id different from windows.swup global property -->
                         <slot />
                         <div
-                            class="footer col-span-2 onload-animation hidden lg:block order-4"
+                            class="footer col-span-2 onload-animation hidden lg:block"
                         >
                             <Footer />
                         </div>
                     </div>
                 </main>
 
-                <div
-                    class="footer col-span-2 onload-animation block lg:hidden order-4"
-                >
+                <div class="footer col-span-2 onload-animation block lg:hidden">
                     <Footer />
                 </div>
             </div>
