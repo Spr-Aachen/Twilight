@@ -1,0 +1,129 @@
+/* 移动端无侧边栏布局优化 */
+@media (max-width: 768px) {
+    .mobile-no-sidebar {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .mobile-no-sidebar main {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .mobile-no-sidebar #content-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    /* 修复双侧边栏模式在移动端的布局问题 */
+    .mobile-both-sidebar {
+        /* 确保在移动端使用单列布局 */
+        grid-template-columns: 1fr !important;
+        /* 确保左右padding对称 */
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    
+    /* 确保移动端主内容区域居中且全宽 */
+    .mobile-both-sidebar main {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
+    
+    /* 移动端footer也要居中 */
+    .mobile-both-sidebar .footer {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+/* 主内容区域位置调整样式 */
+@media (max-width: 512px) {
+    .absolute.w-full.z-30 {
+        top: 70vh !important;
+        min-height: calc(100vh - 70vh) !important;
+    }
+}
+
+/* 移动端横幅优化 - 大屏手机 */
+@media (min-width: 513px) and (max-width: 768px) {
+    /* 主内容区域位置调整 - 确保在banner下面 */
+    .absolute.w-full.z-30 {
+        top: 75vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 75vh) !important;
+    }
+}
+
+/* 平板设备横幅优化 */
+@media (min-width: 769px) and (max-width: 1023px) {
+    /* 主内容区域位置调整 - 确保在banner下面 */
+    .absolute.w-full.z-30 {
+        top: 70vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 70vh) !important;
+    }
+}
+
+/* 手机端非首页隐藏banner - 改进的分阶段动画 */
+@media (max-width: 1023px) {
+    /* 手机端非首页时主内容区域从顶部开始 - 延迟出现的动画 */
+    .absolute.w-full.z-30 {
+        transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
+        /* 硬件加速优化 */
+        will-change: top;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+
+    .absolute.w-full.z-30.mobile-main-no-banner {
+        top: 5.5rem !important;
+        min-height: calc(100vh - 5.5rem) !important;
+        /* 内容区域快速上移 */
+        transition: top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s !important;
+    }
+}
+
+/* 当banner被禁用时的布局样式 */
+.no-banner-layout {
+    top: 5.5rem !important;
+    min-height: calc(100vh - 5.5rem) !important;
+}
+
+/* 移动端当banner被禁用时的布局样式 */
+@media (max-width: 1023px) {
+    .absolute.w-full.z-30.no-banner-layout {
+        top: 5.5rem !important;
+        min-height: calc(100vh - 5.5rem) !important;
+        transition: none !important; /* 移除过渡动画，立即应用位置 */
+    }
+}
+
+/* 小屏手机当banner被禁用时的布局样式 */
+@media (max-width: 512px) {
+    .absolute.w-full.z-30.no-banner-layout {
+        top: 5.5rem !important;
+        min-height: calc(100vh - 5.5rem) !important;
+        transition: none !important;
+    }
+}
+
+/* 平板设备当banner被禁用时的布局样式 */
+@media (min-width: 769px) and (max-width: 1023px) {
+    .absolute.w-full.z-30.no-banner-layout {
+        top: 5.5rem !important;
+        min-height: calc(100vh - 5.5rem) !important;
+        transition: none !important;
+    }
+}
+
+/* 移动端横屏优化 */
+@media (max-width: 1023px) and (orientation: landscape) {
+    /* 主内容区域位置调整 - 确保在banner下面，但不影响非首页 */
+    .absolute.w-full.z-30:not(.mobile-main-no-banner) {
+        top: 60vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 60vh) !important;
+    }
+}
