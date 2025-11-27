@@ -19,11 +19,11 @@
 
 /* 导入 Hanalei 字体 */
 @font-face {
-	font-family: "Hanalei";
-	src: url("/assets/font/Hanalei.woff2") format("woff2");
-	font-style: normal;
-	font-weight: 400;
-	font-display: swap;
+    font-family: "Hanalei";
+    src: url("/assets/font/Hanalei.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
 }
 
 
@@ -72,7 +72,7 @@ html {
     .is-theme-transitioning *::after {
         transition: none !important;
     }
-    
+
     /* 波浪效果精确同步处理 */
     .is-theme-transitioning svg use {
         /* 禁用过渡但保持动画 */
@@ -80,7 +80,7 @@ html {
         /* 强制立即继承页面背景色 */
         fill: currentColor;
     }
-    
+
     /* 导航栏主题切换保护 - 完全禁用过渡以确保性能 */
     .is-theme-transitioning #navbar > div,
     .is-theme-transitioning #navbar[data-transparent-mode] > div,
@@ -95,7 +95,7 @@ html {
         transition: none !important;
         backdrop-filter: none !important;
     }
-    
+
     /* 导航栏相关浮动面板的过渡禁用 */
     .is-theme-transitioning .dropdown-content,
     .is-theme-transitioning .float-panel,
@@ -107,7 +107,7 @@ html {
         transition: none !important;
         backdrop-filter: none !important;
     }
-    
+
     /* 波浪容器的颜色传递 */
     .is-theme-transitioning #header-waves {
         /* 设置当前颜色为页面背景色，供SVG继承 */
@@ -121,38 +121,38 @@ html {
         /* 确保没有背景色 */
         background: transparent;
     }
-    
+
     .is-theme-transitioning #header-waves use {
         /* 保持动画连续性 */
         will-change: transform;
         /* GPU优化 */
         transform: translateZ(0);
     }
-    
+
     .card-base {
         @apply rounded-[var(--radius-large)] overflow-hidden bg-[var(--card-bg)] transition-colors duration-150;
     }
     .card-base-transparent {
         @apply rounded-[var(--radius-large)] overflow-hidden bg-[var(--card-bg-transparent)] backdrop-blur-sm transition-colors duration-150;
     }
-    
+
     /* 全屏壁纸模式下的半透明效果 */
     .wallpaper-transparent .card-base {
         @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
     }
-    
+
     .wallpaper-transparent .float-panel {
         @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
     }
-    
+
     .wallpaper-transparent #navbar > div {
-    @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
-}
-    
+        @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
+    }
+
     .wallpaper-transparent .btn-card {
         @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
     }
-    
+
     .wallpaper-transparent ~ * .music-player .mini-player,
     .wallpaper-transparent ~ * .music-player .expanded-player,
     .wallpaper-transparent ~ * .music-player .playlist-panel,
@@ -215,7 +215,7 @@ html {
     .current-theme-btn {
         @apply text-[var(--primary)] bg-[var(--btn-plain-bg-hover)] hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-hover)] !important;
     }
-    .current-theme-btn .iconify, .current-theme-btn svg, .current-theme-btn span, 
+    .current-theme-btn .iconify, .current-theme-btn svg, .current-theme-btn span,
     .current-theme-btn .text-sm, .current-theme-btn .text-lg {
         @apply text-[var(--primary)] !important;
     }
@@ -297,20 +297,13 @@ html {
     .mobile-submenu {
         @apply max-h-0 overflow-hidden transition-all duration-300 ease-in-out;
     }
-    
+
     .mobile-dropdown[data-expanded="true"] .mobile-submenu {
         @apply max-h-96;
     }
-    
+
     .mobile-dropdown[data-expanded="true"] .mobile-dropdown-arrow {
         @apply rotate-180;
-    }
-
-    /* 响应式隐藏 */
-    @media (max-width: 768px) {
-        .dropdown-container {
-            @apply hidden;
-        }
     }
 
     /* 无障碍支持 */
@@ -373,7 +366,7 @@ html {
     height: var(--collapsedHeight);
 }
 
-/*剧透效果*/
+/* 剧透效果 */
 .custom-md spoiler {
   --_spoiler-mask: var(--primary);
   @apply hover:bg-transparent px-1 py-0.5 overflow-hidden rounded-md transition-all duration-150;

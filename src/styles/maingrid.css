@@ -58,33 +58,8 @@
     }
 }
 
-/* 主内容区域位置调整样式 */
-@media (max-width: 512px) {
-    .absolute.w-full.z-30 {
-        top: 70vh !important;
-        min-height: calc(100vh - 70vh) !important;
-    }
-}
 
-/* 移动端横幅优化 - 大屏手机 */
-@media (min-width: 513px) and (max-width: 768px) {
-    /* 主内容区域位置调整 - 确保在banner下面 */
-    .absolute.w-full.z-30 {
-        top: 75vh !important; /* 与banner高度对应 */
-        min-height: calc(100vh - 75vh) !important;
-    }
-}
-
-/* 平板设备横幅优化 */
-@media (min-width: 769px) and (max-width: 1023px) {
-    /* 主内容区域位置调整 - 确保在banner下面 */
-    .absolute.w-full.z-30 {
-        top: 70vh !important; /* 与banner高度对应 */
-        min-height: calc(100vh - 70vh) !important;
-    }
-}
-
-/* 手机端非首页隐藏banner - 改进的分阶段动画 */
+/* 移动端横幅优化 */
 @media (max-width: 1023px) {
     /* 手机端非首页时主内容区域从顶部开始 - 延迟出现的动画 */
     .absolute.w-full.z-30 {
@@ -103,6 +78,41 @@
     }
 }
 
+/* 移动端横屏优化 */
+@media (max-width: 1023px) and (orientation: landscape) {
+    /* 主内容区域位置调整 - 确保在banner下面，但不影响非首页 */
+    .absolute.w-full.z-30:not(.mobile-main-no-banner) {
+        top: 60vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 60vh) !important;
+    }
+}
+
+/* 平板设备横幅优化 */
+@media (min-width: 769px) and (max-width: 1023px) {
+    /* 主内容区域位置调整 - 确保在banner下面 */
+    .absolute.w-full.z-30 {
+        top: 70vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 70vh) !important;
+    }
+}
+
+/* 大屏手机端横幅优化 */
+@media (min-width: 513px) and (max-width: 768px) {
+    /* 主内容区域位置调整 - 确保在banner下面 */
+    .absolute.w-full.z-30 {
+        top: 75vh !important; /* 与banner高度对应 */
+        min-height: calc(100vh - 75vh) !important;
+    }
+}
+
+/* 小屏手机横幅优化 */
+@media (max-width: 512px) {
+    .absolute.w-full.z-30 {
+        top: 70vh !important;
+        min-height: calc(100vh - 70vh) !important;
+    }
+}
+
 /* 当banner被禁用时的布局样式 */
 .no-banner-layout {
     top: 5.5rem !important;
@@ -118,15 +128,6 @@
     }
 }
 
-/* 小屏手机当banner被禁用时的布局样式 */
-@media (max-width: 512px) {
-    .absolute.w-full.z-30.no-banner-layout {
-        top: 5.5rem !important;
-        min-height: calc(100vh - 5.5rem) !important;
-        transition: none !important;
-    }
-}
-
 /* 平板设备当banner被禁用时的布局样式 */
 @media (min-width: 769px) and (max-width: 1023px) {
     .absolute.w-full.z-30.no-banner-layout {
@@ -136,11 +137,11 @@
     }
 }
 
-/* 移动端横屏优化 */
-@media (max-width: 1023px) and (orientation: landscape) {
-    /* 主内容区域位置调整 - 确保在banner下面，但不影响非首页 */
-    .absolute.w-full.z-30:not(.mobile-main-no-banner) {
-        top: 60vh !important; /* 与banner高度对应 */
-        min-height: calc(100vh - 60vh) !important;
+/* 小屏手机当banner被禁用时的布局样式 */
+@media (max-width: 512px) {
+    .absolute.w-full.z-30.no-banner-layout {
+        top: 5.5rem !important;
+        min-height: calc(100vh - 5.5rem) !important;
+        transition: none !important;
     }
 }

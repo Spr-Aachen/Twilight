@@ -36,129 +36,6 @@
  * 
  */
 
-/* 小屏手机优化 */
-@media (max-width: 512px) {
-    /* Banner wrapper 高度优化 - 优先保持banner显示 */
-    #banner-wrapper {
-        height: 70vh !important; /* 保持较大高度优先显示banner */
-        min-height: 450px;
-        max-height: none; /* 移除最大高度限制 */
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
-    }
-    
-    /* 横幅文本覆盖层优化 */
-    .banner-text-overlay {
-        align-items: center !important; /* 垂直居中 */
-        justify-content: center !important; /* 水平居中 */
-        padding: 1rem !important;
-        text-align: center !important; /* 文字居中对齐 */
-    }
-    
-    /* 文本容器优化 */
-    .banner-text-overlay > div {
-        margin-bottom: 0 !important; /* 移除底部边距，保持居中 */
-        width: 95% !important; /* 增加文本宽度利用率 */
-        text-align: center !important; /* 确保文字居中 */
-    }
-    
-    /* 标题字体优化 */
-    .banner-title {
-        font-size: 3.2rem !important; /* 增大字体大小 */
-        line-height: 1.1 !important;
-        margin-bottom: 0.5rem !important;
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important; /* 增强阴影 */
-    }
-    
-    /* 副标题字体优化 */
-    .banner-subtitle {
-        font-size: 1rem !important;
-        line-height: 1.3 !important;
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
-    }
-}
-
-/* 中屏手机优化 */
-@media (min-width: 513px) and (max-width: 768px) {
-    /* Banner wrapper 高度优化 - 优先保持banner显示 */
-    #banner-wrapper {
-        height: 75vh !important;
-        min-height: 500px;
-        max-height: none; /* 移除最大高度限制 */
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
-    }
-    
-    /* 横幅文本覆盖层优化 */
-    .banner-text-overlay {
-        align-items: center !important; /* 垂直居中 */
-        justify-content: center !important; /* 水平居中 */
-        padding: 1.5rem !important;
-        text-align: center !important; /* 文字居中对齐 */
-    }
-    
-    /* 文本容器优化 */
-    .banner-text-overlay > div {
-        margin-bottom: 0 !important; /* 移除底部边距，保持居中 */
-        width: 90% !important;
-        text-align: center !important; /* 确保文字居中 */
-    }
-    
-    /* 标题字体优化 */
-    .banner-title {
-        font-size: 3.8rem !important; /* 增大字体大小 */
-        line-height: 1.1 !important;
-        margin-bottom: 0.75rem !important;
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
-    }
-    
-    /* 副标题字体优化 */
-    .banner-subtitle {
-        font-size: 1.125rem !important;
-        line-height: 1.4 !important;
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
-    }
-}
-
-
-/* 平板优化 */
-@media (min-width: 769px) and (max-width: 1023px) {
-    /* Banner wrapper 高度优化 */
-    #banner-wrapper {
-        height: 70vh !important;
-        min-height: 500px;
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
-    }
-    
-    /* 横幅文本覆盖层优化 */
-    .banner-text-overlay {
-        align-items: center !important; /* 垂直居中 */
-        justify-content: center !important; /* 水平居中 */
-        padding: 2rem !important;
-        text-align: center !important; /* 文字居中对齐 */
-    }
-    
-    /* 文本容器优化 */
-    .banner-text-overlay > div {
-        margin-bottom: 0 !important; /* 移除底部边距，保持居中 */
-        width: 85% !important;
-        text-align: center !important; /* 确保文字居中 */
-    }
-    
-    /* 标题字体优化 */
-    .banner-title {
-        font-size: 4rem !important;
-        line-height: 1.1 !important;
-        margin-bottom: 1rem !important;
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
-    }
-    
-    /* 副标题字体优化 */
-    .banner-subtitle {
-        font-size: 1.5rem !important;
-        line-height: 1.4 !important;
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
-    }
-}
-
 /* 桌面端优化 */
 @media (min-width: 1024px) {
     .banner-text-overlay {
@@ -205,6 +82,18 @@
     }
 }
 
+/* 移动端专用淡入动画 - 与电脑端保持一致 */
+@keyframes mobile-fade-in {
+    0% {
+        opacity: 0;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1); /* 与电脑端当前图片缩放保持一致 */
+    }
+}
+
 /* 移动端图片优化 */
 @media (max-width: 1023px) {
     /* 移动端图片容器优化 */
@@ -243,19 +132,7 @@
     }
 }
 
-/* 移动端专用淡入动画 - 与电脑端保持一致 */
-@keyframes mobile-fade-in {
-    0% {
-        opacity: 0;
-        transform: scale(1.1);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1); /* 与电脑端当前图片缩放保持一致 */
-    }
-}
-
-/* 手机端非首页隐藏banner */
+/* 移动端非首页隐藏banner */
 @media (max-width: 1023px) {
     #banner-wrapper {
         transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease-out;
@@ -358,6 +235,26 @@
     }
 }
 
+/* 移动端暗色模式优化 */
+@media (max-width: 1023px) and (prefers-color-scheme: dark) {
+    .banner-text-overlay {
+        background: linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.8) 0%,
+            rgba(0, 0, 0, 0.4) 50%,
+            transparent 100%
+        );
+    }
+
+    .banner-title {
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    .banner-subtitle {
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    }
+}
+
 /* 移动端横屏优化 */
 @media (max-width: 1023px) and (orientation: landscape) {
     #banner-wrapper:not(.mobile-hide-banner) {
@@ -388,23 +285,125 @@
     }
 }
 
-/* 移动端暗色模式优化 */
-@media (max-width: 1023px) and (prefers-color-scheme: dark) {
+/* 平板优化 */
+@media (min-width: 769px) and (max-width: 1023px) {
+    /* Banner wrapper 高度优化 */
+    #banner-wrapper {
+        height: 70vh !important;
+        min-height: 500px;
+        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+    }
+    
+    /* 横幅文本覆盖层优化 */
     .banner-text-overlay {
-        background: linear-gradient(
-            to top,
-            rgba(0, 0, 0, 0.8) 0%,
-            rgba(0, 0, 0, 0.4) 50%,
-            transparent 100%
-        );
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        padding: 2rem !important;
+        text-align: center !important; /* 文字居中对齐 */
     }
-
+    
+    /* 文本容器优化 */
+    .banner-text-overlay > div {
+        margin-bottom: 0 !important; /* 移除底部边距，保持居中 */
+        width: 85% !important;
+        text-align: center !important; /* 确保文字居中 */
+    }
+    
+    /* 标题字体优化 */
     .banner-title {
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        font-size: 4rem !important;
+        line-height: 1.1 !important;
+        margin-bottom: 1rem !important;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
     }
-
+    
+    /* 副标题字体优化 */
     .banner-subtitle {
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+        font-size: 1.5rem !important;
+        line-height: 1.4 !important;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
+    }
+}
+
+/* 中屏手机优化 */
+@media (min-width: 513px) and (max-width: 768px) {
+    /* Banner wrapper 高度优化 - 优先保持banner显示 */
+    #banner-wrapper {
+        height: 75vh !important;
+        min-height: 500px;
+        max-height: none; /* 移除最大高度限制 */
+        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+    }
+    
+    /* 横幅文本覆盖层优化 */
+    .banner-text-overlay {
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        padding: 1.5rem !important;
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    /* 文本容器优化 */
+    .banner-text-overlay > div {
+        margin-bottom: 0 !important; /* 移除底部边距，保持居中 */
+        width: 90% !important;
+        text-align: center !important; /* 确保文字居中 */
+    }
+    
+    /* 标题字体优化 */
+    .banner-title {
+        font-size: 3.8rem !important; /* 增大字体大小 */
+        line-height: 1.1 !important;
+        margin-bottom: 0.75rem !important;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
+    }
+    
+    /* 副标题字体优化 */
+    .banner-subtitle {
+        font-size: 1.125rem !important;
+        line-height: 1.4 !important;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
+    }
+}
+
+/* 小屏手机优化 */
+@media (max-width: 512px) {
+    /* Banner wrapper 高度优化 - 优先保持banner显示 */
+    #banner-wrapper {
+        height: 70vh !important; /* 保持较大高度优先显示banner */
+        min-height: 450px;
+        max-height: none; /* 移除最大高度限制 */
+        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
+    }
+    
+    /* 横幅文本覆盖层优化 */
+    .banner-text-overlay {
+        align-items: center !important; /* 垂直居中 */
+        justify-content: center !important; /* 水平居中 */
+        padding: 1rem !important;
+        text-align: center !important; /* 文字居中对齐 */
+    }
+    
+    /* 文本容器优化 */
+    .banner-text-overlay > div {
+        margin-bottom: 0 !important; /* 移除底部边距，保持居中 */
+        width: 95% !important; /* 增加文本宽度利用率 */
+        text-align: center !important; /* 确保文字居中 */
+    }
+    
+    /* 标题字体优化 */
+    .banner-title {
+        font-size: 3.2rem !important; /* 增大字体大小 */
+        line-height: 1.1 !important;
+        margin-bottom: 0.5rem !important;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important; /* 增强阴影 */
+    }
+    
+    /* 副标题字体优化 */
+    .banner-subtitle {
+        font-size: 1rem !important;
+        line-height: 1.3 !important;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
     }
 }
 
@@ -517,31 +516,30 @@
  * 基于屏幕高度的banner优化
  */
 
-/* 极小高度屏幕 (高度 ≤ 500px) */
-@media (max-height: 500px) {
+/* 中等高度屏幕 (高度 601px - 700px) */
+@media (min-height: 601px) and (max-height: 700px) {
     #banner-wrapper {
-        height: 85vh !important; /* 占用更多高度确保banner显示 */
-        min-height: 350px !important;
+        height: 75vh !important;
+        min-height: 450px !important;
     }
     
     .banner-text-overlay {
-        padding: 1rem !important;
+        padding: 2rem !important;
         align-items: center !important; /* 垂直居中 */
         justify-content: center !important; /* 水平居中 */
         text-align: center !important; /* 文字居中对齐 */
     }
     
     .banner-title {
-        font-size: 2.8rem !important; /* 增大字体大小 */
+        font-size: 3.8rem !important; /* 增大字体大小 */
         line-height: 1.1 !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 1rem !important;
     }
     
     .banner-subtitle {
-        font-size: 0.9rem !important;
-        line-height: 1.2 !important;
+        font-size: 1.125rem !important;
+        line-height: 1.4 !important;
     }
-    
 }
 
 /* 小高度屏幕 (高度 501px - 600px) */
@@ -570,29 +568,29 @@
     }
 }
 
-/* 中等高度屏幕 (高度 601px - 700px) */
-@media (min-height: 601px) and (max-height: 700px) {
+/* 极小高度屏幕 (高度 ≤ 500px) */
+@media (max-height: 500px) {
     #banner-wrapper {
-        height: 75vh !important;
-        min-height: 450px !important;
+        height: 85vh !important; /* 占用更多高度确保banner显示 */
+        min-height: 350px !important;
     }
     
     .banner-text-overlay {
-        padding: 2rem !important;
+        padding: 1rem !important;
         align-items: center !important; /* 垂直居中 */
         justify-content: center !important; /* 水平居中 */
         text-align: center !important; /* 文字居中对齐 */
     }
     
     .banner-title {
-        font-size: 3.8rem !important; /* 增大字体大小 */
+        font-size: 2.8rem !important; /* 增大字体大小 */
         line-height: 1.1 !important;
-        margin-bottom: 1rem !important;
+        margin-bottom: 0.5rem !important;
     }
     
     .banner-subtitle {
-        font-size: 1.125rem !important;
-        line-height: 1.4 !important;
+        font-size: 0.9rem !important;
+        line-height: 1.2 !important;
     }
 }
 
