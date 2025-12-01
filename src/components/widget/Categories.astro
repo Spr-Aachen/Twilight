@@ -6,12 +6,13 @@ import ButtonLink from "../control/ButtonLink.astro";
 import WidgetLayout from "./WidgetLayout.astro";
 import { widgetManager } from "../../utils/widget-manager";
 
+
 const categories = await getCategoryList();
 
 const COLLAPSED_HEIGHT = "7.5rem";
 
 // 使用统一的组件管理器检查是否应该折叠
-const categoriesComponent = widgetManager.config.components.find(c => c.type === "categories");
+const categoriesComponent = widgetManager.getConfig().components.find(c => c.type === "categories");
 const isCollapsed = categoriesComponent ? widgetManager.isCollapsed(categoriesComponent, categories.length) : false;
 
 interface Props {

@@ -1,32 +1,33 @@
 import { definePlugin } from "@expressive-code/core";
 import type { Element } from "hast";
 
+
 export function pluginCustomCopyButton() {
 	return definePlugin({
 		name: "Custom Copy Button",
-		baseStyles: ({ cssVar }) => `
+		baseStyles: () => `
 			.copy-btn {
 				position: absolute;
 				top: 0.5rem;
 				right: 0.5rem;
 				z-index: 10;
 				padding: 0.25rem;
-				background: ${cssVar('frames.copyButtonBackground')};
+				background: var(--code-bg);
 				border: none;
 				border-radius: 0.25rem;
 				cursor: pointer;
 				opacity: 0;
 				transition: all 0.2s ease;
-				color: ${cssVar('frames.copyButtonForeground')};
+				color: var(--code-text);
 			}
 			
 			.copy-btn:hover {
-				background: ${cssVar('frames.copyButtonBackgroundHover')};
+				background: var(--code-bg-hover);
 				opacity: 1;
 			}
 			
 			.copy-btn:active {
-				background: ${cssVar('frames.copyButtonBackgroundActive')};
+				background: var(--code-bg-active);
 			}
 			
 			.frame:hover .copy-btn {
@@ -227,7 +228,7 @@ export function pluginCustomCopyButton() {
 					if (!node.children) {
 						node.children = [];
 					}
-					node.children.push(copyButton);
+					(node.children as Element[]).push(copyButton);
 				}
 
 				traverse(context.renderData.blockAst);

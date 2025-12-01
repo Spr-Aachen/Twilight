@@ -1,6 +1,7 @@
 import Key from "../i18nKey";
 import type { Translation } from "../translation";
 
+
 export const ja: Translation = {
 	[Key.home]: "ホーム",
 	[Key.archive]: "アーカイブ",
@@ -9,6 +10,7 @@ export const ja: Translation = {
 
 	[Key.tags]: "タグ",
 	[Key.categories]: "カテゴリ",
+	[Key.series]: "シリーズ",
 	[Key.recentPosts]: "最近の投稿",
 	[Key.postList]: "投稿リスト",
 	[Key.tableOfContents]: "目次",

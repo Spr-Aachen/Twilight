@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from "astro";
-import type { AlbumGroup } from "../../../data/1";
+import type { AlbumGroup } from "../../../data/albums";
 import I18nKey from "../../../i18n/i18nKey";
 import { i18n } from "../../../i18n/translation";
 import MainGridLayout from "../../../layouts/MainGridLayout.astro";
@@ -13,6 +13,7 @@ export const getStaticPaths = async () => {
 		props: { album },
 	}));
 };
+
 
 interface Props {
 	album: AlbumGroup;
@@ -185,4 +186,3 @@ if (!album) {
   }
   
 </style>
-

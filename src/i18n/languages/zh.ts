@@ -1,6 +1,7 @@
 import Key from "../i18nKey";
 import type { Translation } from "../translation";
 
+
 export const zh: Translation = {
 	[Key.home]: "主页",
 	[Key.archive]: "归档",
@@ -9,6 +10,7 @@ export const zh: Translation = {
 
 	[Key.tags]: "标签",
 	[Key.categories]: "分类",
+	[Key.series]: "系列",
 	[Key.recentPosts]: "最新文章",
 	[Key.postList]: "文章列表",
 	[Key.tableOfContents]: "目录",

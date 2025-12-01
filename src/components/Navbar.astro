@@ -14,6 +14,7 @@ import DropdownMenu from "./widget/DropdownMenu.astro";
 import NavMenuPanel from "./widget/NavMenuPanel.astro";
 import TranslateButton from "./widget/TranslateButton.svelte";
 
+
 const className = Astro.props.class;
 
 // 获取导航栏透明模式配置 - 根据当前壁纸模式读取正确的配置
@@ -71,7 +72,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
 </div>
 
 <script>
-function bindToggleButton(buttonId, panelId) {
+function bindToggleButton(buttonId: string, panelId: string) {
     const button = document.getElementById(buttonId);
     if (!button || (button as any)._boundToggle) return;
     (button as any)._boundToggle = true;
@@ -122,9 +123,9 @@ function initSemifullScrollDetection() {
         const threshold = 50; // 滚动阈值，可以根据需要调整
 
         if (scrollTop > threshold) {
-            navbar.classList.add('scrolled');
+            navbar?.classList.add('scrolled');
         } else {
-            navbar.classList.remove('scrolled');
+            navbar?.classList.remove('scrolled');
         }
 
         ticking = false;

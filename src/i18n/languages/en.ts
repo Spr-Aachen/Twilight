@@ -1,6 +1,7 @@
 import Key from "../i18nKey";
 import type { Translation } from "../translation";
 
+
 export const en: Translation = {
 	[Key.home]: "Home",
 	[Key.archive]: "Archive",
@@ -9,6 +10,7 @@ export const en: Translation = {
 
 	[Key.tags]: "Tags",
 	[Key.categories]: "Categories",
+	[Key.series]: "Series",
 	[Key.recentPosts]: "Recent Posts",
 	[Key.postList]: "Post List",
 	[Key.tableOfContents]: "Table of Contents",

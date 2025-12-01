@@ -8,6 +8,7 @@ import { getCategoryUrl, getTagUrl } from "../utils/url-utils";
 
 import { umamiConfig } from '../config';
 
+
 // 解析 umami
 const umamiEnabled = umamiConfig.enabled || false;
 const umamiWebsiteId = umamiConfig.scripts.match(/data-website-id="([^"]+)"/)?.[1] || "";
@@ -17,7 +18,7 @@ const umamiBaseUrl = umamiConfig.baseUrl || "";
 export interface Props {
   published: Date;
   updated?: Date;
-  category?: string;
+  category?: string | null;
   tags?: string[];
   hideUpdateDate?: boolean;
   hideTagsForMobile?: boolean;
@@ -68,7 +69,7 @@ const {
             <Icon name="material-symbols:book-2-outline-rounded" class="text-xl"></Icon>
         </div>
         <div class="flex flex-row flex-nowrap items-center">
-            <a href={getCategoryUrl(category)} aria-label={`View all posts in the ${category} category`}
+            <a href={getCategoryUrl(category || null)} aria-label={`View all posts in the ${category} category`}
                class="link-lg transition text-50 text-sm font-medium
                             hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap">
                 {category || i18n(I18nKey.uncategorized)}

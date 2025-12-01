@@ -600,13 +600,13 @@ function initTranslate() {
 	// 设置忽略的类名和标签
 	if (siteConfig.translate.ignoreClasses) {
 		siteConfig.translate.ignoreClasses.forEach(className => {
-			window.translate.ignore.class.push(className);
+			window.translate?.ignore.class.push(className);
 		});
 	}
 
 	if (siteConfig.translate.ignoreTags) {
 		siteConfig.translate.ignoreTags.forEach(tagName => {
-			window.translate.ignore.tag.push(tagName);
+			window.translate?.ignore.tag.push(tagName);
 		});
 	}
 
@@ -627,7 +627,7 @@ function initTranslate() {
 	window.translateInitialized = true;
 
 	// 执行翻译初始化
-	window.translate.execute();
+	window.translate?.execute();
 }
 
 // 懒加载并初始化翻译功能
@@ -635,7 +635,7 @@ async function loadAndInitTranslate() {
 	if (!siteConfig.translate?.enable) return;
 
 	try {
-		await window.loadTranslateScript();
+		await window.loadTranslateScript?.();
 		initTranslate();
 	} catch (error) {
 		console.error('Failed to load translate.js:', error);
@@ -725,7 +725,7 @@ const setup = () => {
 		if (siteConfig.translate?.enable && window.translateInitialized && window.translate) {
 			// 使用requestAnimationFrame优化性能，减少延迟
 			requestAnimationFrame(() => {
-				window.translate.execute();
+				window.translate?.execute();
 			});
 		}
 
@@ -867,13 +867,11 @@ let toc = document.getElementById('toc-wrapper');
 let navbar = document.getElementById('navbar-wrapper')
 
 // 节流函数
-function throttle(func: Function, limit: number) {
+function throttle(func: (...args: any[]) => void, limit: number) {
 	let inThrottle: boolean;
-	return function(this: any) {
-		const args = arguments;
-		const context = this;
+	return function(this: any, ...args: any[]) {
 		if (!inThrottle) {
-			func.apply(context, args);
+			func.apply(this, args);
 			inThrottle = true;
 			setTimeout(() => inThrottle = false, limit);
 		}
