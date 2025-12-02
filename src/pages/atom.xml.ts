@@ -1,11 +1,11 @@
 import { getImage } from "astro:assets";
-import { getCollection } from "astro:content";
 import type { APIContext, ImageMetadata } from "astro";
 import MarkdownIt from "markdown-it";
 import { parse as htmlParser } from "node-html-parser";
 import sanitizeHtml from "sanitize-html";
 import { siteConfig, profileConfig } from "@/config";
 import { getSortedPosts } from "@/utils/content-utils";
+
 
 const markdownParser = new MarkdownIt();
 
@@ -105,7 +105,7 @@ export async function GET(context: APIContext) {
 		}
 
 		// 添加Atom条目
-		const postUrl = new URL(`posts/${post.slug}/`, context.site).href;
+		const postUrl = new URL(`posts/${post.id}/`, context.site).href;
 		const content = sanitizeHtml(html.toString(), {
 			allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
 		});

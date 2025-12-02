@@ -12,6 +12,7 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { getSortedPosts } from "@utils/content-utils";
 import { getDir, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
+import { render } from "astro:content";
 import bcryptjs from "bcryptjs";
 import CryptoJS from "crypto-js";
 import dayjs from "dayjs";
@@ -21,18 +22,21 @@ import ImageWrapper from "../../components/misc/ImageWrapper.astro";
 import PostMetadata from "../../components/PostMeta.astro";
 import { profileConfig, siteConfig } from "../../config";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
+
+
 export async function getStaticPaths() {
 	const blogEntries = await getSortedPosts();
 	return blogEntries.map((entry) => ({
-		params: { slug: entry.slug },
+		params: { slug: entry.id },
 		props: { entry },
 	}));
 }
 
-const { entry } = Astro.props;
-const { Content, headings } = await entry.render();
 
-const { remarkPluginFrontmatter } = await entry.render();
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+
+const { remarkPluginFrontmatter } = await render(entry);
 
 // 处理加密逻辑
 let encryptedContent = "";
@@ -85,7 +89,8 @@ const jsonLd = {
     description={entry.data.description}
     lang={entry.data.lang}
     setOGTypeArticle={true}
-    postSlug={entry.slug}
+    postSlug={entry.id}
+    series={entry.data.series}
     headings={headings}
 >
     <script
@@ -165,7 +170,7 @@ const jsonLd = {
                     updated={entry.data.updated}
                     tags={entry.data.tags}
                     category={entry.data.category}
-                    slug={entry.slug}
+                    slug={entry.id}
                 />
                 {
                     (!entry.data.image || (entry.data.image && !postConfig.showCoverInContent)) && (
@@ -180,12 +185,23 @@ const jsonLd = {
                 entry.data.image && postConfig.showCoverInContent && (
                     <>
                         <div class="mt-4" />
-                        <ImageWrapper
-                            id="post-cover"
-                            src={entry.data.image}
-                            basePath={path.join("content/posts/", getDir(entry.id))}
-                            class="mb-8 rounded-xl banner-container onload-animation"
-                        />
+                        {
+                            (() => {
+                                let imgDir = getDir(entry.id);
+                                if (imgDir === "/") {
+                                    const nameWithoutExt = entry.id.replace(/\.[^/.]+$/, "");
+                                    imgDir = `${nameWithoutExt}/`;
+                                }
+                                return (
+                                    <ImageWrapper
+                                        id="post-cover"
+                                        src={entry.data.image}
+                                        basePath={path.join("content/posts/", imgDir)}
+                                        class="mb-8 rounded-xl banner-container onload-animation"
+                                    />
+                                );
+                            })()
+                        }
                     </>
                 )
             }
@@ -204,7 +220,7 @@ const jsonLd = {
                         {postConfig.license.enable && (
                             <License
                                 title={entry.data.title}
-                                slug={entry.slug}
+                                id={entry.id}
                                 pubDate={entry.data.published}
                                 author={entry.data.author}
                                 sourceLink={entry.data.sourceLink}

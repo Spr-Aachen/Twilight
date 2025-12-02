@@ -3,6 +3,7 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { getCategoryUrl } from "@utils/url-utils";
 
+
 // // Retrieve posts and sort them by publication date
 async function getRawSortedPosts() {
 	const allBlogPosts = await getCollection("posts", ({ data }) => {
@@ -26,18 +27,18 @@ export async function getSortedPosts() {
 	const sorted = await getRawSortedPosts();
 
 	for (let i = 1; i < sorted.length; i++) {
-		sorted[i].data.nextSlug = sorted[i - 1].slug;
+		sorted[i].data.nextSlug = sorted[i - 1].id;
 		sorted[i].data.nextTitle = sorted[i - 1].data.title;
 	}
 	for (let i = 0; i < sorted.length - 1; i++) {
-		sorted[i].data.prevSlug = sorted[i + 1].slug;
+		sorted[i].data.prevSlug = sorted[i + 1].id;
 		sorted[i].data.prevTitle = sorted[i + 1].data.title;
 	}
 
 	return sorted;
 }
 export type PostForList = {
-	slug: string;
+	id: string;
 	data: CollectionEntry<"posts">["data"];
 };
 export async function getSortedPostsList(): Promise<PostForList[]> {
@@ -45,7 +46,7 @@ export async function getSortedPostsList(): Promise<PostForList[]> {
 
 	// delete post.body
 	const sortedPostsList = sortedFullPosts.map((post) => ({
-		slug: post.slug,
+		id: post.id,
 		data: post.data,
 	}));
 
@@ -121,18 +122,24 @@ export async function getCategoryList(): Promise<Category[]> {
 export async function getPostSeries(
   seriesName: string,
 ): Promise<{ body: string; data: CollectionEntry<"posts">["data"]; slug: string }[]> {
-  const posts = (await getCollection('posts', ({ data }) => {
+  const posts = await getCollection('posts', ({ data }) => {
     return (
       (import.meta.env.PROD ? data.draft !== true : true) &&
       data.series === seriesName
     )
-  })) as unknown as { body: string; data: CollectionEntry<"posts">["data"]; slug: string }[]
+  });
 
-  posts.sort((a, b) => {
+	const mappedPosts = posts.map((post) => ({
+		  body: post.body ?? "",
+		  data: post.data,
+		  slug: post.id,
+	}));
+
+  mappedPosts.sort((a, b) => {
     const dateA = new Date(a.data.published)
     const dateB = new Date(b.data.published)
     return dateA > dateB ? 1 : -1
   })
 
-  return posts
+  return mappedPosts
 }

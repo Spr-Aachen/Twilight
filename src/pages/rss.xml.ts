@@ -9,6 +9,7 @@ import sanitizeHtml from "sanitize-html";
 import { siteConfig } from "@/config";
 import { getSortedPosts } from "@/utils/content-utils";
 
+
 const markdownParser = new MarkdownIt();
 
 // get dynamic import of images as a map collection
@@ -99,7 +100,7 @@ export async function GET(context: APIContext) {
 			title: post.data.title,
 			description: post.data.description,
 			pubDate: post.data.published,
-			link: `/posts/${post.slug}/`,
+			link: `/posts/${post.id}/`,
 			// sanitize the new html string with corrected image paths
 			content: sanitizeHtml(html.toString(), {
 				allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),

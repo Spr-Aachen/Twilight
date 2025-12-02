@@ -6,6 +6,7 @@ import type { CollectionEntry } from "astro:content";
 import { i18n } from '@i18n/translation';
 import I18nKey from '@i18n/i18nKey';
 
+
 const COLLAPSED_HEIGHT = '7.5rem'
 
 interface Props {
@@ -17,8 +18,6 @@ const className = Astro.props.class
 const style = Astro.props.style
 const seriesName = Astro.props.series
 
-// 添加调试信息
-console.log("Series component received seriesName:", seriesName);
 
 let series: { body: string; data: CollectionEntry<"posts">["data"]; slug: string }[] = []
 let isCollapsed = false
@@ -26,8 +25,6 @@ let isCollapsed = false
 if (seriesName) {
   series = await getPostSeries(seriesName)
   
-  // 添加调试信息
-  console.log("Found series posts:", series.length);
 
   isCollapsed = series.length >= 10
 }
