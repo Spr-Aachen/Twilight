@@ -39,11 +39,11 @@ English | [**中文**](docs/README_ZH.md)
 
 2. **Install dependencies:**
    ```bash
-   # Install pnpm if not already installed
-   npm install -g pnpm
+   # Install bun if not already installed
+   curl -fsSL https://bun.sh/install | bash
    
    # Install project dependencies
-   pnpm install
+   bun install
    ```
 
 3. **Configure your blog:**
@@ -54,7 +54,7 @@ English | [**中文**](docs/README_ZH.md)
 
 4. **Start the development server:**
    ```bash
-   pnpm dev
+bun dev
    ```
 
 
@@ -67,15 +67,15 @@ Deploy your blog to any static hosting platform
 
 | Command                    | Action                                  |
 |:---------------------------|:----------------------------------------|
-| `pnpm install`             | Install dependencies                    |
-| `pnpm dev`                 | Start local dev server                  |
-| `pnpm build`               | Build production site to `./dist/`      |
-| `pnpm preview`             | Preview build locally before deployment |
-| `pnpm check`               | Run Astro error checking                |
-| `pnpm format`              | Format code with Biome                  |
-| `pnpm lint`                | Check and fix code issues               |
-| `pnpm new-post <filename>` | Create a new blog post                  |
-| `pnpm astro ...`           | Run Astro CLI commands                  |
+| `bun install`              | Install dependencies                    |
+| `bun dev`                  | Start local dev server                  |
+| `bun build`                | Build production site to `./dist/`      |
+| `bun preview`              | Preview build locally before deployment |
+| `bun check`                | Run Astro error checking                |
+| `bun format`               | Format code with Biome                  |
+| `bun lint`                 | Check and fix code issues               |
+| `bun new-post <filename>`  | Create a new blog post                  |
+| `bun astro ...`            | Run Astro CLI commands                  |
 
 
 ## 🙏 Acknowledgements
