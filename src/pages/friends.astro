@@ -1,47 +1,33 @@
 ---
-
 import { getEntry, render } from "astro:content";
 import Markdown from "@components/misc/Markdown.astro";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { friendsData } from "../data/friends";
+
 
 const friendsPost = await getEntry("spec", "friends");
 
 if (!friendsPost) {
-	throw new Error("friends page content not found");
+    throw new Error("friends page content not found");
 }
 
 const { Content } = await render(friendsPost);
-const items = [
-	{
-		title: "Astro",
-		imgurl: "https://avatars.githubusercontent.com/u/44914786?s=210&v=4",
-		desc: "The web framework for content-driven websites.",
-		siteurl: "https://github.com/withastro/astro",
-		tags: ["Framework"],
-	},
-	{
-		title: "Twilight Docs",
-		imgurl:
-			"https://docs.twilight.spr-aachen.com/twilight.png",
-		desc: "Twilight User Manual",
-		siteurl: "https://docs.twilight.spr-aachen.com",
-		tags: ["Docs"],
-	},
-];
+const items = friendsData;
 
 function shuffleArray(array) {
-	const newArray = [...array];
-	for (let i = newArray.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-	}
-	return newArray;
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
 }
 
 const shuffledItems = shuffleArray(items);
 ---
+
 <MainGridLayout title={i18n(I18nKey.friends)} description={i18n(I18nKey.friends)}>
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
         <div class="card-base z-10 px-9 py-6 relative w-full ">
