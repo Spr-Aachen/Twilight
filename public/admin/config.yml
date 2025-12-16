@@ -99,6 +99,19 @@ collections:
       - { label: "Icon", name: "icon", widget: "string", required: false }
       - { label: "Color", name: "color", widget: "string", required: false }
       - { label: "Featured", name: "featured", widget: "boolean", required: false, default: false }
+  # 友链集合
+  - name: "friends"
+    label: "Friends"
+    folder: "src/data/friends"
+    create: true
+    slug: "{{slug}}"
+    format: "json"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Avatar URL", name: "imgurl", widget: "string" }
+      - { label: "Description", name: "desc", widget: "text" }
+      - { label: "Site URL", name: "siteurl", widget: "string" }
+      - { label: "Tags", name: "tags", widget: "list", required: false, default: [] }
 
 # 编辑器配置
 editor:
