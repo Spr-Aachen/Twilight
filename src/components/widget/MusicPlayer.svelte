@@ -1,6 +1,4 @@
 <script lang="ts">
-// 导入 Svelte 的生命周期函数和过渡效果
-
 // 导入 Icon 组件，用于显示图标
 import Icon from "@iconify/svelte";
 import { onDestroy, onMount } from "svelte";
@@ -10,6 +8,9 @@ import { musicPlayerConfig } from "../../config";
 // 导入国际化相关的 Key 和 i18n 实例
 import Key from "../../i18n/i18nKey";
 import { i18n } from "../../i18n/translation";
+// 导入样式文件
+import "../../styles/musicplayer.css";
+
 
 // 音乐播放器模式，可选 "local" 或 "meting"
 let mode = musicPlayerConfig.mode ?? "local";
@@ -345,7 +346,9 @@ onDestroy(() => {
 });
 </script>
 
+
 {#if musicPlayerConfig.enable}
+
 {#if showError}
 <div class="fixed bottom-20 right-4 z-[60] max-w-sm">
     <div class="bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-up">
@@ -623,182 +626,4 @@ onDestroy(() => {
     {/if}
 </div>
 
-<style>
-.orb-player {
-	position: relative;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-}
-.orb-player::before {
-	content: '';
-	position: absolute;
-	inset: -2px;
-	background: linear-gradient(45deg, var(--primary), transparent, var(--primary));
-	border-radius: 50%;
-	z-index: -1;
-	opacity: 0;
-	transition: opacity 0.3s ease;
-}
-.orb-player:hover::before {
-	opacity: 0.3;
-	animation: rotate 2s linear infinite;
-}
-.orb-player .animate-pulse {
-	animation: musicWave 1.5s ease-in-out infinite;
-}
-@keyframes rotate {
-	from { transform: rotate(0deg); }
-	to { transform: rotate(360deg); }
-}
-@keyframes musicWave {
-	0%, 100% { transform: scaleY(0.5); }
-	50% { transform: scaleY(1); }
-}
-.music-player.hidden-mode {
-	width: 48px;
-	height: 48px;
-}
-.music-player {
-    max-width: 320px;
-    user-select: none;
-}
-.mini-player {
-    width: 280px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    /*left: 0;*/
-}
-.expanded-player {
-    width: 320px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-}
-
-.animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-.progress-section div:hover,
-.bottom-controls > div:hover {
-    transform: scaleY(1.2);
-    transition: transform 0.2s ease;
-}
-@media (max-width: 768px) {
-    .music-player {
-        max-width: 280px;
-        /*left: 8px !important;*/
-        bottom: 8px !important;
-        right: 8px !important;
-    }
-    .music-player.expanded {
-        width: calc(100vw - 16px);
-        max-width: none;
-        /*left: 8px !important;*/
-        right: 8px !important;
-    }
-    .playlist-panel {
-        width: calc(100vw - 16px) !important;
-        /*left: 8px !important;*/
-        right: 8px !important;
-        max-width: none;
-    }
-    .controls {
-        gap: 8px;
-    }
-    .controls button {
-        width: 36px;
-        height: 36px;
-    }
-    .controls button:nth-child(3) {
-        width: 44px;
-        height: 44px;
-    }
-}
-@media (max-width: 480px) {
-    .music-player {
-        max-width: 260px;
-    }
-    .song-title {
-        font-size: 14px;
-    }
-    .song-artist {
-        font-size: 12px;
-    }
-    .controls {
-        gap: 6px;
-        margin-bottom: 12px;
-    }
-    .controls button {
-        width: 32px;
-        height: 32px;
-    }
-    .controls button:nth-child(3) {
-        width: 40px;
-        height: 40px;
-    }
-    .playlist-item {
-        padding: 8px 12px;
-    }
-    .playlist-item .w-10 {
-        width: 32px;
-        height: 32px;
-    }
-}
-@keyframes slide-up {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-.animate-slide-up {
-    animation: slide-up 0.3s ease-out;
-}
-@media (hover: none) and (pointer: coarse) {
-    .music-player button,
-    .playlist-item {
-        min-height: 44px;
-    }
-    .progress-section > div,
-    .bottom-controls > div:nth-child(2) {
-        height: 12px;
-    }
-}
-/* 自定义旋转动画，停止时保持当前位置 */
-@keyframes spin-continuous {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.cover-container img {
-    animation: spin-continuous 3s linear infinite;
-    animation-play-state: paused;
-}
-
-.cover-container img.spinning {
-    animation-play-state: running;
-}
-
-/* 让主题色按钮更有视觉反馈 */
-button.bg-\[var\(--primary\)\] {
-    box-shadow: 0 0 0 2px var(--primary);
-    border: none;
-}
-</style>
 {/if}
