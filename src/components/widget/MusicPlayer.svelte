@@ -5,6 +5,7 @@ import { onDestroy, onMount } from "svelte";
 import { slide } from "svelte/transition";
 // 从配置文件中导入音乐播放器配置
 import { musicPlayerConfig } from "../../config";
+import type { MusicPlayerTrack } from "../../types/config";
 // 导入国际化相关的 Key 和 i18n 实例
 import Key from "../../i18n/i18nKey";
 import { i18n } from "../../i18n/translation";
@@ -13,336 +14,326 @@ import "../../styles/musicplayer.css";
 
 
 // 音乐播放器模式，可选 "local" 或 "meting"
-let mode = musicPlayerConfig.mode ?? "local";
+let mode = musicPlayerConfig.mode ?? "meting";
 // Meting API 地址，从配置中获取或使用默认值
-let meting_api =
-	musicPlayerConfig.meting_api ??
-	"https://exampleapi";
-// Meting API 的 ID，从配置中获取或使用默认值
-let meting_id = musicPlayerConfig.id ?? "exampleid";
-// Meting API 的服务器，从配置中获取或使用默认值,有的meting的api源支持更多平台,一般来说,netease=网易云音乐, tencent=QQ音乐, kugou=酷狗音乐, xiami=虾米音乐, baidu=百度音乐
-let meting_server = musicPlayerConfig.server ?? "netease";
+let meting_api = musicPlayerConfig.meting?.meting_api ?? "https://meting-api-omega.vercel.app/api";
+// Meting API 的数据源，从配置中获取或使用默认值
+let meting_server = musicPlayerConfig.meting?.server ?? "netease";
 // Meting API 的类型，从配置中获取或使用默认值
-let meting_type = musicPlayerConfig.type ?? "playlist";
-// 播放状态，默认为 false (未播放)
+let meting_type = musicPlayerConfig.meting?.type ?? "playlist";
+// Meting API 的 ID，从配置中获取或使用默认值
+let meting_id = musicPlayerConfig.meting?.id ?? "2161912966";
+
+// 是否自动播放
 let isPlaying = false;
-// 播放器是否展开，默认为 false
+// 是否展开播放器
 let isExpanded = false;
-// 播放器是否隐藏，默认为 false
+// 是否隐藏播放器
 let isHidden = false;
-// 是否显示播放列表，默认为 false
+// 是否显示播放列表
 let showPlaylist = false;
-// 当前播放时间，默认为 0
+// 当前播放时间
 let currentTime = 0;
-// 歌曲总时长，默认为 0
+// 歌曲总时长
 let duration = 0;
-// 音量，默认为 0.7
-let volume = 0.7;
-// 是否静音，默认为 false
+// 音量
+let volume = 0.75;
+// 是否静音
 let isMuted = false;
-// 是否正在加载，默认为 false
+// 是否正在加载
 let isLoading = false;
-// 是否随机播放，默认为 false
+// 是否随机播放
 let isShuffled = false;
-// 循环模式，0: 不循环, 1: 单曲循环, 2: 列表循环，默认为 0
+// 循环模式，0: 不循环, 1: 单曲循环, 2: 列表循环
 let isRepeating = 0;
-// 错误信息，默认为空字符串
+// 错误信息
 let errorMessage = "";
-// 是否显示错误信息，默认为 false
+// 是否显示错误信息
 let showError = false;
 
 // 当前歌曲信息
-let currentSong = {
-	title: "Music",
-	artist: "Artist",
-	cover: "/favicon/icon-light.ico",
-	url: "",
-	duration: 0,
+let currentSong: MusicPlayerTrack = {
+    id: 0,
+    title: "Music",
+    artist: "Artist",
+    cover: "/favicon/icon-light.ico",
+    url: "",
+    duration: 0,
 };
-
-let playlist = [];
+let playlist: MusicPlayerTrack[] = [];
 let currentIndex = 0;
 let audio: HTMLAudioElement;
 let progressBar: HTMLElement;
 let volumeBar: HTMLElement;
 
-const localPlaylist = [
-	{
-		id: 1,
-		title: "深海之息",
-		artist: "Youzee Music",
-		cover: "https://p1.music.126.net/PhKOqFtljgHDDpKYM2ADUA==/109951169858309716.jpg",
-		url: "assets/music/url/深海之息.m4a",
-		duration: 146,
-	},
-];
-
 async function fetchMetingPlaylist() {
-	if (!meting_api || !meting_id) return;
-	isLoading = true;
-	const apiUrl = meting_api
-		.replace(":server", meting_server)
-		.replace(":type", meting_type)
-		.replace(":id", meting_id)
-		.replace(":auth", "")
-		.replace(":r", Date.now().toString());
-	try {
-		const res = await fetch(apiUrl);
-		if (!res.ok) throw new Error("meting api error");
-		const list = await res.json();
-		playlist = list.map((song) => {
-			let title = song.name ?? song.title ?? "未知歌曲";
-			let artist = song.artist ?? song.author ?? "未知艺术家";
-			let dur = song.duration ?? 0;
-			if (dur > 10000) dur = Math.floor(dur / 1000);
-			if (!Number.isFinite(dur) || dur <= 0) dur = 0;
-			return {
-				id: song.id,
-				title,
-				artist,
-				cover: song.pic ?? "",
-				url: song.url ?? "",
-				duration: dur,
-			};
-		});
-		if (playlist.length > 0) {
-			loadSong(playlist[0]);
-		}
-		isLoading = false;
-	} catch (e) {
-		showErrorMessage("Meting 歌单获取失败");
-		isLoading = false;
-	}
+    if (!meting_api || !meting_id) return;
+    isLoading = true;
+    const query = new URLSearchParams({
+        server: meting_server,
+        type: meting_type,
+        id: meting_id,
+    });
+    const separator = meting_api.includes("?") ? "&" : "?";
+    const apiUrl = `${meting_api}${separator}${query.toString()}`;
+    try {
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error("meting api error");
+        const list = await res.json();
+        playlist = list.map((song: any) => {
+            let title = song.name ?? song.title ?? "未知歌曲";
+            let artist = song.artist ?? song.author ?? "未知艺术家";
+            let dur = song.duration ?? 0;
+            if (dur > 10000) dur = Math.floor(dur / 1000);
+            if (!Number.isFinite(dur) || dur <= 0) dur = 0;
+            return {
+                id: song.id,
+                title,
+                artist,
+                cover: song.pic ?? "",
+                url: song.url ?? "",
+                duration: dur,
+            };
+        });
+        if (playlist.length > 0) {
+            loadSong(playlist[0]);
+        }
+        isLoading = false;
+    } catch (e) {
+        showErrorMessage("Meting 歌单获取失败");
+        isLoading = false;
+    }
 }
 
 function togglePlay() {
-	if (!audio || !currentSong.url) return;
-	if (isPlaying) {
-		audio.pause();
-	} else {
-		audio.play();
-	}
+    if (!audio || !currentSong.url) return;
+    if (isPlaying) {
+        audio.pause();
+    } else {
+        audio.play();
+    }
 }
 
 function toggleExpanded() {
-	isExpanded = !isExpanded;
-	if (isExpanded) {
-		showPlaylist = false;
-		isHidden = false;
-	}
+    isExpanded = !isExpanded;
+    if (isExpanded) {
+        showPlaylist = false;
+        isHidden = false;
+    }
 }
 
 function toggleHidden() {
-	isHidden = !isHidden;
-	if (isHidden) {
-		isExpanded = false;
-		showPlaylist = false;
-	}
+    isHidden = !isHidden;
+    if (isHidden) {
+        isExpanded = false;
+        showPlaylist = false;
+    }
 }
 
 function togglePlaylist() {
-	showPlaylist = !showPlaylist;
+    showPlaylist = !showPlaylist;
 }
 
 function toggleShuffle() {
-	isShuffled = !isShuffled;
+    isShuffled = !isShuffled;
 }
 
 function toggleRepeat() {
-	isRepeating = (isRepeating + 1) % 3;
+    isRepeating = (isRepeating + 1) % 3;
 }
 
 function previousSong() {
-	if (playlist.length <= 1) return;
-	const newIndex = currentIndex > 0 ? currentIndex - 1 : playlist.length - 1;
-	playSong(newIndex);
+    if (playlist.length <= 1) return;
+    const newIndex = currentIndex > 0 ? currentIndex - 1 : playlist.length - 1;
+    playSong(newIndex);
 }
 
 function nextSong() {
-	if (playlist.length <= 1) return;
-	let newIndex: number;
-	if (isShuffled) {
-		do {
-			newIndex = Math.floor(Math.random() * playlist.length);
-		} while (newIndex === currentIndex && playlist.length > 1);
-	} else {
-		newIndex = currentIndex < playlist.length - 1 ? currentIndex + 1 : 0;
-	}
-	playSong(newIndex);
+    if (playlist.length <= 1) return;
+    let newIndex: number;
+    if (isShuffled) {
+        do {
+            newIndex = Math.floor(Math.random() * playlist.length);
+        } while (newIndex === currentIndex && playlist.length > 1);
+    } else {
+        newIndex = currentIndex < playlist.length - 1 ? currentIndex + 1 : 0;
+    }
+    playSong(newIndex);
 }
 
 function playSong(index: number) {
-	if (index < 0 || index >= playlist.length) return;
-	const wasPlaying = isPlaying;
-	currentIndex = index;
-	if (audio) audio.pause();
-	loadSong(playlist[currentIndex]);
-	if (wasPlaying || !isPlaying) {
-		setTimeout(() => {
-			if (!audio) return;
-			if (audio.readyState >= 2) {
-				audio.play().catch(() => {});
-			} else {
-				audio.addEventListener(
-					"canplay",
-					() => {
-						audio.play().catch(() => {});
-					},
-					{ once: true },
-				);
-			}
-		}, 100);
-	}
+    if (index < 0 || index >= playlist.length) return;
+    const wasPlaying = isPlaying;
+    currentIndex = index;
+    if (audio) audio.pause();
+    loadSong(playlist[currentIndex]);
+    if (wasPlaying || !isPlaying) {
+        setTimeout(() => {
+            if (!audio) return;
+            if (audio.readyState >= 2) {
+                audio.play().catch(() => {});
+            } else {
+                audio.addEventListener(
+                    "canplay",
+                    () => {
+                        audio.play().catch(() => {});
+                    },
+                    { once: true },
+                );
+            }
+        }, 100);
+    }
 }
 
 function getAssetPath(path: string): string {
-	if (path.startsWith("http://") || path.startsWith("https://")) return path;
-	if (path.startsWith("/")) return path;
-	return `/${path}`;
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    if (path.startsWith("/")) return path;
+    return `/${path}`;
 }
 
-function loadSong(song: typeof currentSong) {
-	if (!song || !audio) return;
-	currentSong = { ...song };
-	if (song.url) {
-		isLoading = true;
-		audio.pause();
-		audio.currentTime = 0;
-		currentTime = 0;
-		duration = song.duration ?? 0;
-		audio.removeEventListener("loadeddata", handleLoadSuccess);
-		audio.removeEventListener("error", handleLoadError);
-		audio.removeEventListener("loadstart", handleLoadStart);
-		audio.addEventListener("loadeddata", handleLoadSuccess, { once: true });
-		audio.addEventListener("error", handleLoadError, { once: true });
-		audio.addEventListener("loadstart", handleLoadStart, { once: true });
-		audio.src = getAssetPath(song.url);
-		audio.load();
-	} else {
-		isLoading = false;
-	}
+function loadSong(song: MusicPlayerTrack) {
+    if (!song || !audio) return;
+    currentSong = { ...song };
+    if (song.url) {
+        isLoading = true;
+        audio.pause();
+        audio.currentTime = 0;
+        currentTime = 0;
+        duration = song.duration ?? 0;
+        audio.removeEventListener("loadeddata", handleLoadSuccess);
+        audio.removeEventListener("error", handleLoadError);
+        audio.removeEventListener("loadstart", handleLoadStart);
+        audio.addEventListener("loadeddata", handleLoadSuccess, { once: true });
+        audio.addEventListener("error", handleLoadError, { once: true });
+        audio.addEventListener("loadstart", handleLoadStart, { once: true });
+        audio.src = getAssetPath(song.url);
+        audio.load();
+    } else {
+        isLoading = false;
+    }
 }
 
 function handleLoadSuccess() {
-	isLoading = false;
-	if (audio?.duration && audio.duration > 1) {
-		duration = Math.floor(audio.duration);
-		if (playlist[currentIndex]) playlist[currentIndex].duration = duration;
-		currentSong.duration = duration;
-	}
+    isLoading = false;
+    if (audio?.duration && audio.duration > 1) {
+        duration = Math.floor(audio.duration);
+        if (playlist[currentIndex]) playlist[currentIndex].duration = duration;
+        currentSong.duration = duration;
+    }
 }
 
 function handleLoadError(event: Event) {
-	isLoading = false;
-	showErrorMessage(`无法播放 "${currentSong.title}"，正在尝试下一首...`);
-	if (playlist.length > 1) setTimeout(() => nextSong(), 1000);
-	else showErrorMessage("播放列表中没有可用的歌曲");
+    isLoading = false;
+    showErrorMessage(`无法播放 "${currentSong.title}"，正在尝试下一首...`);
+    if (playlist.length > 1) setTimeout(() => nextSong(), 1000);
+    else showErrorMessage("播放列表中没有可用的歌曲");
 }
 
 function handleLoadStart() {}
 
 function showErrorMessage(message: string) {
-	errorMessage = message;
-	showError = true;
-	setTimeout(() => {
-		showError = false;
-	}, 3000);
+    errorMessage = message;
+    showError = true;
+    setTimeout(() => {
+        showError = false;
+    }, 3000);
 }
+
 function hideError() {
-	showError = false;
+    showError = false;
 }
 
 function setProgress(event: MouseEvent) {
-	if (!audio || !progressBar) return;
-	const rect = progressBar.getBoundingClientRect();
-	const percent = (event.clientX - rect.left) / rect.width;
-	const newTime = percent * duration;
-	audio.currentTime = newTime;
-	currentTime = newTime;
+    if (!audio || !progressBar) return;
+    const rect = progressBar.getBoundingClientRect();
+    const percent = (event.clientX - rect.left) / rect.width;
+    const newTime = percent * duration;
+    audio.currentTime = newTime;
+    currentTime = newTime;
 }
 
 function setVolume(event: MouseEvent) {
-	if (!audio || !volumeBar) return;
-	const rect = volumeBar.getBoundingClientRect();
-	const percent = Math.max(
-		0,
-		Math.min(1, (event.clientX - rect.left) / rect.width),
-	);
-	volume = percent;
-	audio.volume = volume;
-	isMuted = volume === 0;
+    if (!audio || !volumeBar) return;
+    const rect = volumeBar.getBoundingClientRect();
+    const percent = Math.max(
+        0,
+        Math.min(1, (event.clientX - rect.left) / rect.width),
+    );
+    volume = percent;
+    audio.volume = volume;
+    isMuted = volume === 0;
 }
 
 function toggleMute() {
-	if (!audio) return;
-	isMuted = !isMuted;
-	audio.muted = isMuted;
+    if (!audio) return;
+    isMuted = !isMuted;
+    audio.muted = isMuted;
 }
 
 function formatTime(seconds: number): string {
-	if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
-	const mins = Math.floor(seconds / 60);
-	const secs = Math.floor(seconds % 60);
-	return `${mins}:${secs.toString().padStart(2, "0")}`;
+    if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 function handleAudioEvents() {
-	if (!audio) return;
-	audio.addEventListener("play", () => {
-		isPlaying = true;
-	});
-	audio.addEventListener("pause", () => {
-		isPlaying = false;
-	});
-	audio.addEventListener("timeupdate", () => {
-		currentTime = audio.currentTime;
-	});
-	audio.addEventListener("ended", () => {
-		if (isRepeating === 1) {
-			audio.currentTime = 0;
-			audio.play().catch(() => {});
-		} else if (
-			isRepeating === 2 ||
-			currentIndex < playlist.length - 1 ||
-			isShuffled
-		) {
-			nextSong();
-		} else {
-			isPlaying = false;
-		}
-	});
-	audio.addEventListener("error", (event) => {
-		isLoading = false;
-	});
-	audio.addEventListener("stalled", () => {});
-	audio.addEventListener("waiting", () => {});
+    if (!audio) return;
+    audio.addEventListener("play", () => {
+        isPlaying = true;
+    });
+    audio.addEventListener("pause", () => {
+        isPlaying = false;
+    });
+    audio.addEventListener("timeupdate", () => {
+        currentTime = audio.currentTime;
+    });
+    audio.addEventListener("ended", () => {
+        if (isRepeating === 1) {
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        } else if (
+            isRepeating === 2 ||
+            currentIndex < playlist.length - 1 ||
+            isShuffled
+        ) {
+            nextSong();
+        } else {
+            isPlaying = false;
+        }
+    });
+    audio.addEventListener("error", (event) => {
+        isLoading = false;
+    });
+    audio.addEventListener("stalled", () => {});
+    audio.addEventListener("waiting", () => {});
 }
 
 onMount(() => {
-	audio = new Audio();
-	audio.volume = volume;
-	handleAudioEvents();
-	if (!musicPlayerConfig.enable) {
-		return;
-	}
-	if (mode === "meting") {
-		fetchMetingPlaylist();
-	} else {
-		// 使用本地播放列表，不发送任何API请求
-		playlist = [...localPlaylist];
-		if (playlist.length > 0) {
-			loadSong(playlist[0]);
-		} else {
-			showErrorMessage("本地播放列表为空");
-		}
-	}
+    audio = new Audio();
+    audio.volume = volume;
+    handleAudioEvents();
+    if (!musicPlayerConfig.enable) {
+        return;
+    }
+    if (mode === "meting") {
+        fetchMetingPlaylist();
+    } else {
+        // 使用本地播放列表，不发送任何API请求
+        playlist = [...(musicPlayerConfig.local?.playlist ?? [])];
+        if (playlist.length > 0) {
+            loadSong(playlist[0]);
+        } else {
+            showErrorMessage("本地播放列表为空");
+        }
+    }
 });
 
 onDestroy(() => {
-	if (audio) {
-		audio.pause();
-		audio.src = "";
-	}
+    if (audio) {
+        audio.pause();
+        audio.src = "";
+    }
 });
 </script>
 

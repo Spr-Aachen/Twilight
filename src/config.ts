@@ -506,6 +506,33 @@ export const particleConfig: ParticleConfig = {
 export const musicPlayerConfig: MusicPlayerConfig = {
     // 启用音乐播放器功能
     enable: true,
+    // 音乐播放器模式 ("meting" API | "local" 本地)
+    mode: "meting",
+    // meting 模式专属配置
+    meting: {
+        // Meting API 地址
+        meting_api: "https://meting-api-omega.vercel.app/api",
+        // 音乐源
+        server: "netease",
+        // 歌单/单曲 ID
+        id: "2161912966",
+        // 类型 ("playlist" 歌单 | "song" 单曲)
+        type: "playlist",
+    },
+    // local 模式专属配置
+    local: {
+        // 播放列表
+        playlist: [
+            {
+                id: 1,
+                title: "深海之息",
+                artist: "Youzee Music",
+                cover: "https://p1.music.126.net/PhKOqFtljgHDDpKYM2ADUA==/109951169858309716.jpg",
+                url: "assets/music/url/深海之息.m4a",
+                duration: 146,
+            },
+        ],
+    },
 };
 
 

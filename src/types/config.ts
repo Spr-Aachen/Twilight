@@ -462,13 +462,47 @@ export type ParticleConfig = {
     zIndex: number;
 };
 
+/**
+ * 
+ */
+
+export type MusicPlayerTrack = {
+    id: number | string;
+    title: string;
+    artist: string;
+    cover: string;
+    url: string;
+    duration: number;
+};
+
 
 // 音乐播放器配置
 export type MusicPlayerConfig = {
     // 启用音乐播放器功能
     enable: boolean;
+    // 音乐播放器模式
+    mode: "meting" | "local";
+    // meting 模式专属配置
+    meting: {
+        // Meting API 地址
+        meting_api: string;
+        // 音乐源
+        server: string;
+        // 类型
+        type: "playlist" | "song";
+        // 歌单/单曲 ID
+        id: string;
+    };
+    // local 模式专属配置
+    local: {
+        // 播放列表
+        playlist: MusicPlayerTrack[];
+    };
 };
 
+/**
+ * 
+ */
 
 // 看板娘配置
 export type PioConfig = {
