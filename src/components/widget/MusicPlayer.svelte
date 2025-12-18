@@ -103,6 +103,33 @@ async function fetchMetingPlaylist() {
     }
 }
 
+async function toggleMode() {
+    if (!musicPlayerConfig.enable) return;
+    mode = mode === "meting" ? "local" : "meting";
+    showPlaylist = false;
+    isLoading = false;
+    isPlaying = false;
+    currentIndex = 0;
+    playlist = [];
+    if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+    }
+    currentTime = 0;
+    duration = 0;
+
+    if (mode === "meting") {
+        await fetchMetingPlaylist();
+    } else {
+        playlist = [...(musicPlayerConfig.local?.playlist ?? [])];
+        if (playlist.length > 0) {
+            loadSong(playlist[0]);
+        } else {
+            showErrorMessage("本地播放列表为空");
+        }
+    }
+}
+
 function togglePlay() {
     if (!audio || !currentSong.url) return;
     if (isPlaying) {
@@ -391,6 +418,11 @@ onDestroy(() => {
                 </div>
             </div>
             <div class="flex items-center gap-1">
+                <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
+                        on:click={toggleMode}
+                        title={mode === "meting" ? "切换到 Local 模式" : "切换到 Meting 模式"}>
+                    <Icon icon={mode === "meting" ? "material-symbols:cloud" : "material-symbols:folder"} class="text-lg" />
+                </button>
                 <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
                         on:click={toggleCollapse}
                         title="折叠播放器">
