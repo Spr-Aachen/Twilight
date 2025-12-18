@@ -26,10 +26,8 @@ let meting_id = musicPlayerConfig.meting?.id ?? "2161912966";
 
 // 是否自动播放
 let isPlaying = false;
-// 是否展开播放器
-let isExpanded = false;
-// 是否隐藏播放器
-let isHidden = false;
+// 是否折叠播放器
+let isCollapsed = true;
 // 是否显示播放列表
 let showPlaylist = false;
 // 当前播放时间
@@ -114,18 +112,9 @@ function togglePlay() {
     }
 }
 
-function toggleExpanded() {
-    isExpanded = !isExpanded;
-    if (isExpanded) {
-        showPlaylist = false;
-        isHidden = false;
-    }
-}
-
-function toggleHidden() {
-    isHidden = !isHidden;
-    if (isHidden) {
-        isExpanded = false;
+function toggleCollapse() {
+    isCollapsed = !isCollapsed;
+    if (isCollapsed) {
         showPlaylist = false;
     }
 }
@@ -353,23 +342,23 @@ onDestroy(() => {
 {/if}
 
 <div class="music-player fixed bottom-4 right-4 z-50 transition-all duration-300 ease-in-out"
-     class:expanded={isExpanded}
-     class:hidden-mode={isHidden}>
-    <!-- 隐藏状态的小圆球 -->
+     class:expanded={!isCollapsed}
+     class:collapsed={isCollapsed}>
+    <!-- 折叠状态的小圆球 -->
     <div class="orb-player w-12 h-12 bg-[var(--primary)] rounded-full shadow-lg cursor-pointer transition-all duration-500 ease-in-out flex items-center justify-center hover:scale-110 active:scale-95"
-         class:opacity-0={!isHidden}
-         class:scale-0={!isHidden}
-         class:pointer-events-none={!isHidden}
-         on:click={toggleHidden}
+         class:opacity-0={!isCollapsed}
+         class:scale-0={!isCollapsed}
+         class:pointer-events-none={!isCollapsed}
+         on:click={toggleCollapse}
          on:keydown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                toggleHidden();
+                toggleCollapse();
             }
          }}
          role="button"
          tabindex="0"
-         aria-label="显示音乐播放器">
+         aria-label="展开音乐播放器">
         {#if isLoading}
             <Icon icon="eos-icons:loading" class="text-white text-lg" />
         {:else if isPlaying}
@@ -382,59 +371,11 @@ onDestroy(() => {
             <Icon icon="material-symbols:music-note" class="text-white text-lg" />
         {/if}
     </div>
-    <!-- 收缩状态的迷你播放器（封面圆形） -->
-    <div class="mini-player card-base bg-[var(--float-panel-bg)] shadow-xl rounded-2xl p-3 transition-all duration-500 ease-in-out"
-         class:opacity-0={isExpanded || isHidden}
-         class:scale-95={isExpanded || isHidden}
-         class:pointer-events-none={isExpanded || isHidden}
-         on:click={toggleExpanded}
-         on:keydown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleExpanded();
-            }
-         }}
-         role="button"
-         tabindex="0"
-         aria-label="展开音乐播放器">
-        <div class="flex items-center gap-3 cursor-pointer">
-            <div class="cover-container relative w-12 h-12 rounded-full overflow-hidden">
-                <img src={getAssetPath(currentSong.cover)} alt="封面"
-                     class="w-full h-full object-cover transition-transform duration-300"
-                     class:spinning={isPlaying && !isLoading}
-                     class:animate-pulse={isLoading} />
-                <div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    {#if isLoading}
-                        <Icon icon="eos-icons:loading" class="text-white text-xl" />
-                    {:else if isPlaying}
-                        <Icon icon="material-symbols:pause" class="text-white text-xl" />
-                    {:else}
-                        <Icon icon="material-symbols:play-arrow" class="text-white text-xl" />
-                    {/if}
-                </div>
-            </div>
-            <div class="flex-1 min-w-0">
-                <div class="text-sm font-medium text-90 truncate">{currentSong.title}</div>
-                <div class="text-xs text-50 truncate">{currentSong.artist}</div>
-            </div>
-            <div class="flex items-center gap-1">
-                <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                        on:click|stopPropagation={toggleHidden}
-                        title="隐藏播放器">
-                    <Icon icon="material-symbols:visibility-off" class="text-lg" />
-                </button>
-                <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                        on:click|stopPropagation={toggleExpanded}>
-                    <Icon icon="material-symbols:expand-less" class="text-lg" />
-                </button>
-            </div>
-        </div>
-    </div>
     <!-- 展开状态的完整播放器（封面圆形） -->
     <div class="expanded-player card-base bg-[var(--float-panel-bg)] shadow-xl rounded-2xl p-4 transition-all duration-500 ease-in-out"
-         class:opacity-0={!isExpanded}
-         class:scale-95={!isExpanded}
-         class:pointer-events-none={!isExpanded}>
+         class:opacity-0={isCollapsed}
+         class:scale-95={isCollapsed}
+         class:pointer-events-none={isCollapsed}>
         <div class="flex items-center gap-4 mb-4">
             <div class="cover-container relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                 <img src={getAssetPath(currentSong.cover)} alt="封面"
@@ -451,12 +392,8 @@ onDestroy(() => {
             </div>
             <div class="flex items-center gap-1">
                 <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                        on:click={toggleHidden}
-                        title="隐藏播放器">
-                    <Icon icon="material-symbols:visibility-off" class="text-lg" />
-                </button>
-                <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                        on:click={toggleExpanded}>
+                        on:click={toggleCollapse}
+                        title="折叠播放器">
                     <Icon icon="material-symbols:expand-more" class="text-lg" />
                 </button>
             </div>

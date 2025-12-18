@@ -28,20 +28,9 @@
     0%, 100% { transform: scaleY(0.5); }
     50% { transform: scaleY(1); }
 }
-.music-player.hidden-mode {
-    width: 48px;
-    height: 48px;
-}
 .music-player {
     max-width: 320px;
     user-select: none;
-}
-.mini-player {
-    width: 280px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    /*left: 0;*/
 }
 .expanded-player {
     width: 320px;
