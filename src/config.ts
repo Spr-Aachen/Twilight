@@ -511,7 +511,7 @@ export const musicPlayerConfig: MusicPlayerConfig = {
     // meting 模式专属配置
     meting: {
         // Meting API 地址
-        meting_api: "https://meting-api-omega.vercel.app/api",
+        meting_api: "https://api.i-meto.com/meting/api",
         // 音乐平台
         server: "netease",
         // 类型 ("playlist" 歌单 | "song" 单曲)

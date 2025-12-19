@@ -493,9 +493,9 @@ export type MusicPlayerConfig = {
         // Meting API 地址
         meting_api: string;
         // 音乐平台
-        server: string;
+        server: "netease" | "tencent" | "kugou" | "baidu" | "kuwo";
         // 类型
-        type: "playlist" | "song";
+        type: "playlist" | "album" | "artist" | "song" | "search";
         // 资源 ID
         id: string;
     };
