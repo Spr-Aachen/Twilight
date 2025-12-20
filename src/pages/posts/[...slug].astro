@@ -23,38 +23,38 @@ import { formatDateToYYYYMMDD } from "../../utils/date-utils";
 
 
 export async function getStaticPaths() {
-	const blogEntries = await getSortedPosts();
-	const paths: {
-		params: { slug: string };
-		props: { entry: CollectionEntry<"posts"> };
-	}[] = [];
+    const blogEntries = await getSortedPosts();
+    const paths: {
+        params: { slug: string };
+        props: { entry: CollectionEntry<"posts"> };
+    }[] = [];
 
-	for (const entry of blogEntries) {
-		// 将 id 转换为 slug（移除扩展名）以匹配路由参数
-		const slug = removeFileExtension(entry.id);
-		// 为每篇文章创建默认的 slug 路径
-		paths.push({
-			params: { slug },
-			props: { entry },
-		});
-		// 如果文章有自定义固定链接，也创建对应的路径
-		if (entry.data.permalink) {
-			// 移除开头的斜杠和结尾的斜杠
-			// 同时移除可能的 "posts/" 前缀，避免重复
-			let permalink = entry.data.permalink
-				.replace(/^\/+/, "")
-				.replace(/\/+$/, "");
-			if (permalink.startsWith("posts/")) {
-				permalink = permalink.replace(/^posts\//, "");
-			}
-			paths.push({
-				params: { slug: permalink },
-				props: { entry },
-			});
-		}
-	}
+    for (const entry of blogEntries) {
+        // 将 id 转换为 slug（移除扩展名）以匹配路由参数
+        const slug = removeFileExtension(entry.id);
+        // 为每篇文章创建默认的 slug 路径
+        paths.push({
+            params: { slug },
+            props: { entry },
+        });
+        // 如果文章有自定义固定链接，也创建对应的路径
+        if (entry.data.routeName) {
+            // 移除开头的斜杠和结尾的斜杠
+            // 同时移除可能的 "posts/" 前缀，避免重复
+            let routeName = entry.data.routeName
+                .replace(/^\/+/, "")
+                .replace(/\/+$/, "");
+            if (routeName.startsWith("posts/")) {
+                routeName = routeName.replace(/^posts\//, "");
+            }
+            paths.push({
+                params: { slug: routeName },
+                props: { entry },
+            });
+        }
+    }
 
-	return paths;
+    return paths;
 }
 
 
@@ -69,42 +69,42 @@ let passwordHash = "";
 let isEncrypted = entry.data.encrypted && entry.data.password;
 
 if (isEncrypted) {
-	// 对于加密文章，我们将使用内容进行加密
-	// 在客户端解密后，会通过JavaScript重新渲染
-	const contentToEncrypt = entry.body;
+    // 对于加密文章，我们将使用内容进行加密
+    // 在客户端解密后，会通过JavaScript重新渲染
+    const contentToEncrypt = entry.body;
 
-	// 使用AES加密内容
-	encryptedContent = CryptoJS.AES.encrypt(
-		contentToEncrypt,
-		entry.data.password,
-	).toString();
+    // 使用AES加密内容
+    encryptedContent = CryptoJS.AES.encrypt(
+        contentToEncrypt,
+        entry.data.password,
+    ).toString();
 
-	// 生成密码哈希
-	const saltRounds = 10;
-	passwordHash = bcryptjs.hashSync(entry.data.password, saltRounds);
+    // 生成密码哈希
+    const saltRounds = 10;
+    passwordHash = bcryptjs.hashSync(entry.data.password, saltRounds);
 }
 
 dayjs.extend(utc);
 const lastModified = dayjs(entry.data.updated || entry.data.published)
-	.utc()
-	.format("YYYY-MM-DDTHH:mm:ss");
+    .utc()
+    .format("YYYY-MM-DDTHH:mm:ss");
 
 const jsonLd = {
-	"@context": "https://schema.org",
-	"@type": "BlogPosting",
-	headline: entry.data.title,
-	description: entry.data.description || entry.data.title,
-	keywords: entry.data.tags,
-	author: {
-		"@type": "Person",
-		name: profileConfig.name,
-		url: Astro.site,
-	},
-	datePublished: formatDateToYYYYMMDD(entry.data.published),
-	inLanguage: entry.data.lang
-		? entry.data.lang.replace("_", "-")
-		: siteConfig.lang.replace("_", "-"),
-	// TODO include cover image here
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: entry.data.title,
+    description: entry.data.description || entry.data.title,
+    keywords: entry.data.tags,
+    author: {
+        "@type": "Person",
+        name: profileConfig.name,
+        url: Astro.site,
+    },
+    datePublished: formatDateToYYYYMMDD(entry.data.published),
+    inLanguage: entry.data.lang
+        ? entry.data.lang.replace("_", "-")
+        : siteConfig.lang.replace("_", "-"),
+    // TODO include cover image here
 };
 ---
 
@@ -253,8 +253,8 @@ const jsonLd = {
 
     {postConfig.showLastModified && (
         <>
-            <div 
-                id="last-modified" 
+            <div
+                id="last-modified"
                 data-last-modified={lastModified}
                 data-prefix={i18n(I18nKey.lastModifiedPrefix)}
                 data-year={i18n(I18nKey.year)}
@@ -293,7 +293,7 @@ const jsonLd = {
                         const secondKey = lastModifiedElement.dataset.second;
 
                         let runtimeString = prefix + ' ';
-                        
+
                         if (years > 0) {
                             runtimeString += `${years} ${yearKey} `;
                         }
@@ -327,7 +327,7 @@ const jsonLd = {
                                 class="text-4xl text-[var(--primary)] transition-transform group-hover:translate-x-0.5 bg-[var(--enter-btn-bg)] p-2 rounded-md"
                             />
                         </div>
-                       
+
                         <div class="flex flex-col gap-0.1">
                             <div id="modifiedtime" class="text-[1.0rem] leading-tight text-black/75 dark:text-white/75"></div>
                             <p class="text-[0.8rem] leading-tight text-black/75 dark:text-white/75">
