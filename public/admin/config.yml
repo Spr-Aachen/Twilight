@@ -1,7 +1,7 @@
 backend:
   name: github
-  branch: main
   repo: Spr-Aachen/Twilight # 请替换为您的 GitHub 仓库
+  branch: main # 请替换为您的分支名称
   site_domain: twilight.spr-aachen.com # 请替换为您的域名
   base_url: https://twilight.spr-aachen.com  # 请替换为您的 URL
   auth_endpoint: oauth # OAuth 路由由集成提供
@@ -23,7 +23,7 @@ collections:
       - {label: "Published Date", name: "published", widget: "datetime"}
       - {label: "Updated Date", name: "updated", widget: "datetime", required: false}
       - {label: "Description", name: "description", widget: "text", required: false}
-      - {label: "Image", name: "image", widget: "image", required: false}
+      - {label: "Cover", name: "cover", widget: "image", required: false}
       - {label: "Tags", name: "tags", widget: "list", default: [], required: false}
       - {label: "Category", name: "category", widget: "string", required: false}
       - {label: "Draft", name: "draft", widget: "boolean", default: false}
