@@ -19,7 +19,7 @@ interface Props {
 	updated?: Date;
 	tags: string[];
 	category: string | null;
-	image: string;
+	cover: string;
 	description: string;
 	draft: boolean;
 	pinned?: boolean;
@@ -33,7 +33,7 @@ const {
 	updated,
 	tags,
 	category,
-	image,
+	cover,
 	description,
 	pinned,
 	style,
@@ -41,7 +41,7 @@ const {
 
 const className = Astro.props.class;
 
-const hasCover = image !== undefined && image !== null && image !== "";
+const hasCover = cover !== undefined && cover !== null && cover !== "";
 
 const coverWidth = "28%";
 
@@ -99,7 +99,7 @@ const imageBaseDir = getFileDirFromPath(entry.filePath || "");
                   class="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl">
             </Icon>
         </div>
-        <ImageWrapper src={image} basePath={imageBaseDir} alt="Cover Image of the Post"
+        <ImageWrapper src={cover} basePath={imageBaseDir} alt="Cover Image of the Post"
                   class="w-full h-full">
         </ImageWrapper>
     </a>}

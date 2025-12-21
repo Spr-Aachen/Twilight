@@ -109,7 +109,7 @@ const jsonLd = {
 ---
 
 <MainGridLayout
-    banner={entry.data.image}
+    banner={entry.data.cover}
     title={entry.data.title}
     description={entry.data.description}
     lang={entry.data.lang}
@@ -197,7 +197,7 @@ const jsonLd = {
                     slug={entry.id}
                 />
                 {
-                    (!entry.data.image || (entry.data.image && !postConfig.showCoverInContent)) && (
+                    (!entry.data.cover || (entry.data.cover && !postConfig.showCoverInContent)) && (
                         <div class="mt-4 border-[var(--line-divider)] border-dashed border-b-[1px] mb-5" />
                     )
                 }
@@ -206,12 +206,12 @@ const jsonLd = {
             <!-- always show cover as long as it has one -->
 
             {
-                entry.data.image && postConfig.showCoverInContent && (
+                entry.data.cover && postConfig.showCoverInContent && (
                     <>
                         <div class="mt-4" />
                         <ImageWrapper
                             id="post-cover"
-                            src={entry.data.image}
+                            src={entry.data.cover}
                             basePath={getFileDirFromPath(entry.filePath || '')}
                             class="mb-8 rounded-xl banner-container onload-animation"
                         />
