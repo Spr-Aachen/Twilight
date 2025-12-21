@@ -13,7 +13,6 @@ import { Icon } from "astro-icon/components";
 </div>
 
 <style lang="stylus">
-
     .back-to-top-wrapper
         width: 3.57rem
         height: 3.57rem
@@ -58,12 +57,11 @@ import { Icon } from "astro-icon/components";
     @media (max-width: 768px)
         .back-to-top-wrapper
             display: none
-
 </style>
 
 <script is:raw is:inline>
-    function backToTop() {
-        // 直接使用原生滚动，避免OverlayScrollbars冲突
+function backToTop() {
+    // 直接使用原生滚动，避免OverlayScrollbars冲突
     window.scroll({ top: 0, behavior: 'smooth' });
 }
 </script>

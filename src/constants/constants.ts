@@ -1,12 +1,12 @@
 export const PAGE_SIZE = 8;
 
 export const LIGHT_MODE = "light",
-	DARK_MODE = "dark",
-	SYSTEM_MODE = "system";
+    DARK_MODE = "dark",
+    SYSTEM_MODE = "system";
 
 export const WALLPAPER_FULLSCREEN = "fullscreen",
-	WALLPAPER_BANNER = "banner",
-	WALLPAPER_NONE = "none";
+    WALLPAPER_BANNER = "banner",
+    WALLPAPER_NONE = "none";
 
 // Banner height unit (vh)
 export const BANNER_HEIGHT = 30;

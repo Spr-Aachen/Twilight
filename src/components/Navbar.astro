@@ -1,10 +1,11 @@
 ---
 import { Icon } from "astro-icon/components";
-import { navBarConfig, siteConfig } from "../config";
-import { LinkPresets } from "../constants/link-presets";
-import { LinkPreset, type NavBarLink } from "../types/config";
-import { url } from "../utils/url-utils";
-import { getNavbarTransparentModeForWallpaperMode } from "../utils/setting-utils";
+
+import { navBarConfig, siteConfig } from "@/config";
+import { LinkPresets } from "@constants/link-presets";
+import { LinkPreset, type NavBarLink } from "@/types/config";
+import { url } from "@utils/url-utils";
+import { getNavbarTransparentModeForWallpaperMode } from "@utils/setting-utils";
 import LightDarkSwitch from "./LightDarkSwitch.svelte";
 import MobileTOC from "./MobileTOC.svelte";
 import Search from "./Search.svelte";
@@ -31,7 +32,6 @@ let links: NavBarLink[] = navBarConfig.links.map(
         return item;
     },
 );
-
 ---
 
 <div id="navbar" class="z-50 onload-animation px-3 sm:px-6 md:px-0" data-transparent-mode={navbarTransparentMode} data-is-home={isHomePage}>

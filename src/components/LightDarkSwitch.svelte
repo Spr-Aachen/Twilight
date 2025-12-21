@@ -1,14 +1,14 @@
 <script lang="ts">
+import Icon from "@iconify/svelte";
 
 import { SYSTEM_MODE, DARK_MODE, LIGHT_MODE } from "@constants/constants.ts";
-import Icon from "@iconify/svelte";
 import {
     getStoredTheme,
     setTheme,
 } from "@utils/setting-utils.ts";
 import type { LIGHT_DARK_MODE } from "@/types/config.ts";
-import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
 
 
 const seq: LIGHT_DARK_MODE[] = [LIGHT_MODE, DARK_MODE, SYSTEM_MODE];
@@ -16,31 +16,31 @@ let mode: LIGHT_DARK_MODE = $state(getStoredTheme());
 
 
 function switchScheme(newMode: LIGHT_DARK_MODE) {
-	mode = newMode;
-	setTheme(newMode);
+    mode = newMode;
+    setTheme(newMode);
 }
 
 
 function toggleScheme() {
-	let i = 0;
-	for (; i < seq.length; i++) {
-		if (seq[i] === mode) {
-			break;
-		}
-	}
-	switchScheme(seq[(i + 1) % seq.length]);
+    let i = 0;
+    for (; i < seq.length; i++) {
+        if (seq[i] === mode) {
+            break;
+        }
+    }
+    switchScheme(seq[(i + 1) % seq.length]);
 }
 
 
 function showPanel() {
-	const panel = document.querySelector("#light-dark-panel");
-	panel.classList.remove("float-panel-closed");
+    const panel = document.querySelector("#light-dark-panel");
+    panel.classList.remove("float-panel-closed");
 }
 
 
 function hidePanel() {
-	const panel = document.querySelector("#light-dark-panel");
-	panel.classList.add("float-panel-closed");
+    const panel = document.querySelector("#light-dark-panel");
+    panel.classList.add("float-panel-closed");
 }
 
 </script>

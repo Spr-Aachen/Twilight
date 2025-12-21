@@ -1,15 +1,12 @@
 <script lang="ts">
-// 导入 Icon 组件，用于显示图标
-import Icon from "@iconify/svelte";
 import { onDestroy, onMount } from "svelte";
 import { slide } from "svelte/transition";
-// 从配置文件中导入音乐播放器配置
-import { musicPlayerConfig } from "../../config";
+import Icon from "@iconify/svelte";
+
+import { musicPlayerConfig } from "@/config";
 import type { MusicPlayerTrack } from "../../types/config";
-// 导入国际化相关的 Key 和 i18n 实例
-import Key from "../../i18n/i18nKey";
-import { i18n } from "../../i18n/translation";
-// 导入样式文件
+import { i18n } from "@i18n/translation";
+import Key from "@i18n/i18nKey";
 import "../../styles/musicplayer.css";
 
 

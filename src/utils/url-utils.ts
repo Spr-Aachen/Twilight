@@ -1,6 +1,7 @@
 import type { CollectionEntry } from "astro:content";
-import I18nKey from "@i18n/i18nKey";
+
 import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
 
 
 export function pathsEqual(path1: string, path2: string) {

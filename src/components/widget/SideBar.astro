@@ -1,6 +1,7 @@
 ---
 import type { MarkdownHeading } from "astro";
-import { widgetManager } from "../../utils/widget-manager";
+
+import { widgetManager } from "@utils/widget-manager";
 import Profile from "./Profile.astro";
 import Announcement from "./Announcement.astro";
 import Categories from "./Categories.astro";
@@ -50,7 +51,6 @@ function renderComponent(component: any, index: number, components: any[]) {
         },
     };
 }
-
 ---
 
 <div id="sidebar" class:list={[className, "w-full"]}>

@@ -1,34 +1,37 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"jsx": "react-jsx",
-		"jsxImportSource": "react",
-		"baseUrl": ".",
-		"strictNullChecks": true,
-		"allowJs": false,
-		"declaration": true,
-		"resolveJsonModule": true,
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"types": ["astro/client"],
-		"plugins": [
-			{
-				"name": "@astrojs/ts-plugin"
-			}
-		],
-		"paths": {
-			"@components/*": ["src/components/*"],
-			"@assets/*": ["src/assets/*"],
-			"@constants/*": ["src/constants/*"],
-			"@utils/*": ["src/utils/*"],
-			"@i18n/*": ["src/i18n/*"],
-			"@layouts/*": ["src/layouts/*"],
-			"@/*": ["src/*"]
-		},
-		"noEmit": true,
-		"allowImportingTsExtensions": true,
-	},
-	"include": ["src/**/*"]
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "jsx": "react-jsx",
+        "jsxImportSource": "react",
+        "baseUrl": ".",
+        "strictNullChecks": true,
+        "allowJs": false,
+        "declaration": true,
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "types": ["astro/client"],
+        "plugins": [
+            {
+                "name": "@astrojs/ts-plugin"
+            }
+        ],
+        "paths": {
+            "@assets/*": ["src/assets/*"],
+            "@i18n/*": ["src/i18n/*"],
+            "@constants/*": ["src/constants/*"],
+            "@data/*": ["src/data/*"],
+            "@utils/*": ["src/utils/*"],
+            "@components/*": ["src/components/*"],
+            "@pages/*": ["src/pages/*"],
+            "@layouts/*": ["src/layouts/*"],
+            "@styles/*": ["src/styles/*"],
+            "@/*": ["src/*"],
+        },
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+    },
+    "include": ["src/**/*"]
 }

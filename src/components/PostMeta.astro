@@ -1,12 +1,11 @@
 ---
 import { Icon } from "astro-icon/components";
-import { profileConfig } from "../config";
-import I18nKey from "../i18n/i18nKey";
-import { i18n } from "../i18n/translation";
-import { formatDateToYYYYMMDD } from "../utils/date-utils";
-import { getCategoryUrl, getTagUrl } from "../utils/url-utils";
 
-import { umamiConfig } from '../config';
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+import { getCategoryUrl, getTagUrl } from "@utils/url-utils";
+import { umamiConfig } from '@/config';
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
 
 
 // 解析 umami
@@ -16,27 +15,27 @@ const umamiApiKey = umamiConfig.apiKey || "";
 const umamiBaseUrl = umamiConfig.baseUrl || "";
 
 export interface Props {
-  published: Date;
-  updated?: Date;
-  category?: string | null;
-  tags?: string[];
-  hideUpdateDate?: boolean;
-  hideTagsForMobile?: boolean;
-  isHome?: boolean;
-  className?: string;
-  slug?: string;
+    published: Date;
+    updated?: Date;
+    category?: string | null;
+    tags?: string[];
+    hideUpdateDate?: boolean;
+    hideTagsForMobile?: boolean;
+    isHome?: boolean;
+    className?: string;
+    slug?: string;
 }
 
 const {
-  published,
-  updated,
-  category,
-  tags,
-  hideUpdateDate,
-  hideTagsForMobile,
-  isHome,
-  className = "",
-  slug
+    published,
+    updated,
+    category,
+    tags,
+    hideUpdateDate,
+    hideTagsForMobile,
+    isHome,
+    className = "",
+    slug
 } = Astro.props;
 ---
 
@@ -50,7 +49,6 @@ const {
         </div>
         <span class="text-50 text-sm font-medium">{formatDateToYYYYMMDD(published)}</span>
     </div>
-
     <!-- update date -->
     {!hideUpdateDate && updated && updated.getTime() !== published.getTime() && (
         <div class="flex items-center">
@@ -61,7 +59,6 @@ const {
             <span class="text-50 text-sm font-medium">{formatDateToYYYYMMDD(updated)}</span>
         </div>
     )}
-
     <!-- categories -->
     <div class="flex items-center">
         <div class="meta-icon"
@@ -76,7 +73,6 @@ const {
             </a>
         </div>
     </div>
-
     <!-- tags -->
     <div class:list={["items-center", {"flex": !hideTagsForMobile, "hidden md:flex": hideTagsForMobile}]}>
         <div class="meta-icon"
@@ -95,7 +91,6 @@ const {
             {!(tags && tags.length > 0) && <div class="transition text-50 text-sm font-medium">{i18n(I18nKey.noTags)}</div>}
         </div>
     </div>
-    
     <!-- 访问量（首页不显示，且umami.enabled为true时显示） -->
     {!isHome && umamiEnabled && slug && (
         <div class="flex items-center">
@@ -114,24 +109,20 @@ const {
         function generateStatsText(pageViews, visitors) {
             return `浏览量 ${pageViews} · 访客 ${visitors}`;
         }
-        
         // 获取访问量统计
         async function fetchPageViews(isRetry = false) {
             if (!umamiConfig.enabled) {
                 return;
             }
-            
             try {
                 // 构造文章页面的URL路径
                 const pageUrl = `/posts/${slug}/`;
-                
                 // 调用全局工具获取特定页面的 Umami 统计数据
                 const stats = await getUmamiPageStats(umamiBaseUrl, umamiApiKey, umamiWebsiteId, pageUrl);
-                
                 // 从返回的数据中提取页面浏览量和访客数
                 const pageViews = stats.pageviews || 0;
                 const visitors = stats.visitors || 0;
-                
+                // 更新页面上的显示内容
                 const displayElement = document.getElementById('page-views-display');
                 if (displayElement) {
                     displayElement.textContent = generateStatsText(pageViews, visitors);
@@ -144,7 +135,6 @@ const {
                 }
             }
         }
-
         // 页面加载完成后获取统计数据
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', fetchPageViews);

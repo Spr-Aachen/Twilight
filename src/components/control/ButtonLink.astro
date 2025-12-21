@@ -1,11 +1,12 @@
 ---
 interface Props {
-	badge?: string;
-	url?: string;
-	label?: string;
+    badge?: string;
+    url?: string;
+    label?: string;
 }
 const { badge, url, label } = Astro.props;
 ---
+
 <a href={url} aria-label={label}>
     <button
         class:list={`
@@ -18,7 +19,6 @@ const { badge, url, label } = Astro.props;
             transition-all
             pl-2
             hover:pl-3
-            
             text-neutral-700
             hover:text-[var(--primary)]
             dark:text-neutral-300
@@ -27,7 +27,7 @@ const { badge, url, label } = Astro.props;
         }
     >
         <div class="flex items-center justify-between relative mr-2">
-            <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  ">
+            <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis">
                 <slot></slot>
             </div>
             { badge !== undefined && badge !== null && badge !== '' &&

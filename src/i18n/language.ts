@@ -4,14 +4,14 @@
  */
 
 export interface LanguageConfig {
-	/** 翻译服务使用的语言代码 */
-	translateCode: string;
-	/** 语言显示名称 */
-	displayName: string;
-	/** Intl.DateTimeFormat 使用的 locale */
-	locale: string;
-	/** 语言图标（国旗 emoji） */
-	icon: string;
+    /** 翻译服务使用的语言代码 */
+    translateCode: string;
+    /** 语言显示名称 */
+    displayName: string;
+    /** Intl.DateTimeFormat 使用的 locale */
+    locale: string;
+    /** 语言图标（国旗 emoji） */
+    icon: string;
 }
 
 /**
@@ -19,89 +19,89 @@ export interface LanguageConfig {
  * 单一数据源，避免重复定义
  */
 export const LANGUAGE_CONFIG = {
-	zh: {
-		translateCode: "chinese_simplified",
-		displayName: "中文",
-		locale: "zh-CN",
-		icon: "🇨🇳",
-	},
-	en: {
-		translateCode: "english",
-		displayName: "English",
-		locale: "en-US",
-		icon: "🇺🇸",
-	},
-	ja: {
-		translateCode: "japanese",
-		displayName: "日本語",
-		locale: "ja-JP",
-		icon: "🇯🇵",
-	},
-	ko: {
-		translateCode: "korean",
-		displayName: "한국어",
-		locale: "ko-KR",
-		icon: "🇰🇷",
-	},
-	es: {
-		translateCode: "spanish",
-		displayName: "Español",
-		locale: "es-ES",
-		icon: "🇪🇸",
-	},
-	th: {
-		translateCode: "thai",
-		displayName: "ไทย",
-		locale: "th-TH",
-		icon: "🇹🇭",
-	},
-	vi: {
-		translateCode: "vietnamese",
-		displayName: "Tiếng Việt",
-		locale: "vi-VN",
-		icon: "🇻🇳",
-	},
-	tr: {
-		translateCode: "turkish",
-		displayName: "Türkçe",
-		locale: "tr-TR",
-		icon: "🇹🇷",
-	},
-	id: {
-		translateCode: "indonesian",
-		displayName: "Bahasa Indonesia",
-		locale: "id-ID",
-		icon: "🇮🇩",
-	},
-	fr: {
-		translateCode: "french",
-		displayName: "Français",
-		locale: "fr-FR",
-		icon: "🇫🇷",
-	},
-	de: {
-		translateCode: "german",
-		displayName: "Deutsch",
-		locale: "de-DE",
-		icon: "🇩🇪",
-	},
-	ru: {
-		translateCode: "russian",
-		displayName: "Русский",
-		locale: "ru-RU",
-		icon: "🇷🇺",
-	},
-	ar: {
-		translateCode: "arabic",
-		displayName: "العربية",
-		locale: "ar-SA",
-		icon: "🇸🇦",
-	},
+    zh: {
+        translateCode: "chinese_simplified",
+        displayName: "中文",
+        locale: "zh-CN",
+        icon: "🇨🇳",
+    },
+    en: {
+        translateCode: "english",
+        displayName: "English",
+        locale: "en-US",
+        icon: "🇺🇸",
+    },
+    ja: {
+        translateCode: "japanese",
+        displayName: "日本語",
+        locale: "ja-JP",
+        icon: "🇯🇵",
+    },
+    ko: {
+        translateCode: "korean",
+        displayName: "한국어",
+        locale: "ko-KR",
+        icon: "🇰🇷",
+    },
+    es: {
+        translateCode: "spanish",
+        displayName: "Español",
+        locale: "es-ES",
+        icon: "🇪🇸",
+    },
+    th: {
+        translateCode: "thai",
+        displayName: "ไทย",
+        locale: "th-TH",
+        icon: "🇹🇭",
+    },
+    vi: {
+        translateCode: "vietnamese",
+        displayName: "Tiếng Việt",
+        locale: "vi-VN",
+        icon: "🇻🇳",
+    },
+    tr: {
+        translateCode: "turkish",
+        displayName: "Türkçe",
+        locale: "tr-TR",
+        icon: "🇹🇷",
+    },
+    id: {
+        translateCode: "indonesian",
+        displayName: "Bahasa Indonesia",
+        locale: "id-ID",
+        icon: "🇮🇩",
+    },
+    fr: {
+        translateCode: "french",
+        displayName: "Français",
+        locale: "fr-FR",
+        icon: "🇫🇷",
+    },
+    de: {
+        translateCode: "german",
+        displayName: "Deutsch",
+        locale: "de-DE",
+        icon: "🇩🇪",
+    },
+    ru: {
+        translateCode: "russian",
+        displayName: "Русский",
+        locale: "ru-RU",
+        icon: "🇷🇺",
+    },
+    ar: {
+        translateCode: "arabic",
+        displayName: "العربية",
+        locale: "ar-SA",
+        icon: "🇸🇦",
+    },
 } as const satisfies Record<string, LanguageConfig>;
 
 /** 支持的语言代码列表 */
 export const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_CONFIG) as Array<
-	keyof typeof LANGUAGE_CONFIG
+    keyof typeof LANGUAGE_CONFIG
 >;
 
 export type SupportedLanguage = keyof typeof LANGUAGE_CONFIG;
@@ -111,10 +111,10 @@ export type SupportedLanguage = keyof typeof LANGUAGE_CONFIG;
  * 自动从 LANGUAGE_CONFIG 生成
  */
 export const langToTranslateMap: Record<string, string> = Object.fromEntries(
-	Object.entries(LANGUAGE_CONFIG).map(([lang, config]) => [
-		lang,
-		config.translateCode,
-	]),
+    Object.entries(LANGUAGE_CONFIG).map(([lang, config]) => [
+        lang,
+        config.translateCode,
+    ]),
 );
 
 /**
@@ -122,10 +122,10 @@ export const langToTranslateMap: Record<string, string> = Object.fromEntries(
  * 自动从 LANGUAGE_CONFIG 生成
  */
 export const translateToLangMap: Record<string, string> = Object.fromEntries(
-	Object.entries(LANGUAGE_CONFIG).map(([lang, config]) => [
-		config.translateCode,
-		lang,
-	]),
+    Object.entries(LANGUAGE_CONFIG).map(([lang, config]) => [
+        config.translateCode,
+        lang,
+    ]),
 );
 
 /**
@@ -133,17 +133,17 @@ export const translateToLangMap: Record<string, string> = Object.fromEntries(
  * 自动从 LANGUAGE_CONFIG 生成
  */
 export const langToLocaleMap: Record<string, string> = Object.fromEntries(
-	Object.entries(LANGUAGE_CONFIG).map(([lang, config]) => [lang, config.locale]),
+    Object.entries(LANGUAGE_CONFIG).map(([lang, config]) => [lang, config.locale]),
 );
 
 /**
  * 获取所有支持翻译的语言列表（用于 TranslateButton）
  */
 export function getSupportedTranslateLanguages() {
-	return Object.entries(LANGUAGE_CONFIG).map(([code, config]) => ({
-		code: config.translateCode,
-		name: config.displayName,
-		icon: config.icon,
-		langCode: code,
-	}));
+    return Object.entries(LANGUAGE_CONFIG).map(([code, config]) => ({
+        code: config.translateCode,
+        name: config.displayName,
+        icon: config.icon,
+        langCode: code,
+    }));
 }

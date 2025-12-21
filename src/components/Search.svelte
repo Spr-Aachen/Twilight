@@ -1,11 +1,12 @@
 <script lang="ts">
-import I18nKey from "@i18n/i18nKey";
-import { i18n } from "@i18n/translation";
-import Icon from "@iconify/svelte";
-import { url } from "@utils/url-utils.ts";
 import { onMount } from "svelte";
-import type { SearchResult } from "@/global";
+import Icon from "@iconify/svelte";
+
+import { url } from "@utils/url-utils.ts";
 import { navigateToPage } from "@utils/navigation-utils";
+import type { SearchResult } from "@/global";
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
 
 
 let keywordDesktop = "";
@@ -58,7 +59,6 @@ const collapseDesktopSearch = () => {
 const setPanelVisibility = (show: boolean, isDesktop: boolean): void => {
     const panel = document.getElementById("search-panel");
     if (!panel || !isDesktop) return;
-
     if (show) {
         panel.classList.remove("float-panel-closed");
     } else {
@@ -89,16 +89,12 @@ const search = async (keyword: string, isDesktop: boolean): Promise<void> => {
         result = [];
         return;
     }
-
     if (!initialized) {
         return;
     }
-
     isSearching = true;
-
     try {
         let searchResults: SearchResult[] = [];
-
         if (import.meta.env.PROD && pagefindLoaded && window.pagefind) {
             const response = await window.pagefind.search(keyword);
             searchResults = await Promise.all(
@@ -110,7 +106,6 @@ const search = async (keyword: string, isDesktop: boolean): Promise<void> => {
             searchResults = [];
             console.error("Pagefind is not available in production environment.");
         }
-
         result = searchResults;
         setPanelVisibility(result.length > 0, isDesktop);
     } catch (error) {
@@ -133,7 +128,6 @@ onMount(() => {
         if (keywordDesktop) search(keywordDesktop, true);
         if (keywordMobile) search(keywordMobile, false);
     };
-
     if (import.meta.env.DEV) {
         console.log(
             "Pagefind is not available in development mode. Using mock data.",
@@ -150,7 +144,6 @@ onMount(() => {
             );
             initializeSearch(); // Initialize with pagefindLoaded as false
         });
-
         // Fallback in case events are not caught or pagefind is already loaded by the time this script runs
         setTimeout(() => {
             if (!initialized) {
@@ -204,7 +197,6 @@ $: if (initialized && keywordMobile) {
 <!-- search panel -->
 <div id="search-panel" class="float-panel float-panel-closed search-panel absolute md:w-[30rem]
 top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
-
     <!-- search bar inside panel for phone/tablet -->
     <div id="search-bar-inside" class="flex relative lg:hidden transition-all items-center h-11 rounded-xl
       bg-black/[0.04] hover:bg-black/[0.06] focus-within:bg-black/[0.06]
@@ -216,7 +208,6 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
                focus:w-60 text-black/50 dark:text-white/50"
         >
     </div>
-
     <!-- search results -->
     {#each result as item}
         <a href={item.url}

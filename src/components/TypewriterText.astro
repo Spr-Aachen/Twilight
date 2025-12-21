@@ -1,18 +1,18 @@
 ---
 export interface Props {
-	text: string | string[];
-	speed?: number;
-	deleteSpeed?: number;
-	pauseTime?: number;
-	class?: string;
+    text: string | string[];
+    speed?: number;
+    deleteSpeed?: number;
+    pauseTime?: number;
+    class?: string;
 }
 
 const {
-	text,
-	speed = 100,
-	deleteSpeed = 50,
-	pauseTime = 2000,
-	class: className = "",
+    text,
+    speed = 100,
+    deleteSpeed = 50,
+    pauseTime = 2000,
+    class: className = "",
 } = Astro.props;
 const textData = Array.isArray(text) ? JSON.stringify(text) : text;
 ---
@@ -34,7 +34,7 @@ class TypewriterEffect {
     constructor(element: HTMLElement) {
         this.element = element;
         const textData = element.dataset.text || '';
-        
+
         // 尝试解析为JSON数组，如果失败则作为单个字符串处理
         try {
             const parsed = JSON.parse(textData);
@@ -42,11 +42,11 @@ class TypewriterEffect {
         } catch {
             this.texts = [textData];
         }
-        
+
         this.speed = parseInt(element.dataset.speed || '100');
         this.deleteSpeed = parseInt(element.dataset.deleteSpeed || '50');
         this.pauseTime = parseInt(element.dataset.pauseTime || '2000');
-        
+
         // 如果有多条文本且未启用打字机效果，随机显示一条
         if (this.texts.length > 1 && !this.isTypewriterEnabled()) {
             this.showRandomText();
@@ -57,8 +57,8 @@ class TypewriterEffect {
 
     private isTypewriterEnabled(): boolean {
         // 检查是否有打字机相关的数据属性
-        return this.element.dataset.speed !== undefined || 
-               this.element.dataset.deleteSpeed !== undefined || 
+        return this.element.dataset.speed !== undefined ||
+               this.element.dataset.deleteSpeed !== undefined ||
                this.element.dataset.pauseTime !== undefined;
     }
 
@@ -78,7 +78,7 @@ class TypewriterEffect {
 
     private type() {
         const currentText = this.getCurrentText();
-        
+
         if (this.isDeleting) {
             // 删除字符
             if (this.currentIndex > 0) {

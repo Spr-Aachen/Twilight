@@ -1,22 +1,23 @@
 ---
-import ImageWrapper from "./ImageWrapper.astro";
-import TypewriterText from "../TypewriterText.astro";
-import { BANNER_HEIGHT_EXTEND } from "../../constants/constants";
+import { BANNER_HEIGHT_EXTEND } from "@constants/constants";
 import type { SiteConfig } from "../../types/config";
+import TypewriterText from "../TypewriterText.astro";
+import ImageWrapper from "./ImageWrapper.astro";
+
 
 interface Props {
-	config: SiteConfig["wallpaper"];
-	bannerImages: {
-		desktop: string | string[];
-		mobile: string | string[];
-	};
-	isHomePage: boolean;
-	mobileNonHomeBannerClass: string;
-	carouselConfig?: {
-		enable?: boolean;
-		interval?: number;
-	};
-	class?: string;
+    config: SiteConfig["wallpaper"];
+    bannerImages: {
+        desktop: string | string[];
+        mobile: string | string[];
+    };
+    isHomePage: boolean;
+    mobileNonHomeBannerClass: string;
+    carouselConfig?: {
+        enable?: boolean;
+        interval?: number;
+    };
+    class?: string;
 }
 
 const { config, bannerImages, isHomePage, mobileNonHomeBannerClass, carouselConfig, class: className } = Astro.props;
@@ -32,380 +33,357 @@ const hasBannerLink = !!config.banner?.credit?.url;
 const showWaves = config.banner?.waves?.enable;
 // 检查是否启用性能模式（简化波浪效果）
 const isPerformanceMode = config.banner?.waves?.performanceMode;
-
 ---
 
 <!-- Banner Wrapper -->
-<div 
-	id="banner-wrapper" 
-	class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass} ${className || ''}`} 
-	style={`top: -${BANNER_HEIGHT_EXTEND}vh`}
+<div
+    id="banner-wrapper"
+    class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass} ${className || ''}`}
+    style={`top: -${BANNER_HEIGHT_EXTEND}vh`}
 >
-	{/* 检查是否为轮播模式 */}
-	{(bannerImages.desktop && Array.isArray(bannerImages.desktop) && bannerImages.desktop.length > 1) || 
-	 (bannerImages.mobile && Array.isArray(bannerImages.mobile) && bannerImages.mobile.length > 1) ? (
-		<!-- Carousel mode for multiple images -->
-		<div id="banner-carousel" class="relative h-full w-full" data-carousel-config={JSON.stringify(carouselConfig)}>
-			<ul class="carousel-list h-full w-full">
-				{Math.max(
-					Array.isArray(bannerImages.desktop) ? bannerImages.desktop.length : 0,
-					Array.isArray(bannerImages.mobile) ? bannerImages.mobile.length : 0
-				) && Array.from({ length: Math.max(
-					Array.isArray(bannerImages.desktop) ? bannerImages.desktop.length : 0,
-					Array.isArray(bannerImages.mobile) ? bannerImages.mobile.length : 0
-				) }).map((_, index) => {
-					// 确保至少有一个平台有对应索引的图片
-					const hasDesktopImage = Array.isArray(bannerImages.desktop) && bannerImages.desktop[index];
-					const hasMobileImage = Array.isArray(bannerImages.mobile) && bannerImages.mobile[index];
-					
-					// 如果两个平台都没有对应索引的图片，跳过这个轮播项
-					if (!hasDesktopImage && !hasMobileImage) {
-						return null;
-					}
-					
-					return (
-						<li class={`carousel-item absolute inset-0 transition-all duration-500 ${index === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}>
-							<!-- Mobile: use mobile-specific images with same logic as desktop -->
-							{hasMobileImage && (
-								<ImageWrapper 
-									alt={`Mobile banner image ${index + 1}`} 
-									class:list={["block lg:hidden object-cover h-full w-full transition-transform duration-500 ease-out"]}
-									src={Array.isArray(bannerImages.mobile) ? bannerImages.mobile[index] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')} 
-									position={config.position}
-								/>
-							)}
-							<!-- Desktop: use desktop-specific images -->
-							{hasDesktopImage && (
-								<ImageWrapper 
-									alt={`Desktop banner image ${index + 1}`} 
-									class:list={["hidden lg:block object-cover h-full w-full transition-transform duration-500 ease-out"]}
-									src={Array.isArray(bannerImages.desktop) ? bannerImages.desktop[index] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')} 
-									position={config.position}
-								/>
-							)}
-						</li>
-					);
-				}).filter(Boolean)}
-			</ul>
-		</div>
-	) : (
-		<!-- Single image mode -->
-		<div class="relative h-full w-full">
-			<!-- Mobile: use mobile-specific image with same logic as desktop -->
-			<ImageWrapper 
-				alt="Mobile banner image of the blog" 
-				class:list={["block lg:hidden object-cover h-full w-full transition duration-700 opacity-100"]}
-				src={(Array.isArray(bannerImages.mobile) ? bannerImages.mobile[0] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')) || (Array.isArray(bannerImages.desktop) ? bannerImages.desktop[0] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')) || ''} 
-				position={config.position}
-			/>
-			<!-- Desktop: use desktop-specific image -->
-			<ImageWrapper 
-				id="banner" 
-				alt="Desktop banner image of the blog" 
-				class:list={["hidden lg:block object-cover h-full transition duration-700 opacity-100"]}
-				src={(Array.isArray(bannerImages.desktop) ? bannerImages.desktop[0] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')) || (Array.isArray(bannerImages.mobile) ? bannerImages.mobile[0] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')) || ''} 
-				position={config.position}
-			/>
-		</div>
-	)}
-	
-	<!-- Home page text overlay -->
-	{config.banner?.homeText?.enable && (
-		<div class={`banner-text-overlay absolute inset-0 z-20 flex items-center justify-center ${!showHomeText ? 'hidden' : ''}`}>
-			<div class="w-4/5 lg:w-3/4 text-center mb-0">
-				<div class="flex flex-col">
-					{config.banner?.homeText?.title && (
-						<h1 class="banner-title text-6xl lg:text-8xl text-white drop-shadow-lg mb-2 lg:mb-4">
-							{config.banner.homeText.title}
-						</h1>
-					)}
-					{config.banner?.homeText?.subtitle && (
-						<h2 class="banner-subtitle text-xl lg:text-3xl text-white/90 drop-shadow-md">
-							{config.banner.homeText.typewriter?.enable ? (
-								<TypewriterText 
-									text={config.banner.homeText.subtitle}
-									speed={config.banner.homeText.typewriter.speed}
-									deleteSpeed={config.banner.homeText.typewriter.deleteSpeed}
-									pauseTime={config.banner.homeText.typewriter.pauseTime}
-								/>
-							) : (
-								Array.isArray(config.banner.homeText.subtitle) 
-									? config.banner.homeText.subtitle[0] 
-									: config.banner.homeText.subtitle
-							)}
-						</h2>
-					)}
-				</div>
-			</div>
-		</div>
-	)}
-	
-	<!-- Water waves effect -->
-	{showWaves && (
-		<div class="waves-container absolute -bottom-[1px] h-[10vh] max-h-[9.375rem] min-h-[3.125rem] w-full md:h-[15vh]" id="header-waves">
-			<svg
-				class="waves"
-				xmlns="http://www.w3.org/2000/svg"
-				xmlns:xlink="http://www.w3.org/1999/xlink"
-				viewBox="0 20 150 32"
-				preserveAspectRatio="none"
-				shape-rendering="auto"
-			>
-				<defs>
-					<path
-						id="gentle-wave"
-						d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v48h-352z"
-					>
-					</path>
-				</defs>
-				<g class="parallax">
-					{isPerformanceMode ? (
-						// 性能模式：只渲染二个波浪层
-						<use
-							xlink:href="#gentle-wave"
-							x="48"
-							y="7"
-							class="fill-[var(--page-bg)]"
-						></use>
-						<use
-							xlink:href="#gentle-wave"
-							x="48"
-							y="5"
-							class="opacity-75 fill-[var(--page-bg)]"
-						></use>
-					) : (
-						// 正常模式：渲染四个波浪层
-						<>
-							<use
-								xlink:href="#gentle-wave"
-								x="48"
-								y="0"
-								class="opacity-25 fill-[var(--page-bg)]"
-							></use>
-							<use
-								xlink:href="#gentle-wave"
-								x="48"
-								y="3"
-								class="opacity-50 fill-[var(--page-bg)]"
-							></use>
-							<use
-								xlink:href="#gentle-wave"
-								x="48"
-								y="5"
-								class="opacity-75 fill-[var(--page-bg)]"
-							></use>
-							<use
-								xlink:href="#gentle-wave"
-								x="48"
-								y="7"
-								class="fill-[var(--page-bg)]"
-							></use>
-						</>
-					)}
-				</g>
-			</svg>
-		</div>
-	)}
+    {/* 检查是否为轮播模式 */}
+    {(bannerImages.desktop && Array.isArray(bannerImages.desktop) && bannerImages.desktop.length > 1) ||
+     (bannerImages.mobile && Array.isArray(bannerImages.mobile) && bannerImages.mobile.length > 1) ? (
+        <!-- Carousel mode for multiple images -->
+        <div id="banner-carousel" class="relative h-full w-full" data-carousel-config={JSON.stringify(carouselConfig)}>
+            <ul class="carousel-list h-full w-full">
+                {Math.max(
+                    Array.isArray(bannerImages.desktop) ? bannerImages.desktop.length : 0,
+                    Array.isArray(bannerImages.mobile) ? bannerImages.mobile.length : 0
+                ) && Array.from({ length: Math.max(
+                    Array.isArray(bannerImages.desktop) ? bannerImages.desktop.length : 0,
+                    Array.isArray(bannerImages.mobile) ? bannerImages.mobile.length : 0
+                ) }).map((_, index) => {
+                    // 确保至少有一个平台有对应索引的图片
+                    const hasDesktopImage = Array.isArray(bannerImages.desktop) && bannerImages.desktop[index];
+                    const hasMobileImage = Array.isArray(bannerImages.mobile) && bannerImages.mobile[index];
+                    // 如果两个平台都没有对应索引的图片，跳过这个轮播项
+                    if (!hasDesktopImage && !hasMobileImage) {
+                        return null;
+                    }
+                    return (
+                        <li class={`carousel-item absolute inset-0 transition-all duration-500 ${index === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}>
+                            <!-- Mobile: use mobile-specific images with same logic as desktop -->
+                            {hasMobileImage && (
+                                <ImageWrapper
+                                    alt={`Mobile banner image ${index + 1}`}
+                                    class:list={["block lg:hidden object-cover h-full w-full transition-transform duration-500 ease-out"]}
+                                    src={Array.isArray(bannerImages.mobile) ? bannerImages.mobile[index] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')}
+                                    position={config.position}
+                                />
+                            )}
+                            <!-- Desktop: use desktop-specific images -->
+                            {hasDesktopImage && (
+                                <ImageWrapper
+                                    alt={`Desktop banner image ${index + 1}`}
+                                    class:list={["hidden lg:block object-cover h-full w-full transition-transform duration-500 ease-out"]}
+                                    src={Array.isArray(bannerImages.desktop) ? bannerImages.desktop[index] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')}
+                                    position={config.position}
+                                />
+                            )}
+                        </li>
+                    );
+                }).filter(Boolean)}
+            </ul>
+        </div>
+    ) : (
+        <!-- Single image mode -->
+        <div class="relative h-full w-full">
+            <!-- Mobile: use mobile-specific image with same logic as desktop -->
+            <ImageWrapper
+                alt="Mobile banner image of the blog"
+                class:list={["block lg:hidden object-cover h-full w-full transition duration-700 opacity-100"]}
+                src={(Array.isArray(bannerImages.mobile) ? bannerImages.mobile[0] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')) || (Array.isArray(bannerImages.desktop) ? bannerImages.desktop[0] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')) || ''}
+                position={config.position}
+            />
+            <!-- Desktop: use desktop-specific image -->
+            <ImageWrapper
+                id="banner"
+                alt="Desktop banner image of the blog"
+                class:list={["hidden lg:block object-cover h-full transition duration-700 opacity-100"]}
+                src={(Array.isArray(bannerImages.desktop) ? bannerImages.desktop[0] : (typeof bannerImages.desktop === 'string' ? bannerImages.desktop : '')) || (Array.isArray(bannerImages.mobile) ? bannerImages.mobile[0] : (typeof bannerImages.mobile === 'string' ? bannerImages.mobile : '')) || ''}
+                position={config.position}
+            />
+        </div>
+    )}
+
+    <!-- Home page text overlay -->
+    {config.banner?.homeText?.enable && (
+        <div class={`banner-text-overlay absolute inset-0 z-20 flex items-center justify-center ${!showHomeText ? 'hidden' : ''}`}>
+            <div class="w-4/5 lg:w-3/4 text-center mb-0">
+                <div class="flex flex-col">
+                    {config.banner?.homeText?.title && (
+                        <h1 class="banner-title text-6xl lg:text-8xl text-white drop-shadow-lg mb-2 lg:mb-4">
+                            {config.banner.homeText.title}
+                        </h1>
+                    )}
+                    {config.banner?.homeText?.subtitle && (
+                        <h2 class="banner-subtitle text-xl lg:text-3xl text-white/90 drop-shadow-md">
+                            {config.banner.homeText.typewriter?.enable ? (
+                                <TypewriterText
+                                    text={config.banner.homeText.subtitle}
+                                    speed={config.banner.homeText.typewriter.speed}
+                                    deleteSpeed={config.banner.homeText.typewriter.deleteSpeed}
+                                    pauseTime={config.banner.homeText.typewriter.pauseTime}
+                                />
+                            ) : (
+                                Array.isArray(config.banner.homeText.subtitle)
+                                    ? config.banner.homeText.subtitle[0]
+                                    : config.banner.homeText.subtitle
+                            )}
+                        </h2>
+                    )}
+                </div>
+            </div>
+        </div>
+    )}
+
+    <!-- Water waves effect -->
+    {showWaves && (
+        <div class="waves-container absolute -bottom-[1px] h-[10vh] max-h-[9.375rem] min-h-[3.125rem] w-full md:h-[15vh]" id="header-waves">
+            <svg
+                class="waves"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                viewBox="0 20 150 32"
+                preserveAspectRatio="none"
+                shape-rendering="auto"
+            >
+                <defs>
+                    <path
+                        id="gentle-wave"
+                        d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v48h-352z"
+                    >
+                    </path>
+                </defs>
+                <g class="parallax">
+                    {isPerformanceMode ? (
+                        // 性能模式：只渲染二个波浪层
+                        <use
+                            xlink:href="#gentle-wave"
+                            x="48"
+                            y="7"
+                            class="fill-[var(--page-bg)]"
+                        ></use>
+                        <use
+                            xlink:href="#gentle-wave"
+                            x="48"
+                            y="5"
+                            class="opacity-75 fill-[var(--page-bg)]"
+                        ></use>
+                    ) : (
+                        // 正常模式：渲染四个波浪层
+                        <>
+                            <use
+                                xlink:href="#gentle-wave"
+                                x="48"
+                                y="0"
+                                class="opacity-25 fill-[var(--page-bg)]"
+                            ></use>
+                            <use
+                                xlink:href="#gentle-wave"
+                                x="48"
+                                y="3"
+                                class="opacity-50 fill-[var(--page-bg)]"
+                            ></use>
+                            <use
+                                xlink:href="#gentle-wave"
+                                x="48"
+                                y="5"
+                                class="opacity-75 fill-[var(--page-bg)]"
+                            ></use>
+                            <use
+                                xlink:href="#gentle-wave"
+                                x="48"
+                                y="7"
+                                class="fill-[var(--page-bg)]"
+                            ></use>
+                        </>
+                    )}
+                </g>
+            </svg>
+        </div>
+    )}
 </div>
 
 <script>
-	import { BREAKPOINT_LG } from "../../constants/breakpoints";
+    import { BREAKPOINT_LG } from "@constants/breakpoints";
 
-	// 轮播图初始化函数
-	function initCarousel() {
-		const carousel = document.getElementById('banner-carousel');
-		const carouselConfigData = carousel?.getAttribute('data-carousel-config');
-		const carouselConfig = carouselConfigData ? JSON.parse(carouselConfigData) : {};
 
-		const carouselItems = document.querySelectorAll('.carousel-item');
-		
-		// 根据屏幕尺寸过滤有效的轮播项
-		const isMobile = window.innerWidth < BREAKPOINT_LG; // lg breakpoint
-		const validItems = Array.from(carouselItems).filter(item => {
-			if (isMobile) {
-				// 移动端：只显示有mobile图片的项目
-				return item.querySelector('.block.lg\\:hidden');
-			} else {
-				// 桌面端：只显示有desktop图片的项目
-				return item.querySelector('.hidden.lg\\:block');
-			}
-		});
-		
-		// Check if carousel is disabled but we have multiple images - show random image
-		if (validItems.length > 1 && !carouselConfig?.enable) {
-			// Hide all images first
-			carouselItems.forEach((item, index) => {
-				item.classList.add('opacity-0', 'scale-110');
-				item.classList.remove('opacity-100', 'scale-100');
-			});
-			
-			// Show random valid image
-			const randomIndex = Math.floor(Math.random() * validItems.length);
-			const randomItem = validItems[randomIndex];
-			
-			randomItem.classList.add('opacity-100', 'scale-100');
-			randomItem.classList.remove('opacity-0', 'scale-110');
-			return;
-		}
-		
-		if (validItems.length > 1 && carouselConfig?.enable) {
-			let currentIndex = 0;
-			const interval = carouselConfig?.interval || 6;
-			let carouselInterval;
-			let isPaused = false;
+    // 轮播图初始化函数
+    function initCarousel() {
+        const carousel = document.getElementById('banner-carousel');
+        const carouselConfigData = carousel?.getAttribute('data-carousel-config');
+        const carouselConfig = carouselConfigData ? JSON.parse(carouselConfigData) : {};
 
-			// 移动端触摸手势支持
-			let startX = 0;
-			let startY = 0;
-			let isSwiping = false;
-			const carousel = document.getElementById('banner-carousel');
+        const carouselItems = document.querySelectorAll('.carousel-item');
 
-			// 切换图片的函数 - 基于有效项目
-			function switchToSlide(index) {
-				// 隐藏当前图片
-				const currentItem = validItems[currentIndex];
-				currentItem.classList.remove('opacity-100', 'scale-100');
-				currentItem.classList.add('opacity-0', 'scale-110');
+        // 根据屏幕尺寸过滤有效的轮播项
+        const isMobile = window.innerWidth < BREAKPOINT_LG; // lg breakpoint
+        const validItems = Array.from(carouselItems).filter(item => {
+            if (isMobile) {
+                // 移动端：只显示有mobile图片的项目
+                return item.querySelector('.block.lg\\:hidden');
+            } else {
+                // 桌面端：只显示有desktop图片的项目
+                return item.querySelector('.hidden.lg\\:block');
+            }
+        });
 
-				// 更新索引
-				currentIndex = index;
-				
-				// 显示新图片
-				const nextItem = validItems[currentIndex];
-				nextItem.classList.add('opacity-100', 'scale-100');
-				nextItem.classList.remove('opacity-0', 'scale-110');
-			}
+        // Check if carousel is disabled but we have multiple images - show random image
+        if (validItems.length > 1 && !carouselConfig?.enable) {
+            // Hide all images first
+            carouselItems.forEach((item, index) => {
+                item.classList.add('opacity-0', 'scale-110');
+                item.classList.remove('opacity-100', 'scale-100');
+            });
 
-			// 初始化：隐藏所有图片，只显示第一张有效图片
-			carouselItems.forEach((item) => {
-				item.classList.add('opacity-0', 'scale-110');
-				item.classList.remove('opacity-100', 'scale-100');
-			});
-			
-			// 显示第一张有效图片
-			if (validItems.length > 0) {
-				validItems[0].classList.add('opacity-100', 'scale-100');
-				validItems[0].classList.remove('opacity-0', 'scale-110');
-			}
+            // Show random valid image
+            const randomIndex = Math.floor(Math.random() * validItems.length);
+            const randomItem = validItems[randomIndex];
 
-			// 移动端触摸事件
-			if (carousel && 'ontouchstart' in window) {
-				carousel.addEventListener('touchstart', (e) => {
-					startX = e.touches[0].clientX;
-					startY = e.touches[0].clientY;
-					isSwiping = false;
-					isPaused = true;
-					clearInterval(carouselInterval);
-				}, { passive: true });
+            randomItem.classList.add('opacity-100', 'scale-100');
+            randomItem.classList.remove('opacity-0', 'scale-110');
+            return;
+        }
 
-				carousel.addEventListener('touchmove', (e) => {
-					if (!startX || !startY) return;
-					
-					const diffX = Math.abs(e.touches[0].clientX - startX);
-					const diffY = Math.abs(e.touches[0].clientY - startY);
-					
-					// 判断是否为水平滑动
-					if (diffX > diffY && diffX > 30) {
-						isSwiping = true;
-						e.preventDefault();
-					}
-				}, { passive: false });
+        if (validItems.length > 1 && carouselConfig?.enable) {
+            let currentIndex = 0;
+            const interval = carouselConfig?.interval || 6;
+            let carouselInterval;
+            let isPaused = false;
+            // 移动端触摸手势支持
+            let startX = 0;
+            let startY = 0;
+            let isSwiping = false;
+            const carousel = document.getElementById('banner-carousel');
+            // 切换图片的函数 - 基于有效项目
+            function switchToSlide(index) {
+                // 隐藏当前图片
+                const currentItem = validItems[currentIndex];
+                currentItem.classList.remove('opacity-100', 'scale-100');
+                currentItem.classList.add('opacity-0', 'scale-110');
+                // 更新索引
+                currentIndex = index;
+                // 显示新图片
+                const nextItem = validItems[currentIndex];
+                nextItem.classList.add('opacity-100', 'scale-100');
+                nextItem.classList.remove('opacity-0', 'scale-110');
+            }
+            // 初始化：隐藏所有图片，只显示第一张有效图片
+            carouselItems.forEach((item) => {
+                item.classList.add('opacity-0', 'scale-110');
+                item.classList.remove('opacity-100', 'scale-100');
+            });
+            // 显示第一张有效图片
+            if (validItems.length > 0) {
+                validItems[0].classList.add('opacity-100', 'scale-100');
+                validItems[0].classList.remove('opacity-0', 'scale-110');
+            }
+            // 移动端触摸事件
+            if (carousel && 'ontouchstart' in window) {
+                carousel.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    isSwiping = false;
+                    isPaused = true;
+                    clearInterval(carouselInterval);
+                }, { passive: true });
+                carousel.addEventListener('touchmove', (e) => {
+                    if (!startX || !startY) return;
+                    const diffX = Math.abs(e.touches[0].clientX - startX);
+                    const diffY = Math.abs(e.touches[0].clientY - startY);
+                    // 判断是否为水平滑动
+                    if (diffX > diffY && diffX > 30) {
+                        isSwiping = true;
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                carousel.addEventListener('touchend', (e) => {
+                    if (!startX || !startY || !isSwiping) {
+                        isPaused = false;
+                        startCarousel();
+                        return;
+                    }
+                    const endX = e.changedTouches[0].clientX;
+                    const diffX = startX - endX;
+                    // 滑动距离超过50px才切换
+                    if (Math.abs(diffX) > 50) {
+                            if (diffX > 0) {
+                            // 向左滑动，显示下一张
+                            const nextIndex = (currentIndex + 1) % validItems.length;
+                            switchToSlide(nextIndex);
+                        } else {
+                            // 向右滑动，显示上一张
+                            const prevIndex = (currentIndex - 1 + validItems.length) % validItems.length;
+                            switchToSlide(prevIndex);
+                        }
+                    }
+                    startX = 0;
+                startY = 0;
+                    isSwiping = false;
+                    isPaused = false;
+                    // 重新开始自动轮播
+                    startCarousel();
+                }, { passive: true });
+            }
+            // 开始轮播的函数
+            function startCarousel() {
+                clearInterval(carouselInterval);
+                carouselInterval = setInterval(() => {
+                    if (!isPaused) {
+                        const nextIndex = (currentIndex + 1) % validItems.length;
+                        switchToSlide(nextIndex);
+                    }
+                }, interval * 1000);
+            }
+            // 鼠标悬停暂停（桌面端）
+            if (carousel) {
+                carousel.addEventListener('mouseenter', () => {
+                    isPaused = true;
+                    clearInterval(carouselInterval);
+                });
+                carousel.addEventListener('mouseleave', () => {
+                    isPaused = false;
+                    startCarousel();
+                });
+            }
+            // 开始自动轮播
+            startCarousel();
+        }
+    }
 
-				carousel.addEventListener('touchend', (e) => {
-					if (!startX || !startY || !isSwiping) {
-						isPaused = false;
-						startCarousel();
-						return;
-					}
-					
-					const endX = e.changedTouches[0].clientX;
-					const diffX = startX - endX;
-					
-					// 滑动距离超过50px才切换
-					if (Math.abs(diffX) > 50) {
-						if (diffX > 0) {
-						// 向左滑动，显示下一张
-						const nextIndex = (currentIndex + 1) % validItems.length;
-						switchToSlide(nextIndex);
-					} else {
-						// 向右滑动，显示上一张
-						const prevIndex = (currentIndex - 1 + validItems.length) % validItems.length;
-						switchToSlide(prevIndex);
-					}
-					}
-					
-					startX = 0;
-				startY = 0;
-					isSwiping = false;
-					isPaused = false;
-					
-					// 重新开始自动轮播
-					startCarousel();
-				}, { passive: true });
-			}
+    // Banner显示控制函数
+    function showBanner() {
+        // 使用requestAnimationFrame优化DOM操作
+        requestAnimationFrame(() => {
+            // Handle single image banner (desktop)
+            const banner = document.getElementById('banner');
+            if (banner) {
+                banner.classList.remove('opacity-0', 'scale-105');
+            }
+            // Handle mobile single image banner - 使用与电脑端相同的逻辑
+            const mobileBanner = document.querySelector('.block.lg\\:hidden[alt="Mobile banner image of the blog"]');
+            if (mobileBanner && !document.getElementById('banner-carousel')) {
+                // 移动端使用与电脑端相同的初始化逻辑
+                mobileBanner.classList.remove('opacity-0', 'scale-105');
+                mobileBanner.classList.add('opacity-100');
+            }
+            // Handle carousel banner - 立即初始化，移除延迟
+            const carousel = document.getElementById('banner-carousel');
+            if (carousel) {
+                // 立即初始化轮播，移除延迟以改善流畅性
+                initCarousel();
+            }
+        });
+    }
 
-			// 开始轮播的函数
-			function startCarousel() {
-				clearInterval(carouselInterval);
-				carouselInterval = setInterval(() => {
-					if (!isPaused) {
-						const nextIndex = (currentIndex + 1) % validItems.length;
-						switchToSlide(nextIndex);
-					}
-				}, interval * 1000);
-			}
-
-			// 鼠标悬停暂停（桌面端）
-			if (carousel) {
-				carousel.addEventListener('mouseenter', () => {
-					isPaused = true;
-					clearInterval(carouselInterval);
-				});
-
-				carousel.addEventListener('mouseleave', () => {
-					isPaused = false;
-					startCarousel();
-				});
-			}
-
-			// 开始自动轮播
-			startCarousel();
-		}
-	}
-
-	// Banner显示控制函数
-	function showBanner() {
-		// 使用requestAnimationFrame优化DOM操作
-		requestAnimationFrame(() => {
-			// Handle single image banner (desktop)
-			const banner = document.getElementById('banner');
-			if (banner) {
-				banner.classList.remove('opacity-0', 'scale-105');
-			}
-
-			// Handle mobile single image banner - 使用与电脑端相同的逻辑
-			const mobileBanner = document.querySelector('.block.lg\\:hidden[alt="Mobile banner image of the blog"]');
-			if (mobileBanner && !document.getElementById('banner-carousel')) {
-				// 移动端使用与电脑端相同的初始化逻辑
-				mobileBanner.classList.remove('opacity-0', 'scale-105');
-				mobileBanner.classList.add('opacity-100');
-			}
-
-			// Handle carousel banner - 立即初始化，移除延迟
-			const carousel = document.getElementById('banner-carousel');
-			if (carousel) {
-				// 立即初始化轮播，移除延迟以改善流畅性
-				initCarousel();
-			}
-		});
-	}
-
-	// 页面加载完成后初始化banner和轮播图
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', () => {
-			showBanner();
-		});
-	} else {
-		showBanner();
-	}
+    // 页面加载完成后初始化banner和轮播图
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            showBanner();
+        });
+    } else {
+        showBanner();
+    }
 </script>

@@ -4,9 +4,9 @@
 import { definePlugin } from "@expressive-code/core";
 
 export function pluginLanguageBadge() {
-	return definePlugin({
-		name: "Language Badge",
-		baseStyles: () => `
+    return definePlugin({
+        name: "Language Badge",
+        baseStyles: () => `
       [data-language]::before {
         position: absolute;
         z-index: 2;
@@ -35,7 +35,7 @@ export function pluginLanguageBadge() {
           }
         }
       }
-      
+
       /* 移动端优化：使用触摸事件而不是始终显示，与复制按钮行为一致 */
       @media (hover: none) {
         .frame:not(.has-title):not(.is-terminal).touch-active [data-language]::before {
@@ -43,54 +43,54 @@ export function pluginLanguageBadge() {
         }
       }
     `,
-		jsModules: [`
-			// Language badge touch functionality
-			document.addEventListener('DOMContentLoaded', function() {
-				function initializeLanguageBadges() {
-					// 在移动端添加触摸事件支持
-					if (window.matchMedia('(hover: none)').matches) {
-						const frames = document.querySelectorAll('.frame:not(.has-title):not(.is-terminal):not([data-language-events-initialized])');
-						frames.forEach(frame => {
-							// 添加触摸开始事件
-							frame.addEventListener('touchstart', function() {
-								this.classList.add('touch-active');
-								
-								// 3秒后自动隐藏按钮（除非处于成功状态）
-								setTimeout(() => {
-									const copyBtn = this.querySelector('.copy-btn');
-									if (copyBtn && !copyBtn.classList.contains('success')) {
-										this.classList.remove('touch-active');
-									}
-								}, 3000);
-							}, { passive: true });
-							
-							frame.setAttribute('data-language-events-initialized', 'true');
-						});
-					}
-				}
-				
-				// Initialize on page load
-				initializeLanguageBadges();
-				
-				// Re-initialize after page transitions
-				if (window.swup) {
-					window.swup.hooks.on('page:view', initializeLanguageBadges);
-				}
-				
-				// Handle dynamic content loading
-				const observer = new MutationObserver(function(mutations) {
-					mutations.forEach(function(mutation) {
-						if (mutation.addedNodes.length > 0) {
-							initializeLanguageBadges();
-						}
-					});
-				});
-				
-				observer.observe(document.body, {
-					childList: true,
-					subtree: true
-				});
-			});
-		`],
-	});
+        jsModules: [`
+            // Language badge touch functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                function initializeLanguageBadges() {
+                    // 在移动端添加触摸事件支持
+                    if (window.matchMedia('(hover: none)').matches) {
+                        const frames = document.querySelectorAll('.frame:not(.has-title):not(.is-terminal):not([data-language-events-initialized])');
+                        frames.forEach(frame => {
+                            // 添加触摸开始事件
+                            frame.addEventListener('touchstart', function() {
+                                this.classList.add('touch-active');
+
+                                // 3秒后自动隐藏按钮（除非处于成功状态）
+                                setTimeout(() => {
+                                    const copyBtn = this.querySelector('.copy-btn');
+                                    if (copyBtn && !copyBtn.classList.contains('success')) {
+                                        this.classList.remove('touch-active');
+                                    }
+                                }, 3000);
+                            }, { passive: true });
+
+                            frame.setAttribute('data-language-events-initialized', 'true');
+                        });
+                    }
+                }
+
+                // Initialize on page load
+                initializeLanguageBadges();
+
+                // Re-initialize after page transitions
+                if (window.swup) {
+                    window.swup.hooks.on('page:view', initializeLanguageBadges);
+                }
+
+                // Handle dynamic content loading
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.addedNodes.length > 0) {
+                            initializeLanguageBadges();
+                        }
+                    });
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            });
+        `],
+    });
 }

@@ -1,25 +1,25 @@
 ---
-import type { CollectionEntry } from "astro:content";
-import { render } from "astro:content";
-import Comment from "@components/comment/index.astro";
-import License from "@components/misc/License.astro";
-import Markdown from "@components/misc/Markdown.astro";
-import PasswordProtection from "@components/PasswordProtection.astro";
-import I18nKey from "@i18n/i18nKey";
-import { i18n } from "@i18n/translation";
-import MainGridLayout from "@layouts/MainGridLayout.astro";
-import { getSortedPosts } from "@utils/content-utils";
-import { getFileDirFromPath, getPostUrlBySlug, removeFileExtension} from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
+import { render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 import bcryptjs from "bcryptjs";
 import CryptoJS from "crypto-js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { postConfig } from "src/config";
-import ImageWrapper from "../../components/misc/ImageWrapper.astro";
-import PostMetadata from "../../components/PostMeta.astro";
-import { profileConfig, siteConfig } from "../../config";
-import { formatDateToYYYYMMDD } from "../../utils/date-utils";
+
+import { siteConfig, profileConfig, postConfig } from "@/config";
+import { getSortedPosts } from "@utils/content-utils";
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+import { getFileDirFromPath, getPostUrlBySlug, removeFileExtension} from "@utils/url-utils";
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
+import License from "@components/misc/License.astro";
+import Markdown from "@components/misc/Markdown.astro";
+import ImageWrapper from "@components/misc/ImageWrapper.astro";
+import Comment from "@components/comment/index.astro";
+import PasswordProtection from "@components/PasswordProtection.astro";
+import PostMetadata from "@components/PostMeta.astro";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 
 export async function getStaticPaths() {
@@ -169,7 +169,6 @@ const jsonLd = {
                     </div>
                 </div>
             </div>
-
             <!-- title -->
             <div class="relative onload-animation">
                 <div
@@ -185,7 +184,6 @@ const jsonLd = {
                     {entry.data.title}
                 </div>
             </div>
-
             <!-- metadata -->
             <div class="onload-animation">
                 <PostMetadata
@@ -202,9 +200,7 @@ const jsonLd = {
                     )
                 }
             </div>
-
             <!-- always show cover as long as it has one -->
-
             {
                 entry.data.cover && postConfig.showCoverInContent && (
                     <>
@@ -218,7 +214,6 @@ const jsonLd = {
                     </>
                 )
             }
-
             {
                 isEncrypted ? (
                     <PasswordProtection
@@ -247,10 +242,8 @@ const jsonLd = {
             }
         </div>
     </div>
-
     <!-- 评论 -->
     <Comment post={entry} />
-
     {postConfig.showLastModified && (
         <>
             <div
@@ -273,17 +266,14 @@ const jsonLd = {
                         const startDate = new Date(lastModifiedElement.dataset.lastModified);
                         const currentDate = new Date();
                         const diff = currentDate - startDate;
-
                         const seconds = Math.floor(diff / 1000);
                         const days = Math.floor(seconds / 86400);
                         const hours = Math.floor((seconds % 86400) / 3600);
                         const minutes = Math.floor((seconds % 3600) / 60);
                         const secs = seconds % 60;
-
                         const years = Math.floor(days / 365);
                         const months = Math.floor((days % 365) / 30);
                         const remainingDays = days % 30;
-
                         const prefix = lastModifiedElement.dataset.prefix;
                         const yearKey = lastModifiedElement.dataset.year;
                         const monthKey = lastModifiedElement.dataset.month;
@@ -291,9 +281,7 @@ const jsonLd = {
                         const hourKey = lastModifiedElement.dataset.hour;
                         const minuteKey = lastModifiedElement.dataset.minute;
                         const secondKey = lastModifiedElement.dataset.second;
-
                         let runtimeString = prefix + ' ';
-
                         if (years > 0) {
                             runtimeString += `${years} ${yearKey} `;
                         }
@@ -314,7 +302,6 @@ const jsonLd = {
                         } else {
                             runtimeString += `${secs} ${secondKey}`;
                         }
-
                         document.getElementById("modifiedtime").innerHTML = runtimeString;
                     }
                     setInterval(runtime, 1000);
@@ -327,7 +314,6 @@ const jsonLd = {
                                 class="text-4xl text-[var(--primary)] transition-transform group-hover:translate-x-0.5 bg-[var(--enter-btn-bg)] p-2 rounded-md"
                             />
                         </div>
-
                         <div class="flex flex-col gap-0.1">
                             <div id="modifiedtime" class="text-[1.0rem] leading-tight text-black/75 dark:text-white/75"></div>
                             <p class="text-[0.8rem] leading-tight text-black/75 dark:text-white/75">
@@ -339,7 +325,6 @@ const jsonLd = {
             </div>
         </>
     )}
-
     <div
         class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full"
     >
@@ -366,7 +351,6 @@ const jsonLd = {
                 )
             }
         </a>
-
         <a
             href={entry.data.prevSlug
                 ? getPostUrlBySlug(entry.data.prevSlug)

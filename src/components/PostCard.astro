@@ -1,42 +1,42 @@
 ---
-import type { CollectionEntry } from "astro:content";
-import path from "node:path";
 import { Icon } from "astro-icon/components";
-import I18nKey from "../i18n/i18nKey";
-import { i18n } from "../i18n/translation";
-import { getFileDirFromPath } from "../utils/url-utils";
+import { render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import { getFileDirFromPath } from "@utils/url-utils";
 import ImageWrapper from "./misc/ImageWrapper.astro";
 import PostMetadata from "./PostMeta.astro";
-import { render } from "astro:content";
 
 
 interface Props {
-	class?: string;
-	entry: CollectionEntry<"posts">;
-	title: string;
-	url: string;
-	published: Date;
-	updated?: Date;
-	tags: string[];
-	category: string | null;
-	cover: string;
-	description: string;
-	draft: boolean;
-	pinned?: boolean;
-	style: string;
+    class?: string;
+    entry: CollectionEntry<"posts">;
+    title: string;
+    url: string;
+    published: Date;
+    updated?: Date;
+    tags: string[];
+    category: string | null;
+    cover: string;
+    description: string;
+    draft: boolean;
+    pinned?: boolean;
+    style: string;
 }
 const {
-	entry,
-	title,
-	url,
-	published,
-	updated,
-	tags,
-	category,
-	cover,
-	description,
-	pinned,
-	style,
+    entry,
+    title,
+    url,
+    published,
+    updated,
+    tags,
+    category,
+    cover,
+    description,
+    pinned,
+    style,
 } = Astro.props;
 
 const className = Astro.props.class;
@@ -49,7 +49,6 @@ const { remarkPluginFrontmatter } = await render(entry);
 
 // derive image base path from the real file path to preserve directory casing
 const imageBaseDir = getFileDirFromPath(entry.filePath || "");
-
 ---
 
 <div class:list={["card-base flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative", className]} style={style}>
@@ -66,15 +65,12 @@ const imageBaseDir = getFileDirFromPath(entry.filePath || "");
             <Icon class="inline text-[2rem] text-[var(--primary)] md:hidden translate-y-0.5 absolute" name="material-symbols:chevron-right-rounded" ></Icon>
             <Icon class="text-[var(--primary)] text-[2rem] transition hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0" name="material-symbols:chevron-right-rounded"></Icon>
         </a>
-
         <!-- metadata -->
         <PostMetadata published={published} updated={updated} tags={tags} category={category || undefined} hideTagsForMobile={true} hideUpdateDate={true} className="mb-4"></PostMetadata>
-
         <!-- description -->
         <div class:list={["transition text-75 mb-3.5 pr-4", {"line-clamp-2 md:line-clamp-1": !description}]}>
             { description || remarkPluginFrontmatter.excerpt }
         </div>
-
         <!-- word count and read time  -->
         <div class="text-sm text-black/30 dark:text-white/30 flex gap-4 transition">
             <div>
@@ -85,7 +81,6 @@ const imageBaseDir = getFileDirFromPath(entry.filePath || "");
                 {remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
             </div>
         </div>
-
     </div>
 
     {hasCover && <a href={url} aria-label={title}

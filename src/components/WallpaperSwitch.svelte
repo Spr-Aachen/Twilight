@@ -1,15 +1,15 @@
 <script lang="ts">
-
-import { WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "@constants/constants.ts";
 import Icon from "@iconify/svelte";
+
 import { BREAKPOINT_LG } from "@/constants/breakpoints";
+import { WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "@constants/constants.ts";
 import {
     getStoredWallpaperMode,
     setWallpaperMode,
 } from "@utils/setting-utils.ts";
 import type { WALLPAPER_MODE } from "@/types/config.ts";
-import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
 
 
 const seq: WALLPAPER_MODE[] = [WALLPAPER_BANNER, WALLPAPER_FULLSCREEN, WALLPAPER_NONE];
@@ -17,31 +17,31 @@ let mode: WALLPAPER_MODE = $state(getStoredWallpaperMode());
 
 
 function switchWallpaperMode(newMode: WALLPAPER_MODE) {
-	mode = newMode;
-	setWallpaperMode(newMode);
+    mode = newMode;
+    setWallpaperMode(newMode);
 }
 
 
 function toggleWallpaperMode() {
-	let i = 0;
-	for (; i < seq.length; i++) {
-		if (seq[i] === mode) {
-			break;
-		}
-	}
-	switchWallpaperMode(seq[(i + 1) % seq.length]);
+    let i = 0;
+    for (; i < seq.length; i++) {
+        if (seq[i] === mode) {
+            break;
+        }
+    }
+    switchWallpaperMode(seq[(i + 1) % seq.length]);
 }
 
 
 function showPanel() {
-	const panel = document.querySelector("#wallpaper-mode-panel");
-	panel?.classList.remove("float-panel-closed");
+    const panel = document.querySelector("#wallpaper-mode-panel");
+    panel?.classList.remove("float-panel-closed");
 }
 
 
 function hidePanel() {
-	const panel = document.querySelector("#wallpaper-mode-panel");
-	panel?.classList.add("float-panel-closed");
+    const panel = document.querySelector("#wallpaper-mode-panel");
+    panel?.classList.add("float-panel-closed");
 }
 
 </script>
