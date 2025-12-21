@@ -6,7 +6,7 @@ import { Icon } from "astro-icon/components";
 <div class="back-to-top-wrapper block">
     <div id="back-to-top-btn" class="back-to-top-btn hide flex items-center rounded-2xl overflow-hidden transition"
          onclick="backToTop()">
-        <button aria-label="Back to Top" class="btn-card h-[3.57rem] w-[3.57rem]">
+        <button aria-label="Back to Top" class="btn-card h-[3.45rem] w-[3.45rem]">
             <Icon name="material-symbols:keyboard-arrow-up-rounded" class="mx-auto"></Icon>
         </button>
     </div>
@@ -14,8 +14,8 @@ import { Icon } from "astro-icon/components";
 
 <style lang="stylus">
     .back-to-top-wrapper
-        width: 3.57rem
-        height: 3.57rem
+        width: 3.45rem
+        height: 3.45rem
         position: absolute
         right: 0
         top: 0
@@ -27,11 +27,11 @@ import { Icon } from "astro-icon/components";
         font-weight: bold
         border: none
         position: fixed
-        bottom: 9.9rem
+        bottom: 6.78rem
         opacity: 1
-        right: 5.31rem
+        right: 6.78rem
         cursor: pointer
-        transform: translateX(5rem)
+        transform: translateX(6rem)
         pointer-events: auto
         transition: box-shadow 1s ease-in-out
 
@@ -39,15 +39,15 @@ import { Icon } from "astro-icon/components";
             font-size: 1.75rem
 
         &.hide
-            transform: translateX(5rem) scale(0.9)
+            transform: translateX(6rem) scale(0.9)
             opacity: 0
             pointer-events: none
 
         &:active
-            transform: translateX(5rem) scale(0.9)
+            transform: translateX(6rem) scale(0.9)
 
-    // Desktop
-    @media (max-width: 1560px)
+    // Desktop & Tablet
+    @media (min-width: 768px)
         .back-to-top-btn
             box-shadow:
                 0 0 0 1px var(--btn-regular-bg),

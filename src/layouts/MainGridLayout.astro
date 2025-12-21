@@ -2,16 +2,8 @@
 import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
 
-import {
-    siteConfig,
-    sidebarLayoutConfig,
-    postConfig,
-} from "@/config";
-import {
-    BANNER_HEIGHT,
-    BANNER_HEIGHT_EXTEND,
-    MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
-} from "@constants/constants";
+import { siteConfig, postConfig } from "@/config";
+import { BANNER_HEIGHT, MAIN_PANEL_OVERLAPS_BANNER_HEIGHT } from "@constants/constants";
 import { widgetManager } from "@utils/widget-manager";
 import BackToTop from "@components/control/BackToTop.astro";
 import Footer from "@components/Footer.astro";
