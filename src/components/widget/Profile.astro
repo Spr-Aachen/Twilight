@@ -1,10 +1,10 @@
 ---
 import { Icon } from "astro-icon/components";
-import { profileConfig } from "../../config";
-import { url } from "../../utils/url-utils";
-import ImageWrapper from "../misc/ImageWrapper.astro";
 
-import { umamiConfig } from '../../config';
+import { profileConfig, umamiConfig } from "@/config";
+import { url } from "@utils/url-utils";
+import ImageWrapper from "@components/misc/ImageWrapper.astro";
+
 
 // 解析 umami
 const umamiEnabled = umamiConfig.enabled || false;
@@ -57,21 +57,21 @@ const umamiBaseUrl = umamiConfig.baseUrl || "";
         function generateStatsText(pageViews, visits) {
             return `浏览量 ${pageViews} · 访问次数 ${visits}`;
         }
-        
+
         // 获取访问量统计
         async function fetchSiteStats(isRetry = false) {
             if (!umamiConfig.enabled) {
                 return;
             }
-            
+
             try {
                 // 调用全局工具获取 Umami 统计数据
                 const stats = await getUmamiWebsiteStats(umamiBaseUrl, umamiApiKey, umamiWebsiteId);
-                
+
                 // 从返回的数据中提取页面浏览量和访客数
                 const pageViews = stats.pageviews || 0;
                 const visits = stats.visits || 0;
-                
+
                 const displayElement = document.getElementById('site-stats-display');
                 if (displayElement) {
                     displayElement.textContent = generateStatsText(pageViews, visits);

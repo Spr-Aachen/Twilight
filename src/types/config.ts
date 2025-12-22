@@ -35,17 +35,17 @@ export type SiteConfig = {
     // 翻译配置
     translate?: {
         // 启用翻译功能
-        enable: boolean; 
+        enable: boolean;
         // 翻译服务类型，如 'client.edge'
-        service?: string; 
+        service?: string;
         // 默认语言
-        defaultLanguage?: string; 
+        defaultLanguage?: string;
         // 显示语言选择下拉框
-        showSelectTag?: boolean; 
+        showSelectTag?: boolean;
         // 自动识别用户语言
-        autoDiscriminate?: boolean; 
+        autoDiscriminate?: boolean;
         // 翻译时忽略的 CSS 类名
-        ignoreClasses?: string[]; 
+        ignoreClasses?: string[];
         // 翻译时忽略的 HTML 标签
         ignoreTags?: string[];
     };
@@ -56,7 +56,7 @@ export type SiteConfig = {
         // zenMaruGothic 字体
         zenMaruGothic: {
             // 作为全局字体
-            enable: boolean; 
+            enable: boolean;
         };
         // Hanalei 字体
         hanalei: {
@@ -78,12 +78,12 @@ export type SiteConfig = {
         // 模式
         mode: "fullscreen" | "banner" | "none";
         src: // 图片源配置 (fullscreen 和 banner 模式共享) 
-            | string
-            | string[]
-            | {
-                    desktop?: string | string[];
-                    mobile?: string | string[];
-              };
+        | string
+        | string[]
+        | {
+            desktop?: string | string[];
+            mobile?: string | string[];
+        };
         // 壁纸位置，等同于 object-position
         position?: "top" | "center" | "bottom";
         // 轮播配置 (fullscreen 和 banner 模式共享)
@@ -91,7 +91,7 @@ export type SiteConfig = {
             // 为多张图片启用轮播，否则随机显示一张图片
             enable: boolean;
             // 轮播间隔时间 (s) 
-            interval: number; 
+            interval: number;
         };
         // PicFlow API 配置 (fullscreen 和 banner 模式共享)
         imageApi?: {
@@ -112,7 +112,7 @@ export type SiteConfig = {
                 // 副标题打字机效果
                 typewriter?: {
                     // 启用副标题打字机效果
-                    enable: boolean; 
+                    enable: boolean;
                     // 打字速度 (ms)
                     speed: number;
                     // 删除速度 (ms)
@@ -209,7 +209,7 @@ export type NavBarLink = {
     // 是否为外部链接
     external?: boolean;
     // 菜单项图标
-    icon?: string; 
+    icon?: string;
     // 子菜单，可以是NavBarLink或LinkPreset
     children?: (NavBarLink | LinkPreset)[];
 };
@@ -248,11 +248,11 @@ export type WidgetComponentConfig = {
     // 组件位置
     position: "top" | "sticky"; // 顶部固定区域或粘性区域
     // 自定义CSS类名
-    class?: string; 
+    class?: string;
     // 自定义内联样式
-    style?: string; 
+    style?: string;
     // 动画延迟时间 (ms) 
-    animationDelay?: number; 
+    animationDelay?: number;
     // 响应式配置
     responsive?: {
         // 在指定设备上隐藏
@@ -261,7 +261,7 @@ export type WidgetComponentConfig = {
         collapseThreshold?: number;
     };
     // 自定义属性
-    customProps?: Record<string, any>; 
+    customProps?: Record<string, any>;
 };
 
 
@@ -274,16 +274,16 @@ export type SidebarLayoutConfig = {
         // 是否启用默认动画
         enable: boolean;
         // 基础延迟时间 (ms)
-        baseDelay: number; 
+        baseDelay: number;
         // 每个组件递增的延迟时间 (ms)
-        increment: number; 
+        increment: number;
     };
     // 响应式布局配置
     responsive: {
         // 不同设备的布局模式
         layout: {
             // 移动端
-            mobile: "hidden" | "bottom" | "drawer" | "sidebar"; 
+            mobile: "hidden" | "bottom" | "drawer" | "sidebar";
             // 平板端
             tablet: "sidebar" | "bottom" | "drawer";
             // 桌面端
@@ -331,7 +331,7 @@ export type AnnouncementConfig = {
         // 链接 URL
         url: string;
         // 是否外部链接
-        external?: boolean; 
+        external?: boolean;
     };
 };
 
@@ -426,40 +426,59 @@ export type ParticleConfig = {
     // 粒子尺寸配置
     size: {
         // 粒子最小尺寸倍数
-        min: number; 
+        min: number;
         // 粒子最大尺寸倍数
-        max: number; 
+        max: number;
     };
     // 粒子透明度配置
     opacity: {
         // 粒子最小不透明度
         min: number;
         // 粒子最大不透明度
-        max: number; 
+        max: number;
     };
     // 粒子移动速度配置
     speed: {
         // 水平移动速度
         horizontal: {
             // 最小值
-            min: number; 
+            min: number;
             // 最大值
-            max: number; 
+            max: number;
         };
         // 垂直移动速度
         vertical: {
             // 最小值
-            min: number; 
+            min: number;
             // 最大值
-            max: number; 
+            max: number;
         };
         // 旋转速度
-        rotation: number; 
+        rotation: number;
         // 消失速度
-        fadeSpeed: number; 
+        fadeSpeed: number;
     };
     // 粒子层级
     zIndex: number;
+};
+
+/**
+ * 
+ */
+
+export type MusicPlayerTrack = {
+    // 序号
+    id: number | string;
+    // 标题
+    title: string;
+    // 作者
+    artist: string;
+    // 封面
+    cover: string;
+    // 路径
+    url: string;
+    // 时长
+    duration: number;
 };
 
 
@@ -467,8 +486,29 @@ export type ParticleConfig = {
 export type MusicPlayerConfig = {
     // 启用音乐播放器功能
     enable: boolean;
+    // 默认模式
+    mode: "meting" | "local";
+    // meting 模式专属配置
+    meting: {
+        // Meting API 地址
+        meting_api: string;
+        // 音乐平台
+        server: "netease" | "tencent" | "kugou" | "baidu" | "kuwo";
+        // 类型
+        type: "playlist" | "album" | "artist" | "song" | "search";
+        // 资源 ID
+        id: string;
+    };
+    // local 模式专属配置
+    local: {
+        // 播放列表
+        playlist: MusicPlayerTrack[];
+    };
 };
 
+/**
+ * 
+ */
 
 // 看板娘配置
 export type PioConfig = {
@@ -491,23 +531,23 @@ export type PioConfig = {
         // 欢迎词
         welcome?: string | string[];
         // 触摸提示
-        touch?: string | string[]; 
+        touch?: string | string[];
         // 首页提示
-        home?: string; 
+        home?: string;
         // 换装提示
         skin?: [string, string]; // [切换前, 切换后]
         // 关闭提示
-        close?: string; 
+        close?: string;
         // 关于链接
-        link?: string; 
+        link?: string;
         // 自定义属性
         custom?: Array<{
             // CSS选择器
-            selector: string; 
+            selector: string;
             // 类型
-            type: "read" | "link"; 
+            type: "read" | "link";
             // 自定义文本
-            text?: string; 
+            text?: string;
         }>;
     };
 };

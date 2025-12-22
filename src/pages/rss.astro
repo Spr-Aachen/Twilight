@@ -1,10 +1,11 @@
 ---
-import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { Icon } from "astro-icon/components";
+
 import { getSortedPosts } from "@utils/content-utils";
 import { formatDateToYYYYMMDD } from "@utils/date-utils";
-import { Icon } from "astro-icon/components";
-import I18nKey from "../i18n/i18nKey";
-import { i18n } from "../i18n/translation";
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 const posts = (await getSortedPosts()).filter((post) => !post.data.encrypted);
 const recentPosts = posts.slice(0, 6);
@@ -41,7 +42,7 @@ const recentPosts = posts.slice(0, 6);
                     <code class="bg-[var(--card-bg)] px-3 py-2 rounded-lg text-sm font-mono text-75 border border-[var(--line-divider)] break-all">
                         {Astro.site}rss.xml
                     </code>
-                    <button 
+                    <button
                         id="copy-rss-btn"
                         class="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:opacity-80 transition-all duration-200 font-medium text-sm whitespace-nowrap"
                         data-url={`${Astro.site}rss.xml`}
@@ -116,7 +117,6 @@ const recentPosts = posts.slice(0, 6);
                         const originalText = this.textContent || "Copy Link";
                         this.textContent = "RSS link copied to clipboard!";
                         this.style.backgroundColor = 'var(--success-color, #10b981)';
-                        
                         setTimeout(() => {
                             this.textContent = originalText;
                             this.style.backgroundColor = '';

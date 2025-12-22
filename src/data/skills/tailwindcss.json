@@ -1,15 +1,15 @@
 {
-  "name": "Tailwind CSS",
-  "description": "A utility-first CSS framework.",
-  "icon": "logos:tailwindcss-icon",
-  "category": "frontend",
-  "level": "beginner",
-  "experience": {
-    "years": 0,
-    "months": 3
-  },
-  "projects": [
-    "Twilight"
-  ],
-  "color": "#06B6D4"
+    "name": "Tailwind CSS",
+    "description": "A utility-first CSS framework.",
+    "icon": "logos:tailwindcss-icon",
+    "category": "frontend",
+    "level": "beginner",
+    "experience": {
+        "years": 0,
+        "months": 3
+    },
+    "projects": [
+        "Twilight"
+    ],
+    "color": "#06B6D4"
 }

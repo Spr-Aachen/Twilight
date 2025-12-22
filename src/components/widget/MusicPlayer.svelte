@@ -1,351 +1,358 @@
 <script lang="ts">
-// 导入 Svelte 的生命周期函数和过渡效果
-
-// 导入 Icon 组件，用于显示图标
-import Icon from "@iconify/svelte";
 import { onDestroy, onMount } from "svelte";
 import { slide } from "svelte/transition";
-// 从配置文件中导入音乐播放器配置
-import { musicPlayerConfig } from "../../config";
-// 导入国际化相关的 Key 和 i18n 实例
-import Key from "../../i18n/i18nKey";
-import { i18n } from "../../i18n/translation";
+import Icon from "@iconify/svelte";
+
+import { musicPlayerConfig } from "@/config";
+import type { MusicPlayerTrack } from "../../types/config";
+import { i18n } from "@i18n/translation";
+import Key from "@i18n/i18nKey";
+import "../../styles/musicplayer.css";
+
 
 // 音乐播放器模式，可选 "local" 或 "meting"
-let mode = musicPlayerConfig.mode ?? "local";
+let mode = musicPlayerConfig.mode ?? "meting";
 // Meting API 地址，从配置中获取或使用默认值
-let meting_api =
-	musicPlayerConfig.meting_api ??
-	"https://exampleapi";
-// Meting API 的 ID，从配置中获取或使用默认值
-let meting_id = musicPlayerConfig.id ?? "exampleid";
-// Meting API 的服务器，从配置中获取或使用默认值,有的meting的api源支持更多平台,一般来说,netease=网易云音乐, tencent=QQ音乐, kugou=酷狗音乐, xiami=虾米音乐, baidu=百度音乐
-let meting_server = musicPlayerConfig.server ?? "netease";
+let meting_api = musicPlayerConfig.meting?.meting_api ?? "https://api.i-meto.com/meting/api";
+// Meting API 的数据源，从配置中获取或使用默认值
+let meting_server = musicPlayerConfig.meting?.server ?? "netease";
 // Meting API 的类型，从配置中获取或使用默认值
-let meting_type = musicPlayerConfig.type ?? "playlist";
-// 播放状态，默认为 false (未播放)
+let meting_type = musicPlayerConfig.meting?.type ?? "playlist";
+// Meting API 的 ID，从配置中获取或使用默认值
+let meting_id = musicPlayerConfig.meting?.id ?? "2161912966";
+
+// 是否自动播放
 let isPlaying = false;
-// 播放器是否展开，默认为 false
-let isExpanded = false;
-// 播放器是否隐藏，默认为 false
-let isHidden = false;
-// 是否显示播放列表，默认为 false
+// 是否折叠播放器
+let isCollapsed = true;
+// 是否显示播放列表
 let showPlaylist = false;
-// 当前播放时间，默认为 0
+// 当前播放时间
 let currentTime = 0;
-// 歌曲总时长，默认为 0
+// 歌曲总时长
 let duration = 0;
-// 音量，默认为 0.7
-let volume = 0.7;
-// 是否静音，默认为 false
+// 音量
+let volume = 0.75;
+// 是否静音
 let isMuted = false;
-// 是否正在加载，默认为 false
+// 是否正在加载
 let isLoading = false;
-// 是否随机播放，默认为 false
+// 是否随机播放
 let isShuffled = false;
-// 循环模式，0: 不循环, 1: 单曲循环, 2: 列表循环，默认为 0
+// 循环模式，0: 不循环, 1: 单曲循环, 2: 列表循环
 let isRepeating = 0;
-// 错误信息，默认为空字符串
+// 错误信息
 let errorMessage = "";
-// 是否显示错误信息，默认为 false
+// 是否显示错误信息
 let showError = false;
 
 // 当前歌曲信息
-let currentSong = {
-	title: "Music",
-	artist: "Artist",
-	cover: "/favicon/icon-light.ico",
-	url: "",
-	duration: 0,
+let currentSong: MusicPlayerTrack = {
+    id: 0,
+    title: "Music",
+    artist: "Artist",
+    cover: "/favicon/icon-light.ico",
+    url: "",
+    duration: 0,
 };
-
-let playlist = [];
+let playlist: MusicPlayerTrack[] = [];
 let currentIndex = 0;
 let audio: HTMLAudioElement;
 let progressBar: HTMLElement;
 let volumeBar: HTMLElement;
 
-const localPlaylist = [
-	{
-		id: 1,
-		title: "深海之息",
-		artist: "Youzee Music",
-		cover: "https://p1.music.126.net/PhKOqFtljgHDDpKYM2ADUA==/109951169858309716.jpg",
-		url: "assets/music/url/深海之息.m4a",
-		duration: 146,
-	},
-];
-
 async function fetchMetingPlaylist() {
-	if (!meting_api || !meting_id) return;
-	isLoading = true;
-	const apiUrl = meting_api
-		.replace(":server", meting_server)
-		.replace(":type", meting_type)
-		.replace(":id", meting_id)
-		.replace(":auth", "")
-		.replace(":r", Date.now().toString());
-	try {
-		const res = await fetch(apiUrl);
-		if (!res.ok) throw new Error("meting api error");
-		const list = await res.json();
-		playlist = list.map((song) => {
-			let title = song.name ?? song.title ?? "未知歌曲";
-			let artist = song.artist ?? song.author ?? "未知艺术家";
-			let dur = song.duration ?? 0;
-			if (dur > 10000) dur = Math.floor(dur / 1000);
-			if (!Number.isFinite(dur) || dur <= 0) dur = 0;
-			return {
-				id: song.id,
-				title,
-				artist,
-				cover: song.pic ?? "",
-				url: song.url ?? "",
-				duration: dur,
-			};
-		});
-		if (playlist.length > 0) {
-			loadSong(playlist[0]);
-		}
-		isLoading = false;
-	} catch (e) {
-		showErrorMessage("Meting 歌单获取失败");
-		isLoading = false;
-	}
+    if (!meting_api || !meting_id) return;
+    isLoading = true;
+    const query = new URLSearchParams({
+        server: meting_server,
+        type: meting_type,
+        id: meting_id,
+    });
+    const separator = meting_api.includes("?") ? "&" : "?";
+    const apiUrl = `${meting_api}${separator}${query.toString()}`;
+    try {
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error("meting api error");
+        const list = await res.json();
+        playlist = list.map((song: any) => {
+            let title = song.name ?? song.title ?? "未知歌曲";
+            let artist = song.artist ?? song.author ?? "未知艺术家";
+            let dur = song.duration ?? 0;
+            if (dur > 10000) dur = Math.floor(dur / 1000);
+            if (!Number.isFinite(dur) || dur <= 0) dur = 0;
+            return {
+                id: song.id,
+                title,
+                artist,
+                cover: song.pic ?? "",
+                url: song.url ?? "",
+                duration: dur,
+            };
+        });
+        if (playlist.length > 0) {
+            loadSong(playlist[0]);
+        }
+        isLoading = false;
+    } catch (e) {
+        showErrorMessage("Meting 歌单获取失败");
+        isLoading = false;
+    }
+}
+
+async function toggleMode() {
+    if (!musicPlayerConfig.enable) return;
+    mode = mode === "meting" ? "local" : "meting";
+    showPlaylist = false;
+    isLoading = false;
+    isPlaying = false;
+    currentIndex = 0;
+    playlist = [];
+    if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+    }
+    currentTime = 0;
+    duration = 0;
+
+    if (mode === "meting") {
+        await fetchMetingPlaylist();
+    } else {
+        playlist = [...(musicPlayerConfig.local?.playlist ?? [])];
+        if (playlist.length > 0) {
+            loadSong(playlist[0]);
+        } else {
+            showErrorMessage("本地播放列表为空");
+        }
+    }
 }
 
 function togglePlay() {
-	if (!audio || !currentSong.url) return;
-	if (isPlaying) {
-		audio.pause();
-	} else {
-		audio.play();
-	}
+    if (!audio || !currentSong.url) return;
+    if (isPlaying) {
+        audio.pause();
+    } else {
+        audio.play();
+    }
 }
 
-function toggleExpanded() {
-	isExpanded = !isExpanded;
-	if (isExpanded) {
-		showPlaylist = false;
-		isHidden = false;
-	}
-}
-
-function toggleHidden() {
-	isHidden = !isHidden;
-	if (isHidden) {
-		isExpanded = false;
-		showPlaylist = false;
-	}
+function toggleCollapse() {
+    isCollapsed = !isCollapsed;
+    if (isCollapsed) {
+        showPlaylist = false;
+    }
 }
 
 function togglePlaylist() {
-	showPlaylist = !showPlaylist;
+    showPlaylist = !showPlaylist;
 }
 
 function toggleShuffle() {
-	isShuffled = !isShuffled;
+    isShuffled = !isShuffled;
 }
 
 function toggleRepeat() {
-	isRepeating = (isRepeating + 1) % 3;
+    isRepeating = (isRepeating + 1) % 3;
 }
 
 function previousSong() {
-	if (playlist.length <= 1) return;
-	const newIndex = currentIndex > 0 ? currentIndex - 1 : playlist.length - 1;
-	playSong(newIndex);
+    if (playlist.length <= 1) return;
+    const newIndex = currentIndex > 0 ? currentIndex - 1 : playlist.length - 1;
+    playSong(newIndex);
 }
 
 function nextSong() {
-	if (playlist.length <= 1) return;
-	let newIndex: number;
-	if (isShuffled) {
-		do {
-			newIndex = Math.floor(Math.random() * playlist.length);
-		} while (newIndex === currentIndex && playlist.length > 1);
-	} else {
-		newIndex = currentIndex < playlist.length - 1 ? currentIndex + 1 : 0;
-	}
-	playSong(newIndex);
+    if (playlist.length <= 1) return;
+    let newIndex: number;
+    if (isShuffled) {
+        do {
+            newIndex = Math.floor(Math.random() * playlist.length);
+        } while (newIndex === currentIndex && playlist.length > 1);
+    } else {
+        newIndex = currentIndex < playlist.length - 1 ? currentIndex + 1 : 0;
+    }
+    playSong(newIndex);
 }
 
 function playSong(index: number) {
-	if (index < 0 || index >= playlist.length) return;
-	const wasPlaying = isPlaying;
-	currentIndex = index;
-	if (audio) audio.pause();
-	loadSong(playlist[currentIndex]);
-	if (wasPlaying || !isPlaying) {
-		setTimeout(() => {
-			if (!audio) return;
-			if (audio.readyState >= 2) {
-				audio.play().catch(() => {});
-			} else {
-				audio.addEventListener(
-					"canplay",
-					() => {
-						audio.play().catch(() => {});
-					},
-					{ once: true },
-				);
-			}
-		}, 100);
-	}
+    if (index < 0 || index >= playlist.length) return;
+    const wasPlaying = isPlaying;
+    currentIndex = index;
+    if (audio) audio.pause();
+    loadSong(playlist[currentIndex]);
+    if (wasPlaying || !isPlaying) {
+        setTimeout(() => {
+            if (!audio) return;
+            if (audio.readyState >= 2) {
+                audio.play().catch(() => {});
+            } else {
+                audio.addEventListener(
+                    "canplay",
+                    () => {
+                        audio.play().catch(() => {});
+                    },
+                    { once: true },
+                );
+            }
+        }, 100);
+    }
 }
 
 function getAssetPath(path: string): string {
-	if (path.startsWith("http://") || path.startsWith("https://")) return path;
-	if (path.startsWith("/")) return path;
-	return `/${path}`;
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    if (path.startsWith("/")) return path;
+    return `/${path}`;
 }
 
-function loadSong(song: typeof currentSong) {
-	if (!song || !audio) return;
-	currentSong = { ...song };
-	if (song.url) {
-		isLoading = true;
-		audio.pause();
-		audio.currentTime = 0;
-		currentTime = 0;
-		duration = song.duration ?? 0;
-		audio.removeEventListener("loadeddata", handleLoadSuccess);
-		audio.removeEventListener("error", handleLoadError);
-		audio.removeEventListener("loadstart", handleLoadStart);
-		audio.addEventListener("loadeddata", handleLoadSuccess, { once: true });
-		audio.addEventListener("error", handleLoadError, { once: true });
-		audio.addEventListener("loadstart", handleLoadStart, { once: true });
-		audio.src = getAssetPath(song.url);
-		audio.load();
-	} else {
-		isLoading = false;
-	}
+function loadSong(song: MusicPlayerTrack) {
+    if (!song || !audio) return;
+    currentSong = { ...song };
+    if (song.url) {
+        isLoading = true;
+        audio.pause();
+        audio.currentTime = 0;
+        currentTime = 0;
+        duration = song.duration ?? 0;
+        audio.removeEventListener("loadeddata", handleLoadSuccess);
+        audio.removeEventListener("error", handleLoadError);
+        audio.removeEventListener("loadstart", handleLoadStart);
+        audio.addEventListener("loadeddata", handleLoadSuccess, { once: true });
+        audio.addEventListener("error", handleLoadError, { once: true });
+        audio.addEventListener("loadstart", handleLoadStart, { once: true });
+        audio.src = getAssetPath(song.url);
+        audio.load();
+    } else {
+        isLoading = false;
+    }
 }
 
 function handleLoadSuccess() {
-	isLoading = false;
-	if (audio?.duration && audio.duration > 1) {
-		duration = Math.floor(audio.duration);
-		if (playlist[currentIndex]) playlist[currentIndex].duration = duration;
-		currentSong.duration = duration;
-	}
+    isLoading = false;
+    if (audio?.duration && audio.duration > 1) {
+        duration = Math.floor(audio.duration);
+        if (playlist[currentIndex]) playlist[currentIndex].duration = duration;
+        currentSong.duration = duration;
+    }
 }
 
 function handleLoadError(event: Event) {
-	isLoading = false;
-	showErrorMessage(`无法播放 "${currentSong.title}"，正在尝试下一首...`);
-	if (playlist.length > 1) setTimeout(() => nextSong(), 1000);
-	else showErrorMessage("播放列表中没有可用的歌曲");
+    isLoading = false;
+    showErrorMessage(`无法播放 "${currentSong.title}"，正在尝试下一首...`);
+    if (playlist.length > 1) setTimeout(() => nextSong(), 1000);
+    else showErrorMessage("播放列表中没有可用的歌曲");
 }
 
 function handleLoadStart() {}
 
 function showErrorMessage(message: string) {
-	errorMessage = message;
-	showError = true;
-	setTimeout(() => {
-		showError = false;
-	}, 3000);
+    errorMessage = message;
+    showError = true;
+    setTimeout(() => {
+        showError = false;
+    }, 3000);
 }
+
 function hideError() {
-	showError = false;
+    showError = false;
 }
 
 function setProgress(event: MouseEvent) {
-	if (!audio || !progressBar) return;
-	const rect = progressBar.getBoundingClientRect();
-	const percent = (event.clientX - rect.left) / rect.width;
-	const newTime = percent * duration;
-	audio.currentTime = newTime;
-	currentTime = newTime;
+    if (!audio || !progressBar) return;
+    const rect = progressBar.getBoundingClientRect();
+    const percent = (event.clientX - rect.left) / rect.width;
+    const newTime = percent * duration;
+    audio.currentTime = newTime;
+    currentTime = newTime;
 }
 
 function setVolume(event: MouseEvent) {
-	if (!audio || !volumeBar) return;
-	const rect = volumeBar.getBoundingClientRect();
-	const percent = Math.max(
-		0,
-		Math.min(1, (event.clientX - rect.left) / rect.width),
-	);
-	volume = percent;
-	audio.volume = volume;
-	isMuted = volume === 0;
+    if (!audio || !volumeBar) return;
+    const rect = volumeBar.getBoundingClientRect();
+    const percent = Math.max(
+        0,
+        Math.min(1, (event.clientX - rect.left) / rect.width),
+    );
+    volume = percent;
+    audio.volume = volume;
+    isMuted = volume === 0;
 }
 
 function toggleMute() {
-	if (!audio) return;
-	isMuted = !isMuted;
-	audio.muted = isMuted;
+    if (!audio) return;
+    isMuted = !isMuted;
+    audio.muted = isMuted;
 }
 
 function formatTime(seconds: number): string {
-	if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
-	const mins = Math.floor(seconds / 60);
-	const secs = Math.floor(seconds % 60);
-	return `${mins}:${secs.toString().padStart(2, "0")}`;
+    if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 function handleAudioEvents() {
-	if (!audio) return;
-	audio.addEventListener("play", () => {
-		isPlaying = true;
-	});
-	audio.addEventListener("pause", () => {
-		isPlaying = false;
-	});
-	audio.addEventListener("timeupdate", () => {
-		currentTime = audio.currentTime;
-	});
-	audio.addEventListener("ended", () => {
-		if (isRepeating === 1) {
-			audio.currentTime = 0;
-			audio.play().catch(() => {});
-		} else if (
-			isRepeating === 2 ||
-			currentIndex < playlist.length - 1 ||
-			isShuffled
-		) {
-			nextSong();
-		} else {
-			isPlaying = false;
-		}
-	});
-	audio.addEventListener("error", (event) => {
-		isLoading = false;
-	});
-	audio.addEventListener("stalled", () => {});
-	audio.addEventListener("waiting", () => {});
+    if (!audio) return;
+    audio.addEventListener("play", () => {
+        isPlaying = true;
+    });
+    audio.addEventListener("pause", () => {
+        isPlaying = false;
+    });
+    audio.addEventListener("timeupdate", () => {
+        currentTime = audio.currentTime;
+    });
+    audio.addEventListener("ended", () => {
+        if (isRepeating === 1) {
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        } else if (
+            isRepeating === 2 ||
+            currentIndex < playlist.length - 1 ||
+            isShuffled
+        ) {
+            nextSong();
+        } else {
+            isPlaying = false;
+        }
+    });
+    audio.addEventListener("error", (event) => {
+        isLoading = false;
+    });
+    audio.addEventListener("stalled", () => {});
+    audio.addEventListener("waiting", () => {});
 }
 
 onMount(() => {
-	audio = new Audio();
-	audio.volume = volume;
-	handleAudioEvents();
-	if (!musicPlayerConfig.enable) {
-		return;
-	}
-	if (mode === "meting") {
-		fetchMetingPlaylist();
-	} else {
-		// 使用本地播放列表，不发送任何API请求
-		playlist = [...localPlaylist];
-		if (playlist.length > 0) {
-			loadSong(playlist[0]);
-		} else {
-			showErrorMessage("本地播放列表为空");
-		}
-	}
+    audio = new Audio();
+    audio.volume = volume;
+    handleAudioEvents();
+    if (!musicPlayerConfig.enable) {
+        return;
+    }
+    if (mode === "meting") {
+        fetchMetingPlaylist();
+    } else {
+        // 使用本地播放列表，不发送任何API请求
+        playlist = [...(musicPlayerConfig.local?.playlist ?? [])];
+        if (playlist.length > 0) {
+            loadSong(playlist[0]);
+        } else {
+            showErrorMessage("本地播放列表为空");
+        }
+    }
 });
 
 onDestroy(() => {
-	if (audio) {
-		audio.pause();
-		audio.src = "";
-	}
+    if (audio) {
+        audio.pause();
+        audio.src = "";
+    }
 });
 </script>
 
+
 {#if musicPlayerConfig.enable}
+
 {#if showError}
 <div class="fixed bottom-20 right-4 z-[60] max-w-sm">
     <div class="bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-up">
@@ -359,23 +366,23 @@ onDestroy(() => {
 {/if}
 
 <div class="music-player fixed bottom-4 right-4 z-50 transition-all duration-300 ease-in-out"
-     class:expanded={isExpanded}
-     class:hidden-mode={isHidden}>
-    <!-- 隐藏状态的小圆球 -->
+     class:expanded={!isCollapsed}
+     class:collapsed={isCollapsed}>
+    <!-- 折叠状态的小圆球 -->
     <div class="orb-player w-12 h-12 bg-[var(--primary)] rounded-full shadow-lg cursor-pointer transition-all duration-500 ease-in-out flex items-center justify-center hover:scale-110 active:scale-95"
-         class:opacity-0={!isHidden}
-         class:scale-0={!isHidden}
-         class:pointer-events-none={!isHidden}
-         on:click={toggleHidden}
+         class:opacity-0={!isCollapsed}
+         class:scale-0={!isCollapsed}
+         class:pointer-events-none={!isCollapsed}
+         on:click={toggleCollapse}
          on:keydown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                toggleHidden();
+                toggleCollapse();
             }
          }}
          role="button"
          tabindex="0"
-         aria-label="显示音乐播放器">
+         aria-label="展开音乐播放器">
         {#if isLoading}
             <Icon icon="eos-icons:loading" class="text-white text-lg" />
         {:else if isPlaying}
@@ -388,59 +395,11 @@ onDestroy(() => {
             <Icon icon="material-symbols:music-note" class="text-white text-lg" />
         {/if}
     </div>
-    <!-- 收缩状态的迷你播放器（封面圆形） -->
-    <div class="mini-player card-base bg-[var(--float-panel-bg)] shadow-xl rounded-2xl p-3 transition-all duration-500 ease-in-out"
-         class:opacity-0={isExpanded || isHidden}
-         class:scale-95={isExpanded || isHidden}
-         class:pointer-events-none={isExpanded || isHidden}
-         on:click={toggleExpanded}
-         on:keydown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleExpanded();
-            }
-         }}
-         role="button"
-         tabindex="0"
-         aria-label="展开音乐播放器">
-        <div class="flex items-center gap-3 cursor-pointer">
-            <div class="cover-container relative w-12 h-12 rounded-full overflow-hidden">
-                <img src={getAssetPath(currentSong.cover)} alt="封面"
-                     class="w-full h-full object-cover transition-transform duration-300"
-                     class:spinning={isPlaying && !isLoading}
-                     class:animate-pulse={isLoading} />
-                <div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    {#if isLoading}
-                        <Icon icon="eos-icons:loading" class="text-white text-xl" />
-                    {:else if isPlaying}
-                        <Icon icon="material-symbols:pause" class="text-white text-xl" />
-                    {:else}
-                        <Icon icon="material-symbols:play-arrow" class="text-white text-xl" />
-                    {/if}
-                </div>
-            </div>
-            <div class="flex-1 min-w-0">
-                <div class="text-sm font-medium text-90 truncate">{currentSong.title}</div>
-                <div class="text-xs text-50 truncate">{currentSong.artist}</div>
-            </div>
-            <div class="flex items-center gap-1">
-                <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                        on:click|stopPropagation={toggleHidden}
-                        title="隐藏播放器">
-                    <Icon icon="material-symbols:visibility-off" class="text-lg" />
-                </button>
-                <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                        on:click|stopPropagation={toggleExpanded}>
-                    <Icon icon="material-symbols:expand-less" class="text-lg" />
-                </button>
-            </div>
-        </div>
-    </div>
     <!-- 展开状态的完整播放器（封面圆形） -->
     <div class="expanded-player card-base bg-[var(--float-panel-bg)] shadow-xl rounded-2xl p-4 transition-all duration-500 ease-in-out"
-         class:opacity-0={!isExpanded}
-         class:scale-95={!isExpanded}
-         class:pointer-events-none={!isExpanded}>
+         class:opacity-0={isCollapsed}
+         class:scale-95={isCollapsed}
+         class:pointer-events-none={isCollapsed}>
         <div class="flex items-center gap-4 mb-4">
             <div class="cover-container relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                 <img src={getAssetPath(currentSong.cover)} alt="封面"
@@ -457,12 +416,13 @@ onDestroy(() => {
             </div>
             <div class="flex items-center gap-1">
                 <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                        on:click={toggleHidden}
-                        title="隐藏播放器">
-                    <Icon icon="material-symbols:visibility-off" class="text-lg" />
+                        on:click={toggleMode}
+                        title={mode === "meting" ? "切换到 Local 模式" : "切换到 Meting 模式"}>
+                    <Icon icon={mode === "meting" ? "material-symbols:cloud" : "material-symbols:folder"} class="text-lg" />
                 </button>
                 <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                        on:click={toggleExpanded}>
+                        on:click={toggleCollapse}
+                        title="折叠播放器">
                     <Icon icon="material-symbols:expand-more" class="text-lg" />
                 </button>
             </div>
@@ -623,182 +583,4 @@ onDestroy(() => {
     {/if}
 </div>
 
-<style>
-.orb-player {
-	position: relative;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-}
-.orb-player::before {
-	content: '';
-	position: absolute;
-	inset: -2px;
-	background: linear-gradient(45deg, var(--primary), transparent, var(--primary));
-	border-radius: 50%;
-	z-index: -1;
-	opacity: 0;
-	transition: opacity 0.3s ease;
-}
-.orb-player:hover::before {
-	opacity: 0.3;
-	animation: rotate 2s linear infinite;
-}
-.orb-player .animate-pulse {
-	animation: musicWave 1.5s ease-in-out infinite;
-}
-@keyframes rotate {
-	from { transform: rotate(0deg); }
-	to { transform: rotate(360deg); }
-}
-@keyframes musicWave {
-	0%, 100% { transform: scaleY(0.5); }
-	50% { transform: scaleY(1); }
-}
-.music-player.hidden-mode {
-	width: 48px;
-	height: 48px;
-}
-.music-player {
-    max-width: 320px;
-    user-select: none;
-}
-.mini-player {
-    width: 280px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    /*left: 0;*/
-}
-.expanded-player {
-    width: 320px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-}
-
-.animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-.progress-section div:hover,
-.bottom-controls > div:hover {
-    transform: scaleY(1.2);
-    transition: transform 0.2s ease;
-}
-@media (max-width: 768px) {
-    .music-player {
-        max-width: 280px;
-        /*left: 8px !important;*/
-        bottom: 8px !important;
-        right: 8px !important;
-    }
-    .music-player.expanded {
-        width: calc(100vw - 16px);
-        max-width: none;
-        /*left: 8px !important;*/
-        right: 8px !important;
-    }
-    .playlist-panel {
-        width: calc(100vw - 16px) !important;
-        /*left: 8px !important;*/
-        right: 8px !important;
-        max-width: none;
-    }
-    .controls {
-        gap: 8px;
-    }
-    .controls button {
-        width: 36px;
-        height: 36px;
-    }
-    .controls button:nth-child(3) {
-        width: 44px;
-        height: 44px;
-    }
-}
-@media (max-width: 480px) {
-    .music-player {
-        max-width: 260px;
-    }
-    .song-title {
-        font-size: 14px;
-    }
-    .song-artist {
-        font-size: 12px;
-    }
-    .controls {
-        gap: 6px;
-        margin-bottom: 12px;
-    }
-    .controls button {
-        width: 32px;
-        height: 32px;
-    }
-    .controls button:nth-child(3) {
-        width: 40px;
-        height: 40px;
-    }
-    .playlist-item {
-        padding: 8px 12px;
-    }
-    .playlist-item .w-10 {
-        width: 32px;
-        height: 32px;
-    }
-}
-@keyframes slide-up {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-.animate-slide-up {
-    animation: slide-up 0.3s ease-out;
-}
-@media (hover: none) and (pointer: coarse) {
-    .music-player button,
-    .playlist-item {
-        min-height: 44px;
-    }
-    .progress-section > div,
-    .bottom-controls > div:nth-child(2) {
-        height: 12px;
-    }
-}
-/* 自定义旋转动画，停止时保持当前位置 */
-@keyframes spin-continuous {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.cover-container img {
-    animation: spin-continuous 3s linear infinite;
-    animation-play-state: paused;
-}
-
-.cover-container img.spinning {
-    animation-play-state: running;
-}
-
-/* 让主题色按钮更有视觉反馈 */
-button.bg-\[var\(--primary\)\] {
-    box-shadow: 0 0 0 2px var(--primary);
-    border: none;
-}
-</style>
 {/if}

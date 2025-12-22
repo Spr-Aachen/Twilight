@@ -1,12 +1,12 @@
 {
-  "name": "Git",
-  "description": "A distributed version control system.",
-  "icon": "logos:git-icon",
-  "category": "tools",
-  "level": "advanced",
-  "experience": {
-    "years": 3,
-    "months": 0
-  },
-  "color": "#F05032"
+    "name": "Git",
+    "description": "A distributed version control system.",
+    "icon": "logos:git-icon",
+    "category": "tools",
+    "level": "advanced",
+    "experience": {
+        "years": 3,
+        "months": 0
+    },
+    "color": "#F05032"
 }

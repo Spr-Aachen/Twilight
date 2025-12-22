@@ -1,15 +1,15 @@
 {
-  "name": "Svelte",
-  "description": "A compiler-based UI framework.",
-  "icon": "logos:svelte-icon",
-  "category": "frontend",
-  "level": "beginner",
-  "experience": {
-    "years": 0,
-    "months": 3
-  },
-  "projects": [
-    "Twilight"
-  ],
-  "color": "#FF3E00"
+    "name": "Svelte",
+    "description": "A compiler-based UI framework.",
+    "icon": "logos:svelte-icon",
+    "category": "frontend",
+    "level": "beginner",
+    "experience": {
+        "years": 0,
+        "months": 3
+    },
+    "projects": [
+        "Twilight"
+    ],
+    "color": "#FF3E00"
 }

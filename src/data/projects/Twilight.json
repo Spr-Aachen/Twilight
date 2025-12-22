@@ -1,21 +1,21 @@
 {
-  "title": "Twilight Blog Template",
-  "description": "A blog theme built with Astro framework.",
-  "image": "",
-  "category": "website",
-  "techStack": [
-    "Astro",
-    "Svelte",
-    "Tailwind CSS"
-  ],
-  "status": "in-progress",
-  "liveDemo": "https://twilight.spr-aachen.com",
-  "sourceCode": "https://github.com/Spr-Aachen/Twilight",
-  "startDate": "2025-10-01",
-  "endDate": "",
-  "featured": false,
-  "tags": [
-    "Personal Project",
-    "Open Source Project"
-  ]
+    "title": "Twilight Blog Template",
+    "description": "A CMS integrated blog theme built with Astro framework.",
+    "image": "",
+    "category": "website",
+    "techStack": [
+        "Astro",
+        "Svelte",
+        "Tailwind CSS"
+    ],
+    "status": "in-progress",
+    "liveDemo": "https://twilight.spr-aachen.com",
+    "sourceCode": "https://github.com/Spr-Aachen/Twilight",
+    "startDate": "2025-10-01",
+    "endDate": "",
+    "featured": true,
+    "tags": [
+        "Personal Project",
+        "Open Source Project"
+    ]
 }

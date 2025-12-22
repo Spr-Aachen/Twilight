@@ -1,10 +1,11 @@
 ---
-import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { Icon } from "astro-icon/components";
+
 import { getSortedPosts } from "@utils/content-utils";
 import { formatDateToYYYYMMDD } from "@utils/date-utils";
-import { Icon } from "astro-icon/components";
-import I18nKey from "../i18n/i18nKey";
-import { i18n } from "../i18n/translation";
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 
 const posts = (await getSortedPosts()).filter((post) => !post.data.encrypted);
@@ -25,7 +26,6 @@ const recentPosts = posts.slice(0, 6);
                 </p>
             </div>
         </div>
-
         <!-- Atom 链接复制区域 -->
         <div class="card-base rounded-[var(--radius-large)] p-6 mb-6">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -52,7 +52,6 @@ const recentPosts = posts.slice(0, 6);
                 </div>
             </div>
         </div>
-
         <!-- 最新文章预览 -->
         <div class="card-base rounded-[var(--radius-large)] p-6 mb-6">
             <h2 class="text-xl font-bold text-90 mb-4 flex items-center">
@@ -81,7 +80,6 @@ const recentPosts = posts.slice(0, 6);
                 ))}
             </div>
         </div>
-
         <!-- Atom 说明 -->
         <div class="card-base rounded-[var(--radius-large)] p-6">
             <h2 class="text-xl font-bold text-90 mb-4 flex items-center">

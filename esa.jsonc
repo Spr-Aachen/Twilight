@@ -1,0 +1,17 @@
+{
+    // 指定部署的目标项目
+    "name": "twilight",
+    // // 边缘函数的入口执行文件路径
+    // "entry": "./src/index.ts",
+    // 配置自定义安装指令
+    "installCommand": "pnpm install",
+    // 配置自定义构建命令
+    "buildCommand": "pnpm run build",
+    // 静态资源托管功能
+    "assets": {
+        // 构建产物中将被静态托管的目录
+        "directory": "./dist",
+        // 当请求的路径未匹配到任何静态资源时执行的策略
+        "notFoundStrategy": "singlePageApplication"
+    }
+}

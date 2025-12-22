@@ -1,36 +1,38 @@
 ---
 import { Icon } from "astro-icon/components";
-import { type NavBarLink, LinkPreset } from "../../types/config";
-import { LinkPresets } from "../../constants/link-presets";
-import { url } from "../../utils/url-utils";
+
+import { url } from "@utils/url-utils";
+import { LinkPresets } from "@constants/link-presets";
+import { LinkPreset, type NavBarLink } from "../../types/config";
 
 
 interface Props {
-	links: NavBarLink[];
+    links: NavBarLink[];
 }
 
 // 处理links中的LinkPreset转换
 const processedLinks = Astro.props.links.map(
-	(link: NavBarLink): NavBarLink => ({
-		...link,
-		children: link.children?.map(
-			(child: NavBarLink | LinkPreset): NavBarLink => {
-				if (typeof child === "number") {
-					return LinkPresets[child];
-				}
-				return child;
-			},
-		),
-	}),
+    (link: NavBarLink): NavBarLink => ({
+        ...link,
+        children: link.children?.map(
+            (child: NavBarLink | LinkPreset): NavBarLink => {
+                if (typeof child === "number") {
+                    return LinkPresets[child];
+                }
+                return child;
+            },
+        ),
+    }),
 );
 ---
+
 <div id="nav-menu-panel" class:list={["float-panel float-panel-closed fixed transition-all right-4 px-2 py-2 max-h-[80vh] overflow-y-auto"]}>
     {processedLinks.map((link) => (
         <div class="mobile-menu-item">
             {link.children && link.children.length > 0 ? (
                 <!-- 有子菜单的项目 -->
                 <div class="mobile-dropdown" data-mobile-dropdown>
-                    <button 
+                    <button
                         class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8 w-full text-left
                             hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition"
                         data-mobile-dropdown-trigger
@@ -48,7 +50,7 @@ const processedLinks = Astro.props.links.map(
                         {link.children.map((child) => {
                             const navChild = typeof child === 'number' ? LinkPresets[child] : child;
                             return (
-                            <a href={navChild.external ? navChild.url : url(navChild.url)} 
+                            <a href={navChild.external ? navChild.url : url(navChild.url)}
                                class="group flex justify-between items-center py-2 pl-6 pr-1 rounded-lg gap-8
                                    hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition"
                                target={navChild.external ? "_blank" : null}
@@ -92,11 +94,11 @@ const processedLinks = Astro.props.links.map(
     .mobile-submenu {
         @apply max-h-0 overflow-hidden transition-all duration-300 ease-in-out;
     }
-    
+
     .mobile-dropdown[data-expanded="true"] .mobile-submenu {
         @apply max-h-96;
     }
-    
+
     .mobile-dropdown[data-expanded="true"] .mobile-dropdown-arrow {
         @apply rotate-180;
     }
@@ -105,17 +107,17 @@ const processedLinks = Astro.props.links.map(
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const mobileDropdowns = document.querySelectorAll('[data-mobile-dropdown]');
-        
+
         mobileDropdowns.forEach(dropdown => {
             const trigger = dropdown.querySelector('[data-mobile-dropdown-trigger]');
             const submenu = dropdown.querySelector('[data-mobile-submenu]');
-            
+
             if (!trigger || !submenu) return;
-            
+
             trigger.addEventListener('click', function(e) {
                 e.preventDefault();
                 const isExpanded = dropdown.getAttribute('data-expanded') === 'true';
-                
+
                 // 关闭其他打开的下拉菜单
                 mobileDropdowns.forEach(otherDropdown => {
                     if (otherDropdown !== dropdown) {
@@ -126,7 +128,7 @@ const processedLinks = Astro.props.links.map(
                         }
                     }
                 });
-                
+
                 // 切换当前下拉菜单
                 const newState = !isExpanded;
                 dropdown.setAttribute('data-expanded', newState.toString());

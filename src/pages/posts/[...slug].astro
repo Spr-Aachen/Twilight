@@ -1,60 +1,60 @@
 ---
-import type { CollectionEntry } from "astro:content";
-import { render } from "astro:content";
-import Comment from "@components/comment/index.astro";
-import License from "@components/misc/License.astro";
-import Markdown from "@components/misc/Markdown.astro";
-import PasswordProtection from "@components/PasswordProtection.astro";
-import I18nKey from "@i18n/i18nKey";
-import { i18n } from "@i18n/translation";
-import MainGridLayout from "@layouts/MainGridLayout.astro";
-import { getSortedPosts } from "@utils/content-utils";
-import { getFileDirFromPath, getPostUrlBySlug, removeFileExtension} from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
+import { render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 import bcryptjs from "bcryptjs";
 import CryptoJS from "crypto-js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { postConfig } from "src/config";
-import ImageWrapper from "../../components/misc/ImageWrapper.astro";
-import PostMetadata from "../../components/PostMeta.astro";
-import { profileConfig, siteConfig } from "../../config";
-import { formatDateToYYYYMMDD } from "../../utils/date-utils";
+
+import { siteConfig, profileConfig, postConfig } from "@/config";
+import { getSortedPosts } from "@utils/content-utils";
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+import { getFileDirFromPath, getPostUrlBySlug, removeFileExtension} from "@utils/url-utils";
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
+import License from "@components/misc/License.astro";
+import Markdown from "@components/misc/Markdown.astro";
+import ImageWrapper from "@components/misc/ImageWrapper.astro";
+import Comment from "@components/comment/index.astro";
+import PasswordProtection from "@components/PasswordProtection.astro";
+import PostMetadata from "@components/PostMeta.astro";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 
 export async function getStaticPaths() {
-	const blogEntries = await getSortedPosts();
-	const paths: {
-		params: { slug: string };
-		props: { entry: CollectionEntry<"posts"> };
-	}[] = [];
+    const blogEntries = await getSortedPosts();
+    const paths: {
+        params: { slug: string };
+        props: { entry: CollectionEntry<"posts"> };
+    }[] = [];
 
-	for (const entry of blogEntries) {
-		// 将 id 转换为 slug（移除扩展名）以匹配路由参数
-		const slug = removeFileExtension(entry.id);
-		// 为每篇文章创建默认的 slug 路径
-		paths.push({
-			params: { slug },
-			props: { entry },
-		});
-		// 如果文章有自定义固定链接，也创建对应的路径
-		if (entry.data.permalink) {
-			// 移除开头的斜杠和结尾的斜杠
-			// 同时移除可能的 "posts/" 前缀，避免重复
-			let permalink = entry.data.permalink
-				.replace(/^\/+/, "")
-				.replace(/\/+$/, "");
-			if (permalink.startsWith("posts/")) {
-				permalink = permalink.replace(/^posts\//, "");
-			}
-			paths.push({
-				params: { slug: permalink },
-				props: { entry },
-			});
-		}
-	}
+    for (const entry of blogEntries) {
+        // 将 id 转换为 slug（移除扩展名）以匹配路由参数
+        const slug = removeFileExtension(entry.id);
+        // 为每篇文章创建默认的 slug 路径
+        paths.push({
+            params: { slug },
+            props: { entry },
+        });
+        // 如果文章有自定义固定链接，也创建对应的路径
+        if (entry.data.routeName) {
+            // 移除开头的斜杠和结尾的斜杠
+            // 同时移除可能的 "posts/" 前缀，避免重复
+            let routeName = entry.data.routeName
+                .replace(/^\/+/, "")
+                .replace(/\/+$/, "");
+            if (routeName.startsWith("posts/")) {
+                routeName = routeName.replace(/^posts\//, "");
+            }
+            paths.push({
+                params: { slug: routeName },
+                props: { entry },
+            });
+        }
+    }
 
-	return paths;
+    return paths;
 }
 
 
@@ -69,47 +69,47 @@ let passwordHash = "";
 let isEncrypted = entry.data.encrypted && entry.data.password;
 
 if (isEncrypted) {
-	// 对于加密文章，我们将使用内容进行加密
-	// 在客户端解密后，会通过JavaScript重新渲染
-	const contentToEncrypt = entry.body;
+    // 对于加密文章，我们将使用内容进行加密
+    // 在客户端解密后，会通过JavaScript重新渲染
+    const contentToEncrypt = entry.body;
 
-	// 使用AES加密内容
-	encryptedContent = CryptoJS.AES.encrypt(
-		contentToEncrypt,
-		entry.data.password,
-	).toString();
+    // 使用AES加密内容
+    encryptedContent = CryptoJS.AES.encrypt(
+        contentToEncrypt,
+        entry.data.password,
+    ).toString();
 
-	// 生成密码哈希
-	const saltRounds = 10;
-	passwordHash = bcryptjs.hashSync(entry.data.password, saltRounds);
+    // 生成密码哈希
+    const saltRounds = 10;
+    passwordHash = bcryptjs.hashSync(entry.data.password, saltRounds);
 }
 
 dayjs.extend(utc);
 const lastModified = dayjs(entry.data.updated || entry.data.published)
-	.utc()
-	.format("YYYY-MM-DDTHH:mm:ss");
+    .utc()
+    .format("YYYY-MM-DDTHH:mm:ss");
 
 const jsonLd = {
-	"@context": "https://schema.org",
-	"@type": "BlogPosting",
-	headline: entry.data.title,
-	description: entry.data.description || entry.data.title,
-	keywords: entry.data.tags,
-	author: {
-		"@type": "Person",
-		name: profileConfig.name,
-		url: Astro.site,
-	},
-	datePublished: formatDateToYYYYMMDD(entry.data.published),
-	inLanguage: entry.data.lang
-		? entry.data.lang.replace("_", "-")
-		: siteConfig.lang.replace("_", "-"),
-	// TODO include cover image here
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: entry.data.title,
+    description: entry.data.description || entry.data.title,
+    keywords: entry.data.tags,
+    author: {
+        "@type": "Person",
+        name: profileConfig.name,
+        url: Astro.site,
+    },
+    datePublished: formatDateToYYYYMMDD(entry.data.published),
+    inLanguage: entry.data.lang
+        ? entry.data.lang.replace("_", "-")
+        : siteConfig.lang.replace("_", "-"),
+    // TODO include cover image here
 };
 ---
 
 <MainGridLayout
-    banner={entry.data.image}
+    banner={entry.data.cover}
     title={entry.data.title}
     description={entry.data.description}
     lang={entry.data.lang}
@@ -169,7 +169,6 @@ const jsonLd = {
                     </div>
                 </div>
             </div>
-
             <!-- title -->
             <div class="relative onload-animation">
                 <div
@@ -185,7 +184,6 @@ const jsonLd = {
                     {entry.data.title}
                 </div>
             </div>
-
             <!-- metadata -->
             <div class="onload-animation">
                 <PostMetadata
@@ -197,28 +195,25 @@ const jsonLd = {
                     slug={entry.id}
                 />
                 {
-                    (!entry.data.image || (entry.data.image && !postConfig.showCoverInContent)) && (
+                    (!entry.data.cover || (entry.data.cover && !postConfig.showCoverInContent)) && (
                         <div class="mt-4 border-[var(--line-divider)] border-dashed border-b-[1px] mb-5" />
                     )
                 }
             </div>
-
             <!-- always show cover as long as it has one -->
-
             {
-                entry.data.image && postConfig.showCoverInContent && (
+                entry.data.cover && postConfig.showCoverInContent && (
                     <>
                         <div class="mt-4" />
                         <ImageWrapper
                             id="post-cover"
-                            src={entry.data.image}
+                            src={entry.data.cover}
                             basePath={getFileDirFromPath(entry.filePath || '')}
                             class="mb-8 rounded-xl banner-container onload-animation"
                         />
                     </>
                 )
             }
-
             {
                 isEncrypted ? (
                     <PasswordProtection
@@ -247,14 +242,12 @@ const jsonLd = {
             }
         </div>
     </div>
-
     <!-- 评论 -->
     <Comment post={entry} />
-
     {postConfig.showLastModified && (
         <>
-            <div 
-                id="last-modified" 
+            <div
+                id="last-modified"
                 data-last-modified={lastModified}
                 data-prefix={i18n(I18nKey.lastModifiedPrefix)}
                 data-year={i18n(I18nKey.year)}
@@ -273,17 +266,14 @@ const jsonLd = {
                         const startDate = new Date(lastModifiedElement.dataset.lastModified);
                         const currentDate = new Date();
                         const diff = currentDate - startDate;
-
                         const seconds = Math.floor(diff / 1000);
                         const days = Math.floor(seconds / 86400);
                         const hours = Math.floor((seconds % 86400) / 3600);
                         const minutes = Math.floor((seconds % 3600) / 60);
                         const secs = seconds % 60;
-
                         const years = Math.floor(days / 365);
                         const months = Math.floor((days % 365) / 30);
                         const remainingDays = days % 30;
-
                         const prefix = lastModifiedElement.dataset.prefix;
                         const yearKey = lastModifiedElement.dataset.year;
                         const monthKey = lastModifiedElement.dataset.month;
@@ -291,9 +281,7 @@ const jsonLd = {
                         const hourKey = lastModifiedElement.dataset.hour;
                         const minuteKey = lastModifiedElement.dataset.minute;
                         const secondKey = lastModifiedElement.dataset.second;
-
                         let runtimeString = prefix + ' ';
-                        
                         if (years > 0) {
                             runtimeString += `${years} ${yearKey} `;
                         }
@@ -314,7 +302,6 @@ const jsonLd = {
                         } else {
                             runtimeString += `${secs} ${secondKey}`;
                         }
-
                         document.getElementById("modifiedtime").innerHTML = runtimeString;
                     }
                     setInterval(runtime, 1000);
@@ -327,7 +314,6 @@ const jsonLd = {
                                 class="text-4xl text-[var(--primary)] transition-transform group-hover:translate-x-0.5 bg-[var(--enter-btn-bg)] p-2 rounded-md"
                             />
                         </div>
-                       
                         <div class="flex flex-col gap-0.1">
                             <div id="modifiedtime" class="text-[1.0rem] leading-tight text-black/75 dark:text-white/75"></div>
                             <p class="text-[0.8rem] leading-tight text-black/75 dark:text-white/75">
@@ -339,7 +325,6 @@ const jsonLd = {
             </div>
         </>
     )}
-
     <div
         class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full"
     >
@@ -366,7 +351,6 @@ const jsonLd = {
                 )
             }
         </a>
-
         <a
             href={entry.data.prevSlug
                 ? getPostUrlBySlug(entry.data.prevSlug)

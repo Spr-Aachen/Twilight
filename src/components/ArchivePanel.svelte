@@ -1,15 +1,14 @@
 <script lang="ts">
 import { onMount } from "svelte";
 
-import I18nKey from "../i18n/i18nKey";
-import { i18n } from "../i18n/translation";
-import { getPostUrl } from "../utils/url-utils";
+import { getPostUrl } from "@utils/url-utils";
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
 
 
 export let tags: string[];
 export let categories: string[];
 export let sortedPosts: Post[] = [];
-
 
 const params = new URLSearchParams(window.location.search);
 tags = params.has("tag") ? params.getAll("tag") : [];
@@ -23,7 +22,7 @@ interface Post {
         tags: string[];
         category?: string;
         published: Date;
-		permalink?: string; // 添加 permalink 字段
+        routeName?: string; // 添加 routeName 字段
     };
 }
 
