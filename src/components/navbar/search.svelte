@@ -2,7 +2,7 @@
 import { onMount } from "svelte";
 import Icon from "@iconify/svelte";
 
-import { url } from "@utils/url-utils.ts";
+import { url } from "@utils/url-utils";
 import { navigateToPage } from "@utils/navigation-utils";
 import type { SearchResult } from "@/global";
 import { i18n } from "@i18n/translation";

@@ -2,7 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 
 import { postConfig } from "@/config";
-import Twikoo from "./Twikoo.astro";
+import Twikoo from "./twikoo.astro";
 
 
 interface Props {
@@ -12,7 +12,6 @@ interface Props {
 const { id } = Astro.props.post;
 
 const path = `/posts/${id}/`;
-const url = `${Astro.site?.href}${path}`;
 
 let commentService = "";
 if (postConfig.comment?.enable && postConfig.comment?.twikoo) {

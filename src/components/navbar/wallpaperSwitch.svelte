@@ -2,12 +2,12 @@
 import Icon from "@iconify/svelte";
 
 import { BREAKPOINT_LG } from "@/constants/breakpoints";
-import { WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "@constants/constants.ts";
+import { WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "@constants/constants";
 import {
     getStoredWallpaperMode,
     setWallpaperMode,
-} from "@utils/setting-utils.ts";
-import type { WALLPAPER_MODE } from "@/types/config.ts";
+} from "@utils/setting-utils";
+import type { WALLPAPER_MODE } from "@/types/config";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 

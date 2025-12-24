@@ -1,12 +1,12 @@
 <script lang="ts">
 import Icon from "@iconify/svelte";
 
-import { SYSTEM_MODE, DARK_MODE, LIGHT_MODE } from "@constants/constants.ts";
+import { SYSTEM_MODE, DARK_MODE, LIGHT_MODE } from "@constants/constants";
 import {
     getStoredTheme,
     setTheme,
-} from "@utils/setting-utils.ts";
-import type { LIGHT_DARK_MODE } from "@/types/config.ts";
+} from "@utils/setting-utils";
+import type { LIGHT_DARK_MODE } from "@/types/config";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 

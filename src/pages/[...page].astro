@@ -6,8 +6,8 @@ import type { GetStaticPaths } from "astro";
 
 import { PAGE_SIZE } from "@constants/constants";
 import { getSortedPosts } from "@utils/content-utils";
-import Pagination from "@components/control/Pagination.astro";
-import PostPage from "@components/PostPage.astro";
+import Pagination from "@components/pagination.astro";
+import PostPage from "@components/postPage.astro";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 
@@ -16,6 +16,7 @@ export const getStaticPaths = (async ({ paginate }) => {
     return paginate(allBlogPosts, { pageSize: PAGE_SIZE });
 }) satisfies GetStaticPaths;
 // https://github.com/withastro/astro/issues/6507#issuecomment-1489916992
+
 
 const { page } = Astro.props;
 

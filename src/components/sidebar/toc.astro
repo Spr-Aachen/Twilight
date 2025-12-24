@@ -2,7 +2,6 @@
 import type { MarkdownHeading } from "astro";
 
 import { postConfig } from "@/config";
-import { url } from "@utils/url-utils";
 
 
 interface Props {
@@ -18,22 +17,6 @@ for (const heading of headings) {
 }
 
 const className = Astro.props.class;
-// 修复路由判断逻辑，确保在文章页面能正确显示TOC
-const isPostsRoute =
-    Astro.url.pathname.includes("/posts/") || headings.length > 0;
-
-const removeTailingHash = (text: string) => {
-    let lastIndexOfHash = text.lastIndexOf("#");
-    if (lastIndexOfHash !== text.length - 1) {
-        return text;
-    }
-
-    return text.substring(0, lastIndexOfHash);
-};
-
-let heading1Count = 1;
-
-const maxLevel = postConfig.toc.depth;
 ---
 
 <table-of-contents class:list={[className, "group"]} id="toc">

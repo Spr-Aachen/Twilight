@@ -3,8 +3,8 @@ import { getCategoryList } from "@utils/content-utils";
 import { widgetManager } from "@utils/widget-manager";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
-import ButtonLink from "@components/control/ButtonLink.astro";
-import WidgetLayout from "./WidgetLayout.astro";
+import ButtonLink from "@/components/common/buttonLink.astro";
+import WidgetLayout from "./widgetLayout.astro";
 
 
 const categories = await getCategoryList();

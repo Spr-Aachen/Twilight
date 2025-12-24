@@ -5,14 +5,14 @@ import { Icon } from "astro-icon/components";
 import { siteConfig, postConfig } from "@/config";
 import { BANNER_HEIGHT, MAIN_PANEL_OVERLAPS_BANNER_HEIGHT } from "@constants/constants";
 import { widgetManager } from "@utils/widget-manager";
-import BackToTop from "@components/control/BackToTop.astro";
-import Footer from "@components/Footer.astro";
-import Navbar from "@components/Navbar.astro";
-import SideBar from "@components/widget/SideBar.astro";
-import FullscreenWallpaper from "@components/misc/FullscreenWallpaper.astro";
-import Banner from "@components/misc/Banner.astro";
-import IconifyLoader from "@components/misc/IconifyLoader.astro";
-import TOC from "@components/widget/TOC.astro";
+import BackToTop from "@components/backToTop.astro";
+import Footer from "@components/footer.astro";
+import Navbar from "@components/navbar.astro";
+import SideBar from "@components/sidebar.astro";
+import FullscreenWallpaper from "@components/fullscreenWallpaper.astro";
+import Banner from "@components/banner.astro";
+import IconifyLoader from "@components/common/iconifyLoader.astro";
+import TOC from "@components/sidebar/toc.astro";
 import Layout from "./Layout.astro";
 import "@styles/maingrid.css";
 
@@ -29,21 +29,6 @@ interface Props {
     postSlug?: string;
     headings?: MarkdownHeading[];
 }
-
-// 类型守卫函数
-const isBannerSrcObject = (
-    src:
-        | string
-        | string[]
-        | { desktop?: string | string[]; mobile?: string | string[] },
-): src is { desktop?: string | string[]; mobile?: string | string[] } => {
-    return (
-        typeof src === "object" &&
-        src !== null &&
-        !Array.isArray(src) &&
-        ("desktop" in src || "mobile" in src)
-    );
-};
 
 // 获取壁纸图片的辅助函数
 const getBannerImages = async (): Promise<{

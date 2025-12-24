@@ -4,8 +4,8 @@ import { i18n } from "@i18n/translation";
 import { getTagList } from "@utils/content-utils";
 import { getTagUrl } from "@utils/url-utils";
 import { widgetManager } from "@utils/widget-manager";
-import ButtonTag from "@components/control/ButtonTag.astro";
-import WidgetLayout from "@components/widget/WidgetLayout.astro";
+import ButtonTag from "@/components/common/buttonTag.astro";
+import WidgetLayout from "./widgetLayout.astro";
 
 
 const tags = await getTagList();

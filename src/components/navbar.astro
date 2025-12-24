@@ -6,14 +6,14 @@ import { LinkPresets } from "@constants/link-presets";
 import { LinkPreset, type NavBarLink } from "@/types/config";
 import { url } from "@utils/url-utils";
 import { getNavbarTransparentModeForWallpaperMode } from "@utils/setting-utils";
-import LightDarkSwitch from "./LightDarkSwitch.svelte";
-import MobileTOC from "./MobileTOC.svelte";
-import Search from "./Search.svelte";
-import WallpaperSwitch from "./WallpaperSwitch.svelte";
-import DisplaySettings from "./widget/DisplaySettings.svelte";
-import DropdownMenu from "./widget/DropdownMenu.astro";
-import NavMenuPanel from "./widget/NavMenuPanel.astro";
-import TranslateButton from "./widget/TranslateButton.svelte";
+import DropdownMenu from "@components/navbar/dropdownMenu.astro";
+import NavMenuPanel from "@components/navbar/navMenuPanel.astro";
+import Search from "@components/navbar/search.svelte";
+import TranslateButton from "@components/navbar/translateButton.svelte";
+import DisplaySettings from "@components/navbar/displaySettings.svelte";
+import LightDarkSwitch from "@components/navbar/lightDarkSwitch.svelte";
+import WallpaperSwitch from "@components/navbar/wallpaperSwitch.svelte";
+import MobileTOC from "./MobileTOC.svelte"
 
 
 const className = Astro.props.class;
