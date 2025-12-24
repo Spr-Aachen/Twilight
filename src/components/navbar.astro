@@ -13,7 +13,6 @@ import TranslateButton from "@components/navbar/translateButton.svelte";
 import DisplaySettings from "@components/navbar/displaySettings.svelte";
 import LightDarkSwitch from "@components/navbar/lightDarkSwitch.svelte";
 import WallpaperSwitch from "@components/navbar/wallpaperSwitch.svelte";
-import MobileTOC from "./MobileTOC.svelte"
 
 
 const className = Astro.props.class;
@@ -53,7 +52,6 @@ let links: NavBarLink[] = navBarConfig.links.map(
         <div class="flex items-center space-x-2 sm:space-x-1 md:space-x-0.5 navbar-buttons" id="navbar-buttons">
             <!--<SearchPanel client:load>-->
             <Search client:only="svelte" class="hidden xs:block"></Search>
-            <MobileTOC client:only="svelte" class="hidden sm:block"></MobileTOC>
             <TranslateButton client:only="svelte" class="hidden md:block"></TranslateButton>
             {!siteConfig.themeColor.fixed && (
                     <button aria-label="Display Settings" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90 hidden lg:flex items-center justify-center" id="display-settings-switch">

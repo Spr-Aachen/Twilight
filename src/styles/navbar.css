@@ -207,7 +207,6 @@
     :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #display-setting,
     :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #nav-menu-panel,
     :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #translate-panel,
-    :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #mobile-toc-panel,
     :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #search-panel {
         backdrop-filter: blur(20px) !important;
         background: rgba(255, 255, 255, 0.55) !important;
@@ -222,7 +221,6 @@
     :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] ~ * #display-setting,
     :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] #nav-menu-panel,
     :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] #translate-panel,
-    :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] #mobile-toc-panel,
     :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] #search-panel {
         backdrop-filter: blur(20px) !important;
         background: rgba(255, 255, 255, 0.55) !important;
@@ -237,7 +235,6 @@
     :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #display-setting,
     :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #nav-menu-panel,
     :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #translate-panel,
-    :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #mobile-toc-panel,
     :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #search-panel {
         background: rgba(0, 0, 0, 0.55) !important;
         border: 1px solid rgba(0, 0, 0, 0.55) !important;
@@ -251,7 +248,6 @@
     :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] ~ * #display-setting,
     :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] #nav-menu-panel,
     :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] #translate-panel,
-    :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] #mobile-toc-panel,
     :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-is-home="true"] #search-panel {
         background: rgba(0, 0, 0, 0.55) !important;
         border: 1px solid rgba(0, 0, 0, 0.55) !important;

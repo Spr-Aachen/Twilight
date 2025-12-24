@@ -102,7 +102,6 @@ html {
     .is-theme-transitioning #display-setting,
     .is-theme-transitioning #nav-menu-panel,
     .is-theme-transitioning #translate-panel,
-    .is-theme-transitioning #mobile-toc-panel,
     .is-theme-transitioning #search-panel {
         transition: none !important;
         backdrop-filter: none !important;
@@ -138,11 +137,11 @@ html {
 
     /* 全屏壁纸模式下的半透明效果 */
     .wallpaper-transparent .card-base {
-        @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
+        @apply bg-[var(--card-bg-transparent)];
     }
 
     .wallpaper-transparent .float-panel {
-        @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
+        @apply bg-[var(--card-bg-transparent)];
     }
 
     .wallpaper-transparent #navbar > div {
@@ -150,7 +149,7 @@ html {
     }
 
     .wallpaper-transparent .btn-card {
-        @apply bg-[var(--card-bg-transparent)] backdrop-blur-sm;
+        @apply bg-[var(--card-bg-transparent)];
     }
 
     .wallpaper-transparent ~ * .music-player .mini-player,
