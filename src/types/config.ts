@@ -245,12 +245,8 @@ export type WidgetComponentConfig = {
     order: number;
     // 组件位置
     position: "top" | "sticky"; // 顶部固定区域或粘性区域
-    // 自定义CSS类名
-    class?: string;
     // 自定义内联样式
     style?: string;
-    // 动画延迟时间 (ms) 
-    animationDelay?: number;
     // 响应式配置
     responsive?: {
         // 在指定设备上隐藏
@@ -267,15 +263,6 @@ export type WidgetComponentConfig = {
 export type SidebarLayoutConfig = {
     // 侧边栏组件配置列表
     components: WidgetComponentConfig[];
-    // 默认动画配置
-    defaultAnimation: {
-        // 是否启用默认动画
-        enable: boolean;
-        // 基础延迟时间 (ms)
-        baseDelay: number;
-        // 每个组件递增的延迟时间 (ms)
-        increment: number;
-    };
     // 响应式布局配置
     responsive: {
         // 不同设备的布局模式

@@ -217,12 +217,14 @@ class TableOfContents extends HTMLElement {
                     this.innerHTML = '';
                     const tocWidget = document.querySelector('widget-layout[data-id="toc-wrapper"]');
                     if (tocWidget instanceof HTMLElement) {
+                        // 移除离开动画类
+                        tocWidget.classList.remove('animate-leave');
+                        
                         // 检查新页面是否可能是文章页
                         const isPostPage = window.location.pathname.includes('/posts/') ||
                                           document.querySelector('.custom-md, .markdown-content') !== null;
                         if (!isPostPage) {
                             tocWidget.style.display = 'none';
-                            tocWidget.classList.remove('animate-leave');
                         }
                     }
                 });

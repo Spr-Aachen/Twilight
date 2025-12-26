@@ -252,10 +252,6 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             order: 1,
             // 组件位置
             position: "top", // 固定在顶部
-            // CSS 类名，用于应用样式和动画
-            class: "onload-animation",
-            // 动画延迟时间 (毫秒) ，用于错开动画效果
-            animationDelay: 0,
         },
         {
             // 组件类型
@@ -268,10 +264,6 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             order: 2,
             // 组件位置
             position: "top", // 固定在顶部
-            // CSS 类名
-            class: "onload-animation",
-            // 动画延迟时间
-            animationDelay: 50,
         },
         {
             // 组件类型
@@ -284,10 +276,6 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             order: 3,
             // 组件位置
             position: "sticky", // 粘性定位，可滚动
-            // CSS 类名
-            class: "onload-animation",
-            // 动画延迟时间
-            animationDelay: 150,
             // 响应式配置
             responsive: {
                 // 折叠阈值
@@ -305,10 +293,6 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             order: 4,
             // 组件位置
             position: "sticky", // 粘性定位，可滚动
-            // CSS 类名
-            class: "onload-animation",
-            // 动画延迟时间
-            animationDelay: 200,
             // 响应式配置
             responsive: {
                 // 折叠阈值
@@ -322,25 +306,12 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             enable: true,
             // 组件所属侧边栏
             side: "right",
-            // 组件显示顺序
+            // 组件显示顺序 (数字越小越靠前)
             order: 1,
             // 组件位置
-            position: "sticky",
-            // CSS 类名
-            class: "onload-animation",
-            // 动画延迟时间
-            animationDelay: 250,
+            position: "sticky", // 粘性定位，可滚动
         },
     ],
-    // 默认动画配置
-    defaultAnimation: {
-        // 是否启用默认动画
-        enable: true,
-        // 基础延迟时间 (毫秒)
-        baseDelay: 0,
-        // 每个组件递增的延迟时间 (毫秒)
-        increment: 50,
-    },
     // 响应式布局配置
     responsive: {
         // 不同设备的布局模式 ("hidden" 不显示侧边栏 | "drawer" 抽屉模式 | "sidebar" 显示侧边栏)
@@ -449,7 +420,7 @@ export const postConfig: PostConfig = {
             // 环境 ID
             envId: "https://twikoo.vercel.app",
             // 语言
-            lang: "en",
+            lang: SITE_LANG, // 默认使用站点语言
         },
     },
 };

@@ -80,37 +80,12 @@ export class WidgetManager {
     }
 
     /**
-     * 获取组件的动画延迟时间
-     * @param component 组件配置
-     * @param index 组件在列表中的索引
-     */
-    getAnimationDelay(component: WidgetComponentConfig, index: number): number {
-        if (component.animationDelay !== undefined) {
-            return component.animationDelay;
-        }
-
-        if (this.config.defaultAnimation.enable) {
-            return (
-                this.config.defaultAnimation.baseDelay +
-                index * this.config.defaultAnimation.increment
-            );
-        }
-
-        return 0;
-    }
-
-    /**
      * 获取组件的CSS类名
      * @param component 组件配置
      * @param index 组件在列表中的索引
      */
     getComponentClass(component: WidgetComponentConfig, index: number): string {
         const classes: string[] = [];
-
-        // 添加基础类名
-        if (component.class) {
-            classes.push(component.class);
-        }
 
         // 添加响应式隐藏类名
         if (component.responsive?.hidden) {
@@ -143,12 +118,6 @@ export class WidgetManager {
         // 添加自定义样式
         if (component.style) {
             styles.push(component.style);
-        }
-
-        // 添加动画延迟样式
-        const animationDelay = this.getAnimationDelay(component, index);
-        if (animationDelay > 0) {
-            styles.push(`animation-delay: ${animationDelay}ms`);
         }
 
         return styles.join("; ");
