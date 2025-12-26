@@ -2,7 +2,7 @@
 import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
 
-import { siteConfig, postConfig } from "@/config";
+import { siteConfig } from "@/config";
 import { BANNER_HEIGHT, MAIN_PANEL_OVERLAPS_BANNER_HEIGHT } from "@constants/constants";
 import { widgetManager } from "@utils/widget-manager";
 import BackToTop from "@components/backToTop.astro";
@@ -163,12 +163,12 @@ const leftSidebarClass = `
     }
     ${
         tabletShowSidebar && hasLeftSidebar
-            ? "md:block md:row-start-1 md:row-end-2 md:max-w-[17.5rem] md:col-start-1 md:col-end-2"
+            ? "md:block md:max-w-[17.5rem] md:col-start-1 md:row-start-1 md:row-end-2"
             : "md:hidden"
     }
     ${
         desktopShowSidebar && hasLeftSidebar
-            ? "lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] lg:col-start-1 lg:col-end-2"
+            ? "lg:block lg:max-w-[17.5rem] lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2"
             : "lg:hidden"
     }
 `
@@ -188,16 +188,14 @@ const rightSidebarClass = `
     }
     ${
         tabletShowSidebar && hasRightSidebar
-            ? hasLeftSidebar
-                ? "md:block md:row-start-1 md:row-end-2 md:max-w-[17.5rem] md:col-start-3 md:col-end-4"
-                : "md:block md:row-start-1 md:row-end-2 md:max-w-[17.5rem] md:col-start-2 md:col-end-3"
+            ? "md:block md:max-w-[17.5rem] md:col-start-1 md:col-end-2 md:row-start-2"
             : "md:hidden"
     }
     ${
         desktopShowSidebar && hasRightSidebar
             ? hasLeftSidebar
-                ? "lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] lg:col-start-3 lg:col-end-4"
-                : "lg:block lg:row-start-1 lg:row-end-2 lg:max-w-[17.5rem] lg:col-start-2 lg:col-end-3"
+                ? "lg:block lg:max-w-[17.5rem] lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2"
+                : "lg:block lg:max-w-[17.5rem] lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
             : "lg:hidden"
     }
 `
@@ -213,11 +211,9 @@ const mainContentClass = `
     col-span-1 row-start-1 row-end-2
     ${
         tabletShowSidebar
-            ? hasLeftSidebar && hasRightSidebar
+            ? hasLeftSidebar || hasRightSidebar
                 ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2"
-                : hasLeftSidebar
-                    ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2"
-                    : "md:col-start-1 md:col-end-2 md:row-start-1 md:row-end-2"
+                : "md:col-start-1 md:col-end-2 md:row-start-1 md:row-end-2"
             : "md:col-span-1"
     }
     ${
@@ -371,8 +367,6 @@ const mainContentClass = `
                         id="content-wrapper"
                         class="onload-animation transition-leaving"
                     >
-                        <!-- the overflow-hidden here prevent long text break the layout-->
-                        <!-- make id different from windows.swup global property -->
                         <slot />
                         <div
                             class="footer col-span-2 onload-animation hidden lg:block"
