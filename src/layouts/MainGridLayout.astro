@@ -108,9 +108,9 @@ const transparentClass = shouldEnableTransparency ? "wallpaper-transparent" : ""
  */
 
 // 检查侧边栏是否启用，动态调整网格布局
-// 判断左右侧边栏是否有启用组件
-const hasLeftSidebar = widgetManager.hasEnabledSidebarOnSide("left");
-const hasRightSidebar = widgetManager.hasEnabledSidebarOnSide("right");
+// 判断左右侧边栏是否有启用组件且具有实际内容
+const hasLeftSidebar = widgetManager.hasContentOnSide("left", headings);
+const hasRightSidebar = widgetManager.hasContentOnSide("right", headings);
 // 响应式配置：不同设备上的侧边栏显示状态（只要任一侧存在组件且布局为 sidebar 即视为显示）
 const mobileShowSidebar =
     (hasLeftSidebar || hasRightSidebar) &&
@@ -155,7 +155,7 @@ const gridCols = `
 // 平板端：显示在左列第1行
 // 桌面端：显示在第1列
 const leftSidebarClass = `
-    mb-0 col-span-1 onload-animation
+    mb-0 col-span-1
     ${
         mobileShowSidebar && hasLeftSidebar
             ? "block row-start-2 row-end-3"
@@ -163,7 +163,7 @@ const leftSidebarClass = `
     }
     ${
         tabletShowSidebar && hasLeftSidebar
-            ? "md:block md:max-w-[17.5rem] md:col-start-1 md:row-start-1 md:row-end-2"
+            ? "md:block md:max-w-[17.5rem]"
             : "md:hidden"
     }
     ${
@@ -180,7 +180,7 @@ const leftSidebarClass = `
 // 平板端：显示在左列第2行（左侧栏下方）
 // 桌面端：显示在第3列（右侧）
 const rightSidebarClass = `
-    mb-0 col-span-1 onload-animation
+    mb-0 col-span-1
     ${
         mobileShowSidebar && hasRightSidebar
             ? "block row-start-3 row-end-4"
@@ -188,7 +188,7 @@ const rightSidebarClass = `
     }
     ${
         tabletShowSidebar && hasRightSidebar
-            ? "md:block md:max-w-[17.5rem] md:col-start-1 md:col-end-2 md:row-start-2"
+            ? "md:block md:max-w-[17.5rem]"
             : "md:hidden"
     }
     ${
@@ -207,7 +207,7 @@ const rightSidebarClass = `
 // 平板端：主内容在右列，纵向跨越所有侧栏行
 // 桌面端：主内容在第2列
 const mainContentClass = `
-    transition-swup-fade overflow-hidden w-full
+    overflow-hidden w-full
     col-span-1 row-start-1 row-end-2
     ${
         tabletShowSidebar
@@ -334,34 +334,36 @@ const mainContentClass = `
                     )
                 }
 
-                {
-                    (mobileShowSidebar ||
-                        tabletShowSidebar ||
-                        desktopShowSidebar) &&
-                        hasLeftSidebar && (
-                            <SideBar
-                                side="left"
-                                class={`${leftSidebarClass} ${transparentClass}`}
-                                headings={headings}
-                            />
-                        )
-                }
-                {
-                    (mobileShowSidebar ||
-                        tabletShowSidebar ||
-                        desktopShowSidebar) &&
-                        hasRightSidebar && (
-                            <SideBar
-                                side="right"
-                                class={`${rightSidebarClass} ${transparentClass}`}
-                                headings={headings}
-                            />
-                        )
-                }
+                <div class="contents lg:contents md:flex md:flex-col md:col-start-1 md:row-start-1 md:gap-4">
+                    {
+                        (mobileShowSidebar ||
+                            tabletShowSidebar ||
+                            desktopShowSidebar) &&
+                            hasLeftSidebar && (
+                                <SideBar
+                                    side="left"
+                                    class={`${leftSidebarClass} ${transparentClass}`}
+                                    headings={headings}
+                                />
+                            )
+                    }
+                    {
+                        (mobileShowSidebar ||
+                            tabletShowSidebar ||
+                            desktopShowSidebar) &&
+                            hasRightSidebar && (
+                                <SideBar
+                                    side="right"
+                                    class={`${rightSidebarClass} ${transparentClass}`}
+                                    headings={headings}
+                                />
+                            )
+                    }
+                </div>
 
                 <main
                     id="swup-container"
-                    class={`${mainContentClass} transition-main`}
+                    class={`${mainContentClass} transition-swup-fade`}
                 >
                     <div
                         id="content-wrapper"
@@ -369,14 +371,14 @@ const mainContentClass = `
                     >
                         <slot />
                         <div
-                            class="footer col-span-2 onload-animation hidden lg:block"
+                            class="footer col-span-2 onload-animation hidden lg:block transition-swup-fade"
                         >
                             <Footer />
                         </div>
                     </div>
                 </main>
 
-                <div class="footer col-span-2 onload-animation block lg:hidden">
+                <div class="footer col-span-2 onload-animation block lg:hidden transition-swup-fade">
                     <Footer />
                 </div>
             </div>
@@ -385,3 +387,58 @@ const mainContentClass = `
         </div>
     </div>
 </Layout>
+
+<script>
+    function adjustLayout() {
+        const mainGrid = document.getElementById('main-grid');
+        if (!mainGrid) return;
+
+        const sidebars = document.querySelectorAll('#sidebar');
+        sidebars.forEach(sidebar => {
+            const side = sidebar.getAttribute('data-side');
+            const children = Array.from(sidebar.children);
+            
+            // 检查侧边栏是否实际上是空的（所有子元素都隐藏了）
+            const isEmpty = children.length === 0 || children.every(child => {
+                const style = window.getComputedStyle(child);
+                return style.display === 'none' || style.visibility === 'hidden' || child.innerHTML.trim() === '';
+            });
+
+            if (isEmpty && sidebar instanceof HTMLElement) {
+                sidebar.style.display = 'none';
+                
+                // 如果侧边栏为空，调整网格布局
+                if (side === 'left') {
+                    mainGrid.classList.remove('lg:grid-cols-[17.5rem_1fr_17.5rem]', 'lg:grid-cols-[17.5rem_1fr]', 'md:grid-cols-[17.5rem_1fr]');
+                    if (!mainGrid.classList.contains('lg:grid-cols-[1fr_17.5rem]')) {
+                        mainGrid.classList.add('lg:grid-cols-1', 'md:grid-cols-1');
+                    }
+                } else if (side === 'right') {
+                    mainGrid.classList.remove('lg:grid-cols-[17.5rem_1fr_17.5rem]', 'lg:grid-cols-[1fr_17.5rem]');
+                    if (!mainGrid.classList.contains('lg:grid-cols-[17.5rem_1fr]')) {
+                        mainGrid.classList.add('lg:grid-cols-1', 'md:grid-cols-1');
+                    }
+                }
+            }
+        });
+    }
+
+    let layoutAdjustmentInitialized = false;
+    function initLayoutAdjustment() {
+        if (layoutAdjustmentInitialized) return;
+        
+        adjustLayout();
+        
+        // 注册 Swup 钩子
+        if (window.swup && window.swup.hooks) {
+            window.swup.hooks.on('content:replace', adjustLayout);
+            layoutAdjustmentInitialized = true;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', initLayoutAdjustment);
+    document.addEventListener('swup:enable', initLayoutAdjustment);
+    
+    // 定时检查，处理 TOC 等组件动态隐藏的情况
+    setInterval(adjustLayout, 1000);
+</script>

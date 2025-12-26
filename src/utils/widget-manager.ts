@@ -189,11 +189,23 @@ export class WidgetManager {
     }
 
     /**
-     * 检查指定侧边栏是否有启用的组件
+     * 检查指定侧边栏是否具有实际可显示的内容
      * @param side 侧边栏位置：'left' | 'right'
+     * @param headings 页面标题列表，用于判断特殊组件是否显示
      */
-    hasEnabledSidebarOnSide(side: "left" | "right"): boolean {
-        return this.getEnabledComponentsBySide(side).length > 0;
+    hasContentOnSide(side: "left" | "right", headings: any[] = []): boolean {
+        const components = this.getEnabledComponentsBySide(side);
+        if (components.length === 0) return false;
+
+        // 只要有一个组件能显示内容，侧边栏就不是空的
+        return components.some((component) => {
+            // TOC 组件只有在有标题时才显示
+            if (component.type === "toc") {
+                return headings && headings.length > 0;
+            }
+            // 其他组件暂认为始终有内容
+            return true;
+        });
     }
 
     /**

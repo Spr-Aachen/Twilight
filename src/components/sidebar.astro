@@ -51,7 +51,7 @@ function renderComponent(component: any, index: number, components: any[]) {
 }
 ---
 
-<div id="sidebar" class:list={[className, "w-full"]}>
+<div id="sidebar" data-side={side} class:list={[className, "w-full"]}>
     <!-- 顶部固定组件区域 -->
     {topComponents.length > 0 && (
         <div class:list={["flex flex-col w-full gap-4", { "mb-4": stickyComponents.length > 0 }]}>

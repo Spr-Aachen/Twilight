@@ -398,7 +398,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
         @apply translate-y-[var(--banner-height-extend)];
     }
     .enable-banner #top-row {
-        @apply h-[calc(var(--banner-height-home)_-_4.5rem)] transition-all duration-300
+        @apply h-[calc(var(--banner-height-home)_-_4.5rem)]
     }
     .enable-banner.is-home #sidebar-sticky {
         @apply top-[calc(1rem_-_var(--banner-height-extend))]
@@ -416,7 +416,6 @@ import {
     BANNER_HEIGHT_EXTEND,
 } from "@/constants/constants";
 import { BREAKPOINT_LG } from "@constants/breakpoints";
-import {getHue, getStoredTheme, setHue, setTheme} from "@utils/setting-utils";
 import {pathsEqual, url} from "@utils/url-utils";
 import { siteConfig, particleConfig } from '@/config';
 import { initParticle } from "@/utils/particle-manager";
@@ -442,15 +441,6 @@ function setClickOutsideToClose(panel: string, ignores: string[]) {
 setClickOutsideToClose("display-setting", ["display-setting", "display-settings-switch"])
 setClickOutsideToClose("nav-menu-panel", ["nav-menu-panel", "nav-menu-switch"])
 setClickOutsideToClose("search-panel", ["search-panel", "search-bar", "search-switch"])
-
-function loadTheme() {
-    const theme = getStoredTheme()
-    setTheme(theme)
-}
-
-function loadHue() {
-    setHue(getHue())
-}
 
 function initCustomScrollbar() {
     // 完全禁用OverlayScrollbars的body初始化，避免导致页面重新加载
