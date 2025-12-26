@@ -315,6 +315,22 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
                 collapseThreshold: 20, // 当标签数量超过20个时自动折叠
             },
         },
+        {
+            // 组件类型
+            type: "toc", // 目录组件
+            // 是否启用该组件
+            enable: true,
+            // 组件所属侧边栏
+            side: "right",
+            // 组件显示顺序
+            order: 1,
+            // 组件位置
+            position: "sticky",
+            // CSS 类名
+            class: "onload-animation",
+            // 动画延迟时间
+            animationDelay: 250,
+        },
     ],
     // 默认动画配置
     defaultAnimation: {

@@ -12,7 +12,6 @@ import SideBar from "@components/sidebar.astro";
 import FullscreenWallpaper from "@components/fullscreenWallpaper.astro";
 import Banner from "@components/banner.astro";
 import IconifyLoader from "@components/common/iconifyLoader.astro";
-import TOC from "@components/sidebar/toc.astro";
 import Layout from "./Layout.astro";
 import "@styles/maingrid.css";
 
@@ -293,7 +292,6 @@ const mainContentClass = `
         class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? "mobile-main-no-banner" : ""} ${siteConfig.wallpaper.mode !== "banner" ? "no-banner-layout" : ""} ${transparentClass}`}
         style={`top: ${finalMainPanelTop}`}
     >
-        <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
         <div
             class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto"
         >
@@ -390,45 +388,6 @@ const mainContentClass = `
             </div>
 
             <BackToTop />
-        </div>
-    </div>
-
-    <!-- The things that should be under the banner, only the TOC for now -->
-    <div class="absolute w-full z-0 hidden xl:block">
-        <div class="relative max-w-[var(--page-width)] mx-auto">
-            <!-- TOC component -->
-            {
-                postConfig.toc.enable && (
-                    <div
-                        id="toc-wrapper"
-                        class:list={[
-                            "hidden lg:block transition absolute top-0 w-[var(--toc-width)] items-center",
-                            hasRightSidebar && !hasLeftSidebar
-                                ? "-left-[var(--toc-width)]"
-                                : "-right-[var(--toc-width)]",
-                            {
-                                "toc-hide":
-                                    siteConfig.wallpaper.mode === "banner",
-                            },
-                        ]}
-                    >
-                        <div
-                            id="toc-inner-wrapper"
-                            class="fixed top-[4.5rem] w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar"
-                        >
-                            <div
-                                id="toc"
-                                class="w-full h-full transition-swup-fade "
-                            >
-                                <TOC headings={headings} />
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
-
-            <!-- #toc needs to exist for Swup to work normally -->
-            {!postConfig.toc.enable && <div id="toc" />}
         </div>
     </div>
 </Layout>

@@ -588,23 +588,12 @@ const setup = () => {
     window.swup.hooks.on('content:replace', () => {
         // 只处理新的katex元素的滚动条，使用原生CSS滚动条
         initCustomScrollbar();
-        // 检查当前页面是否为文章页面（有TOC元素）
-        const tocWrapper = document.getElementById('toc-wrapper');
-        const isArticlePage = tocWrapper !== null;
-        // 只在文章页面重新初始化 TOC 组件
-        if (isArticlePage) {
-            const tocElement = document.querySelector('table-of-contents');
-            if (tocElement && typeof (tocElement as any).init === 'function') {
-                setTimeout(() => {
-                    (tocElement as any).init();
-                }, 100);
-            }
-            // 重新初始化移动端 TOC 组件
-            if (typeof (window as any).mobileTOCInit === 'function') {
-                setTimeout(() => {
-                    (window as any).mobileTOCInit();
-                }, 100);
-            }
+        // 初始化 TOC 组件
+        const tocElement = document.querySelector('table-of-contents');
+        if (tocElement && typeof (tocElement as any).init === 'function') {
+            setTimeout(() => {
+                (tocElement as any).init();
+            }, 100);
         }
         // 页面内容替换后重新执行翻译（仅在翻译已加载时）
         if (siteConfig.translate?.enable && window.translateInitialized && window.translate) {
@@ -682,11 +671,6 @@ const setup = () => {
         if (heightExtend) {
             heightExtend.classList.remove('hidden')
         }
-        // Hide the TOC while scrolling back to top
-        let toc = document.getElementById('toc-wrapper');
-        if (toc) {
-            toc.classList.add('toc-not-ready')
-        }
     });
     window.swup.hooks.on('page:view', () => {
         // hide the temp high element when the transition is done
@@ -719,11 +703,6 @@ const setup = () => {
             const heightExtend = document.getElementById('page-height-extend')
             if (heightExtend) {
                 heightExtend.classList.add('hidden')
-            }
-            // Just make the transition looks better
-            const toc = document.getElementById('toc-wrapper');
-            if (toc) {
-                toc.classList.remove('toc-not-ready')
             }
         }, 200)
     });
@@ -761,13 +740,6 @@ function scrollFunction() {
                 backToTopBtn.classList.remove('hide')
             } else {
                 backToTopBtn.classList.add('hide')
-            }
-        }
-        if (bannerEnabled && toc) {
-            if (scrollTop > bannerHeight) {
-                toc.classList.remove('toc-hide')
-            } else {
-                toc.classList.add('toc-hide')
             }
         }
         if (bannerEnabled && navbar) {

@@ -1,27 +1,24 @@
 ---
-import type { MarkdownHeading } from "astro";
-
-import { postConfig } from "@/config";
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
+import WidgetLayout from "./widgetLayout.astro";
 
 
 interface Props {
     class?: string;
-    headings: MarkdownHeading[];
+    style?: string;
 }
 
-let { headings = [] } = Astro.props;
-
-let minDepth = 10;
-for (const heading of headings) {
-    minDepth = Math.min(minDepth, heading.depth);
-}
-
-const className = Astro.props.class;
+const { class: className, style } = Astro.props;
 ---
 
-<table-of-contents class:list={[className, "group"]} id="toc">
-    <!-- TOC内容将由JavaScript动态生成 -->
-</table-of-contents>
+<WidgetLayout name={i18n(I18nKey.tableOfContents)} id="toc-wrapper" class={className} style={`${style || ""}; display: none;`}>
+    <div class="toc-scroll-container">
+        <table-of-contents class="group" id="toc">
+            <!-- TOC内容将由JavaScript动态生成 -->
+        </table-of-contents>
+    </div>
+</WidgetLayout>
 
 <script>
 class TableOfContents extends HTMLElement {
@@ -156,7 +153,7 @@ class TableOfContents extends HTMLElement {
             if (targetElement) {
                 // 计算目标位置，与移动端保持一致
                 const navbarHeight = 80; // 导航栏高度
-                const targetTop = targetElement.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+                const targetTop = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight;
                 // 使用与移动端相同的滚动方式
                 window.scrollTo({
                     top: targetTop,
@@ -195,15 +192,59 @@ class TableOfContents extends HTMLElement {
             tryInit();
             setTimeout(tryInit, 300);
         }
+
+        // 监听 Swup 页面过渡，确保 TOC 与内容同步消失
+        const setupSwup = () => {
+            if (window.swup && window.swup.hooks) {
+                // 避免重复添加监听器
+                if ((this as any)._swupListenersAdded) return;
+
+                window.swup.hooks.on('visit:start', () => {
+                    // 检查当前是否在文章页面
+                    const isPostPage = window.location.pathname.includes('/posts/') ||
+                                      document.querySelector('.custom-md, .markdown-content') !== null;
+                    if (isPostPage) {
+                        const tocWidget = document.querySelector('widget-layout[data-id="toc-wrapper"]');
+                        if (tocWidget instanceof HTMLElement) {
+                            // 使用与内容一致的离开动画
+                            tocWidget.classList.add('animate-leave');
+                        }
+                    }
+                });
+
+                window.swup.hooks.on('content:replace', () => {
+                    // 页面内容替换后，立即清空内容并保持隐藏状态，防止旧内容或空外壳闪现
+                    this.innerHTML = '';
+                    const tocWidget = document.querySelector('widget-layout[data-id="toc-wrapper"]');
+                    if (tocWidget instanceof HTMLElement) {
+                        // 检查新页面是否可能是文章页
+                        const isPostPage = window.location.pathname.includes('/posts/') ||
+                                          document.querySelector('.custom-md, .markdown-content') !== null;
+                        if (!isPostPage) {
+                            tocWidget.style.display = 'none';
+                            tocWidget.classList.remove('animate-leave');
+                        }
+                    }
+                });
+
+                (this as any)._swupListenersAdded = true;
+            }
+        };
+
+        if (window.swup) {
+            setupSwup();
+        } else {
+            document.addEventListener('swup:enable', setupSwup);
+        }
     };
 
     init() {
         // 重新生成TOC内容
         this.regenerateTOC();
 
-        this.tocEl = this;
+        this.tocEl = this.parentElement;
 
-        this.tocEl.addEventListener("click", this.handleAnchorClick, {
+        this.tocEl?.addEventListener("click", this.handleAnchorClick, {
             capture: true,
         });
 
@@ -238,14 +279,7 @@ class TableOfContents extends HTMLElement {
     };
 
     regenerateTOC(retryCount = 0) {
-        // 检查是否为文章页面
-        const isPostPage = window.location.pathname.includes('/posts/') ||
-                          document.querySelector('.custom-md, .markdown-content') !== null;
-        if (!isPostPage) {
-            // 如果不是文章页面，隐藏TOC
-            this.innerHTML = '';
-            return;
-        }
+        const tocWidget = document.querySelector('widget-layout[data-id="toc-wrapper"]');
         // 从当前页面重新获取标题
         const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
             .filter(h => h.id)
@@ -260,8 +294,12 @@ class TableOfContents extends HTMLElement {
             return;
         }
         if (headings.length === 0) {
+            if (tocWidget instanceof HTMLElement) tocWidget.style.display = 'none';
             this.innerHTML = '';
             return;
+        }
+        if (tocWidget instanceof HTMLElement) {
+            tocWidget.style.display = 'block';
         }
         // 重新生成TOC HTML
         const minDepth = Math.min(...headings.map(h => h.depth));
@@ -300,14 +338,25 @@ if (!customElements.get("table-of-contents")) {
 </script>
 
 <style>
-    table-of-contents#toc {
-        max-height: 100%;
-        overflow: auto;
-        position: relative;
+    .toc-scroll-container {
+        max-height: calc(100vh - 20rem);
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
         scroll-behavior: smooth;
-        display: block;
     }
-    table-of-contents#toc::-webkit-scrollbar {
-        display: none;
+    .toc-scroll-container::-webkit-scrollbar {
+        width: 4px;
+    }
+    .toc-scroll-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .toc-scroll-container::-webkit-scrollbar-thumb {
+        background: var(--toc-btn-hover);
+        border-radius: 10px;
+    }
+    table-of-contents#toc {
+        position: relative;
+        display: block;
     }
 </style>

@@ -16,8 +16,8 @@ html.is-entering .transition-main {
     transform: translateY(-1rem) !important;
     opacity: 0 !important;
     transition: 
-        transform 250ms cubic-bezier(0.4, 0, 0.6, 1),
-        opacity 250ms cubic-bezier(0.4, 0, 0.6, 1) !important;
+        transform 300ms cubic-bezier(0.4, 0, 0.6, 1),
+        opacity 300ms cubic-bezier(0.4, 0, 0.6, 1) !important;
 }
 
 /* 增强的组件动画 */
