@@ -9,29 +9,17 @@
 .navbar-nav-links {
     min-width: 0;
     flex-shrink: 1;
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-}
-
-#navbar.is-searching .navbar-nav-links {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.95);
-    pointer-events: none;
-    visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s, gap 0.3s ease;
+    display: flex;
+    gap: 0.36rem;
 }
 
 /* 按钮区域基础布局样式（避免 flex 子项溢出） */
 .navbar-buttons {
     min-width: 0;
     flex-shrink: 0;
-}
-
-/* 桌面端将导航区域绝对居中 */
-@media (min-width: 768px) {
-    #navbar .navbar-nav-links {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+    display: flex;
+    gap: 0.36rem;
 }
 
 /* 无banner时使用原始card-base样式，不添加额外的透明效果 */
@@ -265,6 +253,53 @@
 
 /* 响应式优化 */
 
+/* 桌面端&平板端布局 */
+@media (min-width: 768px) {
+    /* 使用 Grid 布局替代简单的 Flex，确保中间区域在有空间时居中，空间不足时被两侧挤压而不重叠 */
+    #navbar > div {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        justify-content: space-between;
+        align-items: center;
+    }
+    /* 确保左侧 Home 按钮不拉伸并靠左 */
+    #navbar > div > a:first-child {
+        justify-self: start;
+    }
+
+    #navbar .navbar-nav-links {
+        position: static;
+        left: unset;
+        transform: none;
+        justify-self: center;
+        gap: clamp(0.12rem, 1vw, 0.36rem);
+    }
+
+    #navbar .navbar-buttons {
+        justify-self: end;
+        gap: clamp(0.12rem, 1vw, 0.36rem);
+    }
+}
+
+/* 非大屏桌面端&平板端优化 */
+@media (min-width: 768px) and (max-width: 1280px) {
+    #navbar .navbar-nav-links {
+        gap: 0.12rem;
+    }
+
+    #navbar .navbar-buttons {
+        gap: 0.12rem;
+    }
+
+    /* 搜索状态下的避让逻辑以防重叠 */
+    #navbar.is-searching .navbar-nav-links {
+        opacity: 0;
+        transform: scale(0.9);
+        pointer-events: none;
+        visibility: hidden;
+    }
+}
+
 /* 手机端导航栏全宽优化 */
 @media (max-width: 768px) {
     #navbar > div {
@@ -298,10 +333,6 @@
         height: 2.4rem !important;
         padding: 0 !important;
     }
-    /* Hide home button text (keep icon) */
-    #navbar > div > a:first-child > div {
-        font-size: 0 !important;
-    }
 }
 
 /* 超小屏幕优化 - 只显示菜单按钮 */
@@ -320,5 +351,10 @@
         width: 2.75rem !important;
         height: 2.75rem !important;
         margin-left: auto !important;
+    }
+
+    /* Hide home button text (keep icon) */
+    #navbar > div > a:first-child > div {
+        font-size: 0 !important;
     }
 }
