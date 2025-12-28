@@ -1,15 +1,9 @@
 ---
 import { siteConfig } from "@/config";
-import { moments } from "@/data/diary";
+import { sortedMoments } from "@/data/diary";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-
-
-// 按时间倒序排列，最新在前
-const sortedMoments = [...moments].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-);
 
 
 // 时间格式化函数
