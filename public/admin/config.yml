@@ -98,7 +98,22 @@ collections:
           - { label: "Type", name: "type", widget: "select", options: ["certificate","project","other"] }
       - { label: "Icon", name: "icon", widget: "string", required: false }
       - { label: "Color", name: "color", widget: "string", required: false }
-      - { label: "Featured", name: "featured", widget: "boolean", required: false, default: false }
+  # 日记集合
+  - name: "diary"
+    label: "Diary"
+    folder: "src/data/diary"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{hour}}-{{minute}}"
+    format: "json"
+    fields:
+      - { label: "Content", name: "content", widget: "text" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - label: "Images"
+        name: "images"
+        widget: "list"
+        required: false
+        default: []
+        field: { label: "Image", name: "image", widget: "image" }
   # 友链集合
   - name: "friends"
     label: "Friends"
