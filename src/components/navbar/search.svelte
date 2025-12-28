@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMount } from "svelte";
+import { onMount, onDestroy } from "svelte";
 import Icon from "@iconify/svelte";
 
 import { url } from "@utils/url-utils";
@@ -54,6 +54,15 @@ const collapseDesktopSearch = () => {
     if (!keywordDesktop) {
         isDesktopSearchExpanded = false;
     }
+};
+
+const handleBlur = () => {
+    // 延迟处理以允许搜索结果的点击事件先于折叠逻辑执行
+    setTimeout(() => {
+        isDesktopSearchExpanded = false;
+        // 仅隐藏面板并折叠，保留搜索关键词和结果以便下次展开时查看
+        setPanelVisibility(false, true);
+    }, 200);
 };
 
 const setPanelVisibility = (show: boolean, isDesktop: boolean): void => {
@@ -165,14 +174,32 @@ $: if (initialized && keywordMobile) {
         await search(keywordMobile, false);
     })();
 }
+
+$: {
+    if (typeof document !== 'undefined') {
+        const navbar = document.getElementById('navbar');
+        if (isDesktopSearchExpanded) {
+            navbar?.classList.add('is-searching');
+        } else {
+            navbar?.classList.remove('is-searching');
+        }
+    }
+}
+
+onDestroy(() => {
+    if (typeof document !== 'undefined') {
+        const navbar = document.getElementById('navbar');
+        navbar?.classList.remove('is-searching');
+    }
+});
 </script>
 
 <!-- search bar for desktop view (collapsed by default) -->
 <div
     id="search-bar"
-    class="hidden lg:flex transition-all items-center h-11 mr-2 rounded-lg
+    class="hidden lg:flex transition-all items-center h-11 rounded-lg
         {isDesktopSearchExpanded ? 'bg-black/[0.04] hover:bg-black/[0.06] focus-within:bg-black/[0.06] dark:bg-white/5 dark:hover:bg-white/10 dark:focus-within:bg-white/10' : 'btn-plain scale-animation active:scale-90'}
-        {isDesktopSearchExpanded ? 'w-60' : 'w-11'}"
+        {isDesktopSearchExpanded ? 'w-48' : 'w-11'}"
     role="button"
     tabindex="0"
     aria-label="Search"
@@ -182,9 +209,9 @@ $: if (initialized && keywordMobile) {
     <Icon icon="material-symbols:search" class="absolute text-[1.25rem] pointer-events-none {isDesktopSearchExpanded ? 'ml-3' : 'left-1/2 -translate-x-1/2'} transition my-auto {isDesktopSearchExpanded ? 'text-black/30 dark:text-white/30' : ''}"></Icon>
     <input id="search-input-desktop" placeholder="{i18n(I18nKey.search)}" bind:value={keywordDesktop}
         on:focus={() => {if (!isDesktopSearchExpanded) toggleDesktopSearch(); search(keywordDesktop, true)}}
-        on:blur={collapseDesktopSearch}
+        on:blur={handleBlur}
         class="transition-all pl-10 text-sm bg-transparent outline-0
-            h-full {isDesktopSearchExpanded ? 'w-48' : 'w-0'} text-black/50 dark:text-white/50"
+            h-full {isDesktopSearchExpanded ? 'w-36' : 'w-0'} text-black/50 dark:text-white/50"
     >
 </div>
 

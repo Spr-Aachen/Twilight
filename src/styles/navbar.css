@@ -9,6 +9,14 @@
 .navbar-nav-links {
     min-width: 0;
     flex-shrink: 1;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+}
+
+#navbar.is-searching .navbar-nav-links {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.95);
+    pointer-events: none;
+    visibility: hidden;
 }
 
 /* 按钮区域基础布局样式（避免 flex 子项溢出） */
