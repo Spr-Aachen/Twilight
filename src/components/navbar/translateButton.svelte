@@ -3,7 +3,7 @@ import { onDestroy, onMount } from "svelte";
 import Icon from "@iconify/svelte";
 
 import { siteConfig } from "@/config";
-import { getTranslateLanguageFromConfig } from "@/utils/language-utils";
+import { getTranslateLanguageFromConfig, getSiteLanguage, setStoredLanguage } from "@/utils/language-utils";
 import { getSupportedTranslateLanguages } from "@/i18n/language";
 
 
@@ -14,8 +14,8 @@ let currentLanguage = "";
 // 从统一配置动态获取支持的语言列表
 const languages = getSupportedTranslateLanguages();
 
-// 根据配置文件的语言设置获取默认翻译语言
-const defaultTranslateLanguage = getTranslateLanguageFromConfig(
+// 根据配置文件的语言设置获取源语言
+const sourceLanguage = getTranslateLanguageFromConfig(
     siteConfig.lang,
 );
 
@@ -29,27 +29,27 @@ function togglePanel() {
 async function changeLanguage(languageCode: string) {
     try {
         // 如果翻译脚本未加载，先加载
-        if (!window.translateScriptLoaded && typeof window.loadTranslateScript === "function") {
-            await window.loadTranslateScript();
+        if (!(window as any).translateScriptLoaded && typeof (window as any).loadTranslateScript === "function") {
+            await (window as any).loadTranslateScript();
         }
         // 确认翻译脚本已加载
-        if (!window.translate) {
+        if (!(window as any).translate) {
             console.warn("translate.js is not loaded");
             return;
         }
-        // 检查是否选择的是本地语言
-        const localLang = window.translate.language.getLocal();
+        // 获取翻译实例
+        const translate = (window as any).translate;
+        // 检查是否切换回源语言
+        const localLang = translate.language.getLocal();
+        // 统一使用 changeLanguage 方法
+        translate.changeLanguage(languageCode);
+        // 如果是切换回源语言，额外执行一次 reset 以确保在不刷新的情况下也能还原
         if (languageCode === localLang) {
-            // 如果选择本地语言，重置翻译状态
-            window.translate.reset();
-            // 强制设置允许翻译本地语种（用于下次切换）
-            window.translate.language.translateLocal = true;
-        } else {
-            // 设置目标语言并执行翻译
-            window.translate.to = languageCode;
-            window.translate.execute();
+            translate.reset();
         }
-        // 更新当前语言状态
+        // 同步保存到我们的缓存中
+        setStoredLanguage(languageCode);
+        // 更新当前 UI 状态
         currentLanguage = languageCode;
     } catch (error) {
         console.error("Failed to execute translation:", error);
@@ -82,12 +82,8 @@ function handleClickOutside(event: MouseEvent) {
 // 组件挂载时添加事件监听和初始化默认语言
 onMount(() => {
     document.addEventListener("click", handleClickOutside);
-    // 初始化当前语言为默认翻译语言
-    currentLanguage = defaultTranslateLanguage;
-    // 如果翻译功能已加载，设置默认语言
-    if (window.translate) {
-        window.translate.to = defaultTranslateLanguage;
-    }
+    // 初始化当前语言为站点语言（优先缓存）
+    currentLanguage = getSiteLanguage(siteConfig.translate.defaultLanguage);
 });
 
 onDestroy(() => {

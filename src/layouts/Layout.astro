@@ -332,37 +332,6 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 
         <!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
         <div id="page-height-extend" class="hidden h-[300vh]"></div>
-
-        <!-- Translate.js integration - lazy loading -->
-        {siteConfig.translate?.enable && (
-            <script>
-                window.loadTranslateScript = function() {
-                    if (window.translateScriptLoaded) {
-                        return Promise.resolve();
-                    }
-                    if (window.translate || document.getElementById('translate-script')) {
-                        window.translateScriptLoaded = true;
-                        return Promise.resolve();
-                    }
-                    return new Promise((resolve, reject) => {
-                        const script = document.createElement('script');
-                        script.src = '/translate.js';
-                        script.id = 'translate-script';
-                        script.async = true;
-                        script.onload = () => {
-                            if (typeof window.translate !== 'undefined') {
-                                window.translateScriptLoaded = true;
-                                resolve();
-                            } else {
-                                reject(new Error('translate.js loaded but window.translate not available'));
-                            }
-                        };
-                        script.onerror = reject;
-                        document.head.appendChild(script);
-                    });
-                };
-            </script>
-        )}
     </body>
 </html>
 
@@ -408,14 +377,14 @@ import {
 } from "@/constants/constants";
 import { BREAKPOINT_LG } from "@constants/breakpoints";
 import {pathsEqual, url} from "@utils/url-utils";
-import { siteConfig, particleConfig } from '@/config';
+import { particleConfig } from '@/config';
 import { initWallpaperMode } from "@utils/setting-utils";
 import { initParticle } from "@/utils/particle-manager";
 import { initMarkdownActions } from "@/utils/markdown";
+import { loadAndInitTranslate } from "@utils/language-utils";
 
 
-const bannerEnabled = !!document.getElementById('banner-wrapper')
-
+// Set click outside to close panel
 function setClickOutsideToClose(panel: string, ignores: string[]) {
     document.addEventListener("click", event => {
         let panelDom = document.getElementById(panel);
@@ -434,67 +403,7 @@ setClickOutsideToClose("display-setting", ["display-setting", "display-settings-
 setClickOutsideToClose("nav-menu-panel", ["nav-menu-panel", "nav-menu-switch"])
 setClickOutsideToClose("search-panel", ["search-panel", "search-bar", "search-switch"])
 
-function initTranslate() {
-    if (!siteConfig.translate?.enable || !window.translate || window.translateInitialized) return;
-    // 配置translate.js
-    if (siteConfig.translate.service) {
-        window.translate.service.use(siteConfig.translate.service);
-    }
-    if (siteConfig.translate.defaultLanguage) {
-        window.translate.language.setLocal(siteConfig.translate.defaultLanguage);
-    }
-    if (siteConfig.translate.autoDiscriminate) {
-        window.translate.setAutoDiscriminateLocalLanguage();
-    }
-    // 设置忽略的类名和标签
-    if (siteConfig.translate.ignoreClasses) {
-        siteConfig.translate.ignoreClasses.forEach(className => {
-            window.translate?.ignore.class.push(className);
-        });
-    }
-    if (siteConfig.translate.ignoreTags) {
-        siteConfig.translate.ignoreTags.forEach(tagName => {
-            window.translate?.ignore.tag.push(tagName);
-        });
-    }
-    // 不显示默认的select选择框
-    if (siteConfig.translate.showSelectTag === false) {
-        window.translate.selectLanguageTag.show = false;
-    }
-    // 禁用自动保存翻译状态到localStorage
-    window.translate.storage.set = function() {
-        // 空函数，阻止保存状态
-    };
-    // 启动翻译监听
-    window.translate.listener.start();
-    // 标记已初始化
-    window.translateInitialized = true;
-    // 执行翻译初始化
-    window.translate?.execute();
-}
-
-// 懒加载并初始化翻译功能
-async function loadAndInitTranslate() {
-    if (!siteConfig.translate?.enable) return;
-
-    try {
-        await window.loadTranslateScript?.();
-        initTranslate();
-    } catch (error) {
-        console.error('Failed to load translate.js:', error);
-    }
-}
-
-// 页面加载完成后自动初始化翻译
-if (siteConfig.translate?.enable) {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', loadAndInitTranslate);
-    } else {
-        loadAndInitTranslate();
-    }
-}
-
-// 初始化粒子特效
+// Initialize particle effects
 function setupParticle() {
     if (!particleConfig || !particleConfig.enable) return;
     if ((window as any).particleInitialized) return;
@@ -534,14 +443,7 @@ const setup = () => {
                 (tocElement as any).init();
             }, 100);
         }
-        // 页面内容替换后重新执行翻译（仅在翻译已加载时）
-        if (siteConfig.translate?.enable && window.translateInitialized && window.translate) {
-            // 使用requestAnimationFrame优化性能，减少延迟
-            requestAnimationFrame(() => {
-                window.translate?.execute();
-            });
-        }
-        // 重新初始化semifull模式的滚动检测
+        // 重新初始化 semifull 模式的滚动检测
         const navbar = document.getElementById('navbar')
         if (navbar) {
             const transparentMode = navbar.getAttribute('data-transparent-mode')
@@ -708,6 +610,9 @@ initWallpaperMode();
 
 // 初始化 Markdown 相关操作以防止因 Swup 无刷新跳转的机制限制而导致操作失效
 initMarkdownActions();
+
+// Initialize translate.js
+loadAndInitTranslate();
 </script>
 
 <script>
