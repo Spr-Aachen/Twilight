@@ -146,24 +146,29 @@ export function getStoredTheme(): LIGHT_DARK_MODE {
 
 
 // 应用壁纸模式到文档
-export function applyWallpaperModeToDocument(mode: WALLPAPER_MODE) {
+export function applyWallpaperModeToDocument(mode: WALLPAPER_MODE, force = false) {
     // 获取当前的壁纸模式
-    const currentMode = document.documentElement.getAttribute('data-wallpaper-mode') as WALLPAPER_MODE || siteConfig.wallpaper.mode;
+    const currentMode = document.documentElement.getAttribute('data-wallpaper-mode') as WALLPAPER_MODE;
 
-    // 如果模式没有变化，直接返回
-    if (currentMode === mode) {
+    // 如果模式没有变化且不是强制更新，直接返回
+    if (!force && currentMode === mode) {
         return;
     }
-
-    // 添加过渡保护类
-    document.documentElement.classList.add('is-wallpaper-transitioning');
 
     // 更新数据属性
     document.documentElement.setAttribute('data-wallpaper-mode', mode);
 
-    // 使用 requestAnimationFrame 确保在下一帧执行，避免闪屏
-    requestAnimationFrame(() => {
+    // 如果是初始加载或强制更新，我们可能需要立即执行一些逻辑，或者等待 DOM 就绪
+    const apply = () => {
         const body = document.body;
+        if (!body) {
+            // 如果 body 还没准备好，稍后再试
+            requestAnimationFrame(apply);
+            return;
+        }
+
+        // 添加过渡保护类
+        document.documentElement.classList.add('is-wallpaper-transitioning');
 
         // 移除所有壁纸相关的CSS类
         body.classList.remove('enable-banner', 'wallpaper-transparent');
@@ -196,7 +201,10 @@ export function applyWallpaperModeToDocument(mode: WALLPAPER_MODE) {
         requestAnimationFrame(() => {
             document.documentElement.classList.remove('is-wallpaper-transitioning');
         });
-    });
+    };
+
+    // 使用 requestAnimationFrame 确保在下一帧执行，避免闪屏
+    requestAnimationFrame(apply);
 }
 
 
@@ -206,6 +214,12 @@ function showBannerMode() {
     const fullscreenContainer = document.querySelector('[data-fullscreen-wallpaper]');
     if (fullscreenContainer) {
         fullscreenContainer.classList.add('hidden');
+    } else {
+        // 如果没找到，可能 DOM 还没加载完，尝试在下一帧重试
+        requestAnimationFrame(() => {
+            const fc = document.querySelector('[data-fullscreen-wallpaper]');
+            fc?.classList.add('hidden');
+        });
     }
 
     // 显示banner壁纸（通过CSS类控制）
@@ -282,6 +296,10 @@ function showBannerMode() {
                 }
             }, 100);
         }
+    } else {
+        // 如果没找到，可能 DOM 还没加载完，尝试在下一帧重试
+        requestAnimationFrame(showBannerMode);
+        return;
     }
 
     // 调整主内容位置
@@ -300,12 +318,22 @@ function showFullscreenMode() {
         fullscreenContainer.classList.remove('hidden');
         fullscreenContainer.classList.remove('opacity-0');
         fullscreenContainer.classList.add('opacity-100');
+    } else {
+        // 如果没找到，可能 DOM 还没加载完，尝试在下一帧重试
+        requestAnimationFrame(showFullscreenMode);
+        return;
     }
 
     // 隐藏banner壁纸（通过CSS类控制）
     const bannerWrapper = document.getElementById('banner-wrapper');
     if (bannerWrapper) {
         bannerWrapper.classList.add('hidden');
+    } else {
+        // 如果没找到，可能 DOM 还没加载完，尝试在下一帧重试
+        requestAnimationFrame(() => {
+            const bw = document.getElementById('banner-wrapper');
+            bw?.classList.add('hidden');
+        });
     }
 
     // 组件现在自动处理轮播初始化
@@ -326,10 +354,21 @@ function hideAllWallpapers() {
 
     if (bannerWrapper) {
         bannerWrapper.classList.add('hidden');
+    } else {
+        // 尝试下一帧重试，但不要死循环
+        requestAnimationFrame(() => {
+            const bw = document.getElementById('banner-wrapper');
+            bw?.classList.add('hidden');
+        });
     }
 
     if (fullscreenContainer) {
         fullscreenContainer.classList.add('hidden');
+    } else {
+        requestAnimationFrame(() => {
+            const fc = document.querySelector('[data-fullscreen-wallpaper]');
+            fc?.classList.add('hidden');
+        });
     }
 
     // 调整主内容位置和透明度
@@ -442,7 +481,7 @@ export function setWallpaperMode(mode: WALLPAPER_MODE): void {
 
 export function initWallpaperMode(): void {
     const storedMode = getStoredWallpaperMode();
-    applyWallpaperModeToDocument(storedMode);
+    applyWallpaperModeToDocument(storedMode, true);
 }
 
 

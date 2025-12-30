@@ -210,13 +210,6 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
             let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
             offset = offset - offset % 4;
             document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
-            // Initialize wallpaper mode using the proper initialization function
-            setTimeout(() => {
-                // Import and call the proper wallpaper initialization
-                import('@utils/setting-utils').then(({ initWallpaperMode }) => {
-                    initWallpaperMode();
-                });
-            }, 100);
             // Banner carousel initialization function
             window.initBannerCarousel = function() {
                 const carousel = document.getElementById('banner-carousel');
@@ -416,6 +409,7 @@ import {
 import { BREAKPOINT_LG } from "@constants/breakpoints";
 import {pathsEqual, url} from "@utils/url-utils";
 import { siteConfig, particleConfig } from '@/config';
+import { initWallpaperMode } from "@utils/setting-utils";
 import { initParticle } from "@/utils/particle-manager";
 import { initMarkdownActions } from "@/utils/markdown";
 
@@ -708,6 +702,9 @@ window.onresize = () => {
     offset = offset - offset % 4;
     document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
 }
+
+// Initialize wallpaper mode
+initWallpaperMode();
 
 // 初始化 Markdown 相关操作以防止因 Swup 无刷新跳转的机制限制而导致操作失效
 initMarkdownActions();
