@@ -10,19 +10,16 @@ import type {
     MusicPlayerConfig,
 } from "./types/config";
 import { LinkPreset } from "./types/config";
-import { getTranslateLanguageFromConfig, detectBrowserLanguage } from "./utils/language-utils";
 
 /**
  * 
  */
 
-// 自动检测浏览器语言
-const SITE_LANG = detectBrowserLanguage("en"); // 服务端渲染时默认为 'en'
-// 如果需要强制使用特定语言，可以取消注释下面一行并设置语言代码
-//const SITE_LANG = "zh"; // 强制使用的语言代码，'zh', 'en', 'ja' 等
+// 设置浏览器语言 ('zh', 'en', ...)
+const SITE_LANG = "en";
 
-// 设置网站时区
-const SITE_TIMEZONE = 8; // from -12 to 12 default in UTC+8
+// 设置网站时区 (from -12 to 12)
+const SITE_TIMEZONE = 8; // UTC+8
 
 
 // 站点配置
@@ -41,8 +38,6 @@ export const siteConfig: SiteConfig = {
         enable: true,
         // 翻译服务
         service: "client.edge", // 使用 Edge 浏览器
-        // 默认翻译语言
-        defaultLanguage: getTranslateLanguageFromConfig(SITE_LANG), // 根据检测到的语言自动设置默认翻译语言
         // 显示语言选择下拉框
         showSelectTag: false, // 使用自定义按钮
         // 自动检测用户语言
@@ -491,6 +486,8 @@ export const particleConfig: ParticleConfig = {
 export const musicPlayerConfig: MusicPlayerConfig = {
     // 启用音乐播放器功能
     enable: true,
+    // 是否自动播放
+    autoplay: true,
     // 默认模式 ("meting" API | "local" 本地)
     mode: "meting",
     // meting 模式专属配置

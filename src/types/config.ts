@@ -38,8 +38,6 @@ export type SiteConfig = {
         enable: boolean;
         // 翻译服务类型，如 'client.edge'
         service?: string;
-        // 默认语言
-        defaultLanguage?: string;
         // 显示语言选择下拉框
         showSelectTag?: boolean;
         // 自动识别用户语言
@@ -464,6 +462,8 @@ export type MusicPlayerTrack = {
 export type MusicPlayerConfig = {
     // 启用音乐播放器功能
     enable: boolean;
+    // 是否自动播放
+    autoplay?: boolean;
     // 默认模式
     mode: "meting" | "local";
     // meting 模式专属配置

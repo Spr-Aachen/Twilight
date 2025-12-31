@@ -4,10 +4,10 @@ import {
     langToTranslateMap,
     translateToLangMap,
     LANGUAGE_CONFIG,
-} from "../i18n/language";
+} from "@i18n/language";
 import {
     siteConfig,
-} from "../config";
+} from "@/config";
 
 
 // 重新导出以保持向后兼容
@@ -32,6 +32,16 @@ export function getStoredLanguage(): string | null {
 // 将配置文件的语言代码转换为翻译服务的语言代码
 export function getTranslateLanguageFromConfig(configLang: string): string {
     return langToTranslateMap[configLang] || "chinese_simplified";
+}
+
+// 获取解析后的站点语言代码
+export function getResolvedSiteLang(): SupportedLanguage {
+    const configLang = siteConfig.lang as any;
+    if (SUPPORTED_LANGUAGES.includes(configLang)) {
+        return configLang as SupportedLanguage;
+    }
+    // 如果 siteConfig.lang 不合规，则使用浏览器检测到的语言
+    return detectBrowserLanguage();
 }
 
 // 将翻译服务的语言代码转换为配置文件的语言代码
@@ -100,10 +110,11 @@ export function initTranslateService(): void {
         translate.service.use(siteConfig.translate.service);
     }
     // 设置源语言（始终是网站渲染的语言）
-    const sourceLang = getTranslateLanguageFromConfig(siteConfig.lang);
+    const resolvedLang = getResolvedSiteLang();
+    const sourceLang = getTranslateLanguageFromConfig(resolvedLang);
     translate.language.setLocal(sourceLang);
     // 获取目标语言（缓存 -> 配置 -> 浏览器）
-    const targetLang = getSiteLanguage(siteConfig.translate.defaultLanguage);
+    const targetLang = getSiteLanguage(resolvedLang);
     // 如果目标语言不同于源语言，则设置目标语言
     if (targetLang && targetLang !== sourceLang) {
         translate.to = targetLang;

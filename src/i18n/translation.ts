@@ -1,4 +1,4 @@
-import { siteConfig } from "@/config";
+import { getResolvedSiteLang } from "@/utils/language";
 import { en } from "./languages/en";
 import { ja } from "./languages/ja";
 import { zh } from "./languages/zh";
@@ -27,6 +27,6 @@ export function getTranslation(lang: string): Translation {
 }
 
 export function i18n(key: I18nKey): string {
-    const lang = siteConfig.lang || "en";
+    const lang = getResolvedSiteLang();
     return getTranslation(lang)[key];
 }
