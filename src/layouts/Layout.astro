@@ -378,10 +378,12 @@ import {
 import { BREAKPOINT_LG } from "@constants/breakpoints";
 import {pathsEqual, url} from "@utils/url-utils";
 import { particleConfig } from '@/config';
-import { initWallpaperMode, initTheme, initHue } from "@utils/setting-utils";
+import { initWallpaperMode } from "@utils/wallpaper";
+import { initTheme } from "@utils/theme";
+import { initHue } from "@utils/hue";
 import { initParticle } from "@/utils/particle-manager";
 import { initMarkdownActions } from "@/utils/markdown";
-import { loadAndInitTranslate } from "@utils/language-utils";
+import { loadAndInitTranslate } from "@utils/language";
 
 
 // Set click outside to close panel

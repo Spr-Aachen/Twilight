@@ -3,7 +3,7 @@ import { onDestroy, onMount } from "svelte";
 import Icon from "@iconify/svelte";
 
 import { siteConfig } from "@/config";
-import { getTranslateLanguageFromConfig, getSiteLanguage, setStoredLanguage } from "@/utils/language-utils";
+import { getTranslateLanguageFromConfig, getSiteLanguage, setStoredLanguage } from "@/utils/language";
 import { getSupportedTranslateLanguages } from "@/i18n/language";
 
 

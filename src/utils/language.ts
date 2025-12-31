@@ -1,16 +1,13 @@
-/**
- * 语言映射工具函数
- * 将配置文件中的语言代码映射到翻译服务的语言代码
- */
-
 import {
+    type SupportedLanguage,
+    SUPPORTED_LANGUAGES,
     langToTranslateMap,
     translateToLangMap,
     LANGUAGE_CONFIG,
-    SUPPORTED_LANGUAGES,
-    type SupportedLanguage,
 } from "../i18n/language";
-import { siteConfig } from "../config";
+import {
+    siteConfig,
+} from "../config";
 
 
 // 重新导出以保持向后兼容
@@ -20,16 +17,16 @@ export { SUPPORTED_LANGUAGES, type SupportedLanguage, langToTranslateMap, transl
 // 语言存储键
 const LANG_STORAGE_KEY = "selected-language";
 
-// 获取存储的语言设置
-export function getStoredLanguage(): string | null {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(LANG_STORAGE_KEY);
-}
-
 // 存储语言设置
 export function setStoredLanguage(lang: string): void {
     if (typeof window === "undefined") return;
     localStorage.setItem(LANG_STORAGE_KEY, lang);
+}
+
+// 获取存储的语言设置
+export function getStoredLanguage(): string | null {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(LANG_STORAGE_KEY);
 }
 
 // 将配置文件的语言代码转换为翻译服务的语言代码
@@ -92,45 +89,6 @@ export function getSiteLanguage(configLang?: string): string {
     return langToTranslateMap[browserLang];
 }
 
-/**
- * 加载并初始化翻译功能
- */
-export async function loadAndInitTranslate(): Promise<void> {
-    if (typeof window === "undefined" || !siteConfig.translate?.enable) return;
-    // 定义脚本加载逻辑
-    const loadScript = (): Promise<void> => {
-        if ((window as any).translateScriptLoaded) return Promise.resolve();
-        if ((window as any).translate || document.getElementById('translate-script')) {
-            (window as any).translateScriptLoaded = true;
-            return Promise.resolve();
-        }
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = '/translate.js';
-            script.id = 'translate-script';
-            script.async = true;
-            script.onload = () => {
-                if (typeof (window as any).translate !== 'undefined') {
-                    (window as any).translateScriptLoaded = true;
-                    resolve();
-                } else {
-                    reject(new Error('translate.js loaded but window.translate not available'));
-                }
-            };
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    };
-    try {
-        // 加载脚本
-        await loadScript();
-        // 初始化服务
-        initTranslateService();
-    } catch (error) {
-        console.error('Failed to load or init translate.js:', error);
-    }
-}
-
 // 初始化翻译功能
 export function initTranslateService(): void {
     if (typeof window === "undefined" || !siteConfig.translate?.enable) return;
@@ -170,14 +128,14 @@ export function initTranslateService(): void {
         translate.selectLanguageTag.show = false;
     }
     // 接管存储逻辑：使用自定义缓存并同步到 translate.js
-    translate.storage.set = function(key: string, value: string) {
+    translate.storage.set = function (key: string, value: string) {
         if (key === "to") { // translate.js 使用 "to" 存储目标语言
             setStoredLanguage(value);
         } else {
             localStorage.setItem(key, value);
         }
     };
-    translate.storage.get = function(key: string) {
+    translate.storage.get = function (key: string) {
         if (key === "to") {
             return getStoredLanguage();
         }
@@ -197,6 +155,43 @@ export function initTranslateService(): void {
         // 如果目标语言就是源语言，确保处于未翻译状态
         // 有时插件可能会残留之前的翻译状态
         translate.reset();
+    }
+}
+
+// 加载并初始化翻译功能
+export async function loadAndInitTranslate(): Promise<void> {
+    if (typeof window === "undefined" || !siteConfig.translate?.enable) return;
+    // 定义脚本加载逻辑
+    const loadScript = (): Promise<void> => {
+        if ((window as any).translateScriptLoaded) return Promise.resolve();
+        if ((window as any).translate || document.getElementById('translate-script')) {
+            (window as any).translateScriptLoaded = true;
+            return Promise.resolve();
+        }
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = '/translate.js';
+            script.id = 'translate-script';
+            script.async = true;
+            script.onload = () => {
+                if (typeof (window as any).translate !== 'undefined') {
+                    (window as any).translateScriptLoaded = true;
+                    resolve();
+                } else {
+                    reject(new Error('translate.js loaded but window.translate not available'));
+                }
+            };
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    };
+    try {
+        // 加载脚本
+        await loadScript();
+        // 初始化服务
+        initTranslateService();
+    } catch (error) {
+        console.error('Failed to load or init translate.js:', error);
     }
 }
 

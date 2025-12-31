@@ -6,7 +6,7 @@ import { WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "@constan
 import {
     getStoredWallpaperMode,
     setWallpaperMode,
-} from "@utils/setting-utils";
+} from "@utils/wallpaper";
 import type { WALLPAPER_MODE } from "@/types/config";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";

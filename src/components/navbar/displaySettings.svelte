@@ -1,7 +1,7 @@
 <script lang="ts">
 import Icon from "@iconify/svelte";
 
-import { getDefaultHue, getHue, setHue } from "@utils/setting-utils";
+import { getDefaultHue, getHue, setHue } from "@utils/hue";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 
