@@ -378,7 +378,7 @@ import {
 import { BREAKPOINT_LG } from "@constants/breakpoints";
 import {pathsEqual, url} from "@utils/url-utils";
 import { particleConfig } from '@/config';
-import { initWallpaperMode } from "@utils/setting-utils";
+import { initWallpaperMode, initTheme, initHue } from "@utils/setting-utils";
 import { initParticle } from "@/utils/particle-manager";
 import { initMarkdownActions } from "@/utils/markdown";
 import { loadAndInitTranslate } from "@utils/language-utils";
@@ -410,7 +410,6 @@ function setupParticle() {
     initParticle(particleConfig);
     (window as any).particleInitialized = true;
 }
-
 // 页面加载完成后自动初始化粒子特效
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setupParticle);
@@ -424,7 +423,8 @@ const setup = () => {
     window.swup.hooks.on('link:click', () => {
         // Remove the delay for the first time page load
         document.documentElement.style.setProperty('--content-delay', '0ms')
-        // 简化navbar处理逻辑
+        // 简化 navbar 处理逻辑
+        const bannerEnabled = !!document.getElementById('banner-wrapper')
         if (bannerEnabled) {
             const navbar = document.getElementById('navbar-wrapper')
             if (navbar && document.body.classList.contains('lg:is-home')) {
@@ -554,9 +554,10 @@ if (window?.swup?.hooks) {
     document.addEventListener('swup:enable', setup)
 }
 
+// 初始化 navbar 元素，用于控制 banner 隐藏
 let navbar = document.getElementById('navbar-wrapper')
+// 初始化返回顶部按钮元素，用于控制返回顶部按钮的显示与隐藏
 let backToTopBtn = document.getElementById('back-to-top-btn');
-
 // 节流函数
 function throttle(func: (...args: any[]) => void, limit: number) {
     let inThrottle: boolean;
@@ -568,11 +569,11 @@ function throttle(func: (...args: any[]) => void, limit: number) {
         }
     }
 }
-
+// 滚动事件处理函数，用于控制返回顶部按钮和banner隐藏
 function scrollFunction() {
     const scrollTop = document.documentElement.scrollTop;
     const bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100);
-
+    const bannerEnabled = !!document.getElementById('banner-wrapper')
     // 批量处理DOM操作
     requestAnimationFrame(() => {
         if (backToTopBtn) {
@@ -594,16 +595,21 @@ function scrollFunction() {
         }
     });
 }
-
 // 使用节流优化滚动性能
 window.onscroll = throttle(scrollFunction, 16); // 约60fps
-
+// 监听窗口 resize 事件，用于更新 banner 高度相关的 CSS 变量
 window.onresize = () => {
     // calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
     let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
     offset = offset - offset % 4;
     document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
 }
+
+// Initialize theme
+initTheme();
+
+// Initialize hue
+initHue();
 
 // Initialize wallpaper mode
 initWallpaperMode();
