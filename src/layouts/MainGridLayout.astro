@@ -240,23 +240,8 @@ const mainContentClass = `
     setOGTypeArticle={setOGTypeArticle}
     postSlug={postSlug}
 >
-    <!-- 全屏壁纸 - 总是渲染但通过CSS控制可见性 -->
-    <FullscreenWallpaper
-        config={siteConfig.wallpaper}
-        class={siteConfig.wallpaper.mode === "fullscreen" ? "" : "hidden"}
-    />
-
     <!-- 全局图标加载器 -->
     <IconifyLoader />
-
-    <!-- 为全屏壁纸模式添加body类 -->
-    {
-        shouldEnableTransparency && (
-            <script>
-                document.body.classList.add('wallpaper-transparent');
-            </script>
-        )
-    }
 
     <!-- Navbar -->
     <slot slot="head" name="head" />
@@ -272,6 +257,21 @@ const mainContentClass = `
             <Navbar />
         </div>
     </div>
+
+    <!-- 全屏壁纸 - 总是渲染但通过CSS控制可见性 -->
+    <FullscreenWallpaper
+        config={siteConfig.wallpaper}
+        class={siteConfig.wallpaper.mode === "fullscreen" ? "" : "hidden"}
+    />
+
+    <!-- 为全屏壁纸模式添加body类 -->
+    {
+        shouldEnableTransparency && (
+            <script>
+                document.body.classList.add('wallpaper-transparent');
+            </script>
+        )
+    }
 
     <!-- Banner - 总是渲染但通过CSS控制可见性 -->
     <Banner
@@ -342,7 +342,7 @@ const mainContentClass = `
                             hasLeftSidebar && (
                                 <SideBar
                                     side="left"
-                                    class={`${leftSidebarClass} ${transparentClass}`}
+                                    class={`${leftSidebarClass} ${transparentClass} onload-animation`}
                                     headings={headings}
                                 />
                             )
@@ -354,7 +354,7 @@ const mainContentClass = `
                             hasRightSidebar && (
                                 <SideBar
                                     side="right"
-                                    class={`${rightSidebarClass} ${transparentClass}`}
+                                    class={`${rightSidebarClass} ${transparentClass} onload-animation`}
                                     headings={headings}
                                 />
                             )
