@@ -377,13 +377,12 @@ import {
 } from "@/constants/constants";
 import { BREAKPOINT_LG } from "@constants/breakpoints";
 import {pathsEqual, url} from "@utils/url-utils";
-import { particleConfig } from '@/config';
 import { initWallpaperMode } from "@utils/wallpaper";
 import { initTheme } from "@utils/theme";
 import { initHue } from "@utils/hue";
-import { initParticle } from "@/utils/particle-manager";
 import { initMarkdownActions } from "@/utils/markdown";
 import { loadAndInitTranslate } from "@utils/language";
+import { setupParticleEffects } from "@/utils/particle";
 
 
 // Set click outside to close panel
@@ -404,20 +403,6 @@ function setClickOutsideToClose(panel: string, ignores: string[]) {
 setClickOutsideToClose("display-setting", ["display-setting", "display-settings-switch"])
 setClickOutsideToClose("nav-menu-panel", ["nav-menu-panel", "nav-menu-switch"])
 setClickOutsideToClose("search-panel", ["search-panel", "search-bar", "search-switch"])
-
-// Initialize particle effects
-function setupParticle() {
-    if (!particleConfig || !particleConfig.enable) return;
-    if ((window as any).particleInitialized) return;
-    initParticle(particleConfig);
-    (window as any).particleInitialized = true;
-}
-// 页面加载完成后自动初始化粒子特效
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupParticle);
-} else {
-    setupParticle();
-}
 
 // 初始化Swup
 const setup = () => {
