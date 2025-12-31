@@ -13,7 +13,7 @@ interface Props {
 const { class: className, style, depth = 3 } = Astro.props;
 ---
 
-<WidgetLayout name={i18n(I18nKey.tableOfContents)} id="toc-wrapper" class={className} style={`${style || ""}; display: none;`}>
+<WidgetLayout name={i18n(I18nKey.tableOfContents)} id="toc-wrapper" class:list={[className, "toc-hide"]} style={style}>
     <div class="toc-scroll-container">
         <table-of-contents class="group" id="toc" data-depth={depth}>
             <!-- TOC内容将由JavaScript动态生成 -->
@@ -174,6 +174,11 @@ class TableOfContents extends HTMLElement {
         return min < value && value < max;
     };
 
+    isPostPage() {
+        return window.location.pathname.includes('/posts/') ||
+               document.querySelector('.custom-md, .markdown-content') !== null;
+    }
+
     connectedCallback() {
         // 优先监听动画结束，兜底定时初始化，确保二次刷新也能正常显示 TOC
         const element = document.querySelector('.custom-md') || document.querySelector('.prose') || document.querySelector('.markdown-content');
@@ -202,30 +207,26 @@ class TableOfContents extends HTMLElement {
 
                 window.swup.hooks.on('visit:start', () => {
                     // 检查当前是否在文章页面
-                    const isPostPage = window.location.pathname.includes('/posts/') ||
-                                      document.querySelector('.custom-md, .markdown-content') !== null;
-                    if (isPostPage) {
+                    if (this.isPostPage()) {
                         const tocWidget = document.querySelector('widget-layout[data-id="toc-wrapper"]');
                         if (tocWidget instanceof HTMLElement) {
-                            // 使用与内容一致的离开动画
+                            // 移除显现动画并添加离开动画
+                            tocWidget.classList.remove('animate-show');
                             tocWidget.classList.add('animate-leave');
                         }
                     }
                 });
 
                 window.swup.hooks.on('content:replace', () => {
-                    // 页面内容替换后，立即清空内容并保持隐藏状态，防止旧内容或空外壳闪现
-                    this.innerHTML = '';
                     const tocWidget = document.querySelector('widget-layout[data-id="toc-wrapper"]');
                     if (tocWidget instanceof HTMLElement) {
-                        // 移除离开动画类
+                        // 移除离开动画和显现动画
                         tocWidget.classList.remove('animate-leave');
+                        tocWidget.classList.remove('animate-show');
                         
                         // 检查新页面是否可能是文章页
-                        const isPostPage = window.location.pathname.includes('/posts/') ||
-                                          document.querySelector('.custom-md, .markdown-content') !== null;
-                        if (!isPostPage) {
-                            tocWidget.style.display = 'none';
+                        if (!this.isPostPage()) {
+                            tocWidget.classList.add('toc-hide');
                         }
                     }
                 });
@@ -296,13 +297,19 @@ class TableOfContents extends HTMLElement {
             setTimeout(() => this.regenerateTOC(retryCount + 1), 120);
             return;
         }
-        if (headings.length === 0) {
-            if (tocWidget instanceof HTMLElement) tocWidget.style.display = 'none';
-            this.innerHTML = '';
+        if (headings.length === 0 && !this.isPostPage()) {
+            if (tocWidget instanceof HTMLElement) {
+                tocWidget.classList.add('toc-hide');
+                tocWidget.classList.remove('animate-show');
+            }
             return;
         }
         if (tocWidget instanceof HTMLElement) {
-            tocWidget.style.display = 'block';
+            tocWidget.classList.remove('toc-hide');
+            // 使用 requestAnimationFrame 确保在移除 toc-hide 之后触发动画
+            requestAnimationFrame(() => {
+                tocWidget.classList.add('animate-show');
+            });
         }
         // 重新生成TOC HTML
         const minDepth = Math.min(...headings.map(h => h.depth));
@@ -361,5 +368,40 @@ if (!customElements.get("table-of-contents")) {
     table-of-contents#toc {
         position: relative;
         display: block;
+    }
+
+    /* 基础过渡样式 */
+    :global(widget-layout[data-id="toc-wrapper"]) {
+        transition: 
+            max-height 300ms cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
+            margin-bottom 300ms cubic-bezier(0.4, 0, 0.2, 1),
+            padding 300ms cubic-bezier(0.4, 0, 0.2, 1),
+            visibility 300ms;
+        max-height: 100vh; /* 足够容纳目录的高度 */
+        overflow: hidden;
+        display: block; /* 覆盖之前可能的 grid 设置 */
+    }
+    /* 隐藏状态 */
+    :global(widget-layout[data-id="toc-wrapper"].toc-hide) {
+        max-height: 0;
+        opacity: 0;
+        margin-bottom: -1rem; /* 抵消父级 flex 的 gap-4 */
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        visibility: hidden;
+        pointer-events: none;
+    }
+    /* 显现动画 */
+    :global(widget-layout[data-id="toc-wrapper"].animate-show) {
+    }
+    /* 离开动画 */
+    :global(widget-layout[data-id="toc-wrapper"].animate-leave) {
+        max-height: 0;
+        opacity: 0;
+        margin-bottom: -1rem;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        visibility: hidden;
     }
 </style>
