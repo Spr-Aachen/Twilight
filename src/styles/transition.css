@@ -59,6 +59,16 @@ html.is-animating .transition-swup-fade {
         transform: translateY(0) translateX(0);
     }
 }
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-1.5rem) translateX(0rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) translateX(0rem);
+    }
+}
 /* 淡出动画 */
 @keyframes fade-out-down {
     from {
@@ -78,7 +88,14 @@ html.is-animating .transition-swup-fade {
 .is-initial-load .onload-animation,
 #swup-container .onload-animation {
     opacity: 0;
-    animation: fade-in-up 300ms ease-out forwards;
+    animation: fade-in-up 600ms ease-out forwards;
+}
+.onload-animation-down {
+    opacity: 1;
+}
+.is-initial-load .onload-animation-down {
+    opacity: 0;
+    animation: fade-in-down 600ms ease-out forwards;
 }
 /* 渐进式动画延迟 - 在初始加载和主内容切换时应用 */
 :is(.is-initial-load, #swup-container) :is(.onload-animation, .onload-animation-down):nth-child(1) { animation-delay: 0ms; }
