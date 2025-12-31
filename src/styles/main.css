@@ -32,9 +32,15 @@
 @tailwind utilities;
 
 
-/* 确保平滑滚动 */
-html {
+/* 确保平滑滚动并隐藏原生滚动条 */
+html, body {
     scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
 }
 
 /* 当启用 ZenMaruGothic-Medium 字体时应用为全局字体 */
