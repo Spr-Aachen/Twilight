@@ -2,8 +2,6 @@
 import { Icon } from "astro-icon/components";
 import { render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
-import bcryptjs from "bcryptjs";
-import CryptoJS from "crypto-js";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
@@ -64,25 +62,7 @@ const { Content, headings } = await render(entry);
 const { remarkPluginFrontmatter } = await render(entry);
 
 // 处理加密逻辑
-let encryptedContent = "";
-let passwordHash = "";
-let isEncrypted = entry.data.encrypted && entry.data.password;
-
-if (isEncrypted) {
-    // 对于加密文章，我们将使用内容进行加密
-    // 在客户端解密后，会通过JavaScript重新渲染
-    const contentToEncrypt = entry.body;
-
-    // 使用AES加密内容
-    encryptedContent = CryptoJS.AES.encrypt(
-        contentToEncrypt,
-        entry.data.password,
-    ).toString();
-
-    // 生成密码哈希
-    const saltRounds = 10;
-    passwordHash = bcryptjs.hashSync(entry.data.password, saltRounds);
-}
+let isEncrypted = !!(entry.data.encrypted && entry.data.password);
 
 dayjs.extend(utc);
 const lastModified = dayjs(entry.data.updated || entry.data.published)
@@ -214,32 +194,28 @@ const jsonLd = {
                     </>
                 )
             }
-            {
-                isEncrypted ? (
-                    <PasswordProtection
-                        encryptedContent={encryptedContent}
-                        passwordHash={passwordHash}
-                    />
-                ) : (
-                    <>
-                        <Markdown class="mb-6 markdown-content onload-animation">
-                            <Content />
-                        </Markdown>
-                        {postConfig.license.enable && (
-                            <License
-                                title={entry.data.title}
-                                id={entry.id}
-                                pubDate={entry.data.published}
-                                author={entry.data.author}
-                                sourceLink={entry.data.sourceLink}
-                                licenseName={entry.data.licenseName}
-                                licenseUrl={entry.data.licenseUrl}
-                                class="mb-6 rounded-xl license-container onload-animation"
-                            />
-                        )}
-                    </>
-                )
-            }
+            <PasswordProtection
+                isEncrypted={isEncrypted}
+                password={entry.data.password}
+            >
+                <Markdown class="mb-6 markdown-content onload-animation">
+                    <Content />
+                </Markdown>
+                {
+                    postConfig.license.enable && (
+                        <License
+                            title={entry.data.title}
+                            id={entry.id}
+                            pubDate={entry.data.published}
+                            author={entry.data.author}
+                            sourceLink={entry.data.sourceLink}
+                            licenseName={entry.data.licenseName}
+                            licenseUrl={entry.data.licenseUrl}
+                            class="mb-6 rounded-xl license-container onload-animation"
+                        />
+                    )
+                }
+            </PasswordProtection>
         </div>
     </div>
     <!-- 评论 -->
