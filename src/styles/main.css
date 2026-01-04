@@ -5,8 +5,6 @@
 /* 导入动画样式 */
 @import './transition.css';
 @import './animation-enhancements.css';
-/* 导入加密内容样式 */
-@import './encrypted-content.css';
 
 
 /* 导入 ZenMaruGothic-Medium 字体 */
