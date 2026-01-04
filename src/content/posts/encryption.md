@@ -1,58 +1,38 @@
 ---
 title: Encryption Example
 published: 2020-02-02
-description: This is an article for testing the page encryption feature
+description: 'Password: 123456'
 encrypted: true
 pinned: false
 password: "123456"
-routeName: "encrypted-example"
 tags: [Encryption]
 category: Examples
 ---
 
 
-This blog template is built with [Astro](https://astro.build/). For the things that are not mentioned in this guide, you may find the answers in the [Astro Docs](https://docs.astro.build/).
+# Password Protected Post
+
+This is an example of a password-protected post in the Twilight theme. The content below is encrypted using AES and can only be viewed by entering the correct password.
 
 
-## Front-matter of Posts
+## Frontmatter Example
 
 ```yaml
 ---
-title: My First Blog Post
-published: 2023-09-09
-description: This is the first post of my new Astro blog.
-image: ./cover.jpg
-tags: [Foo, Bar]
-category: Front-end
-draft: false
+title: Encryption Example
+published: 2020-02-02
+encrypted: true
+password: "your-password"
+...
 ---
 ```
 
-
-| Attribute     | Description |
-|---------------|-------------|
-| `title`       | The title of the post. |
-| `published`   | The date the post was published. |
-| `pinned`      | Whether this post is pinned to the top of the post list. |
-| `description` | A short description of the post. Displayed on index page. |
-| `image`       | The cover image path of the post. <br/>1. Start with `http://` or `https://`: Use web image <br/>2. Start with `/`: For image in `public` dir <br/>3. With none of the prefixes: Relative to the markdown file |
-| `tags`        | The tags of the post. |
-| `category`    | The category of the post. |
-| `routeName`   | Route name for the post. The post will be accessible at `/posts/{routeName}/` |
-| `licenseName` | The license name for the post content. |
-| `author`      | The author of the post. |
-| `sourceLink`  | The source link or reference for the post content. |
-| `draft`       | If this post is still a draft, which won't be displayed. |
+- `encrypted` - Whether encryption is enabled for the post.
+- `password` - The password required to unlock the content.
 
 
-## Where to Place the Post Files
+## Note
 
-Your post files should be placed in `src/content/posts/` directory. You can also create sub-directories to better organize your posts and assets.
-
-```
-src/content/posts/
-├── post-1.md
-└── post-2/
-    ├── cover.png
-    └── index.md
-```
+:::warning
+Do not use this for extremely sensitive information like bank passwords or private keys. The encryption happens on the client side, and the password itself is stored in the post's metadata (though usually not displayed directly).
+:::
