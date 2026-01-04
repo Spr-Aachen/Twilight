@@ -41,20 +41,28 @@ class TableOfContents extends HTMLElement {
         );
     };
 
-    markVisibleSection = (entries: IntersectionObserverEntry[]) => {
-        entries.forEach((entry) => {
-            const id = entry.target.children[0]?.getAttribute("id");
-            const idx = id ? this.headingIdxMap.get(id) : undefined;
-            if (idx != undefined)
-                this.active[idx] = entry.isIntersecting;
+    markActiveHeading = (idx: number)=> {
+        this.active[idx] = true;
+    };
 
-            if (entry.isIntersecting && this.anchorNavTarget == entry.target.firstChild)
-                this.anchorNavTarget = null;
-        });
+    isInRange(value: number, min: number, max: number) {
+        return min < value && value < max;
+    };
 
-        if (!this.active.includes(true))
-            this.fallback();
-        this.update();
+    fallback = () => {
+        if (!this.sections.length) return;
+
+        for (let i = 0; i < this.sections.length; i++) {
+            let offsetTop = this.sections[i].getBoundingClientRect().top;
+            let offsetBottom = this.sections[i].getBoundingClientRect().bottom;
+
+            if (this.isInRange(offsetTop, 0, window.innerHeight)
+                || this.isInRange(offsetBottom, 0, window.innerHeight)
+                || (offsetTop < 0 && offsetBottom > window.innerHeight)) {
+                this.markActiveHeading(i);
+            }
+            else if (offsetTop > window.innerHeight) break;
+        }
     };
 
     toggleActiveHeading = () => {
@@ -122,24 +130,20 @@ class TableOfContents extends HTMLElement {
         });
     };
 
-    fallback = () => {
-        if (!this.sections.length) return;
+    markVisibleSection = (entries: IntersectionObserverEntry[]) => {
+        entries.forEach((entry) => {
+            const id = entry.target.children[0]?.getAttribute("id");
+            const idx = id ? this.headingIdxMap.get(id) : undefined;
+            if (idx != undefined)
+                this.active[idx] = entry.isIntersecting;
 
-        for (let i = 0; i < this.sections.length; i++) {
-            let offsetTop = this.sections[i].getBoundingClientRect().top;
-            let offsetBottom = this.sections[i].getBoundingClientRect().bottom;
+            if (entry.isIntersecting && this.anchorNavTarget == entry.target.firstChild)
+                this.anchorNavTarget = null;
+        });
 
-            if (this.isInRange(offsetTop, 0, window.innerHeight)
-                || this.isInRange(offsetBottom, 0, window.innerHeight)
-                || (offsetTop < 0 && offsetBottom > window.innerHeight)) {
-                this.markActiveHeading(i);
-            }
-            else if (offsetTop > window.innerHeight) break;
-        }
-    };
-
-    markActiveHeading = (idx: number)=> {
-        this.active[idx] = true;
+        if (!this.active.includes(true))
+            this.fallback();
+        this.update();
     };
 
     handleAnchorClick = (event: Event) => {
@@ -170,14 +174,105 @@ class TableOfContents extends HTMLElement {
         }
     };
 
-    isInRange(value: number, min: number, max: number) {
-        return min < value && value < max;
-    };
-
     isPostPage() {
         return window.location.pathname.includes('/posts/') ||
                document.querySelector('.custom-md, .markdown-content') !== null;
     }
+
+    regenerateTOC(retryCount = 0) {
+        const tocWidget = document.querySelector('widget-layout[data-id="toc-wrapper"]');
+        // 从当前页面重新获取标题
+        const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
+            .filter(h => h.id)
+            .map(h => ({
+                depth: parseInt(h.tagName.substring(1)),
+                slug: h.id,
+                text: (h.textContent || '').replace(/#+\s*$/, '')
+            }));
+        // 如果没有标题，延迟重试最多3次
+        if (headings.length === 0 && retryCount < 3) {
+            setTimeout(() => this.regenerateTOC(retryCount + 1), 120);
+            return;
+        }
+        if (headings.length === 0 && !this.isPostPage()) {
+            if (tocWidget instanceof HTMLElement) {
+                tocWidget.classList.add('toc-hide');
+                tocWidget.classList.remove('animate-show');
+            }
+            return;
+        }
+        if (tocWidget instanceof HTMLElement) {
+            tocWidget.classList.remove('toc-hide');
+            // 使用 requestAnimationFrame 确保在移除 toc-hide 之后触发动画
+            requestAnimationFrame(() => {
+                tocWidget.classList.add('animate-show');
+            });
+        }
+        // 重新生成TOC HTML
+        const minDepth = Math.min(...headings.map(h => h.depth));
+        const maxLevel = parseInt(this.dataset.depth || '3'); 
+        let heading1Count = 1;
+        const tocHTML = headings
+            .filter(heading => heading.depth < minDepth + maxLevel)
+            .map(heading => {
+                const depthClass = heading.depth === minDepth ? '' :
+                    heading.depth === minDepth + 1 ? 'ml-4' : 'ml-8';
+                const badgeContent = heading.depth === minDepth ? (heading1Count++) :
+                    heading.depth === minDepth + 1 ? '<div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>' :
+                    '<div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>';
+                return `<a href="#${heading.slug}" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2">
+                    <div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ${depthClass} ${heading.depth === minDepth ? 'bg-[var(--toc-badge-bg)] text-[var(--btn-content)]' : ''}">
+                        ${badgeContent}
+                    </div>
+                    <div class="transition text-sm ${heading.depth <= minDepth + 1 ? 'text-50' : 'text-30'}">${heading.text}</div>
+                </a>`;
+            }).join('');
+        this.innerHTML = tocHTML + '<div id="active-indicator" style="opacity: 0" class="-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"></div>';
+    }
+
+    init() {
+        // 先清理之前的监听器
+        this.observer.disconnect();
+        this.headingIdxMap.clear();
+
+        // 重新生成TOC内容
+        this.regenerateTOC();
+
+        this.tocEl = this.parentElement;
+
+        this.tocEl?.addEventListener("click", this.handleAnchorClick, {
+            capture: true,
+        });
+
+        this.activeIndicator = document.getElementById("active-indicator");
+
+        this.tocEntries = Array.from(
+            this.querySelectorAll<HTMLAnchorElement>("a[href^='#']")
+        );
+
+        if (this.tocEntries.length === 0) return;
+
+        this.sections = new Array(this.tocEntries.length);
+        this.headings = new Array(this.tocEntries.length);
+        for (let i = 0; i < this.tocEntries.length; i++) {
+            const id = decodeURIComponent(this.tocEntries[i].hash?.substring(1));
+            const heading = document.getElementById(id);
+            const section = heading?.parentElement;
+            if (heading instanceof HTMLElement && section instanceof HTMLElement) {
+                this.headings[i] = heading;
+                this.sections[i] = section;
+                this.headingIdxMap.set(id, i);
+            }
+        }
+        this.active = new Array(this.tocEntries.length).fill(false);
+
+        this.sections.forEach((section) =>
+            this.observer.observe(section)
+        );
+
+        this.fallback();
+        this.update();
+    };
 
     connectedCallback() {
         // 优先监听动画结束，兜底定时初始化，确保二次刷新也能正常显示 TOC
@@ -240,98 +335,12 @@ class TableOfContents extends HTMLElement {
         } else {
             document.addEventListener('swup:enable', setupSwup);
         }
-    };
 
-    init() {
-        // 重新生成TOC内容
-        this.regenerateTOC();
-
-        this.tocEl = this.parentElement;
-
-        this.tocEl?.addEventListener("click", this.handleAnchorClick, {
-            capture: true,
+        // 监听内容解密事件
+        window.addEventListener('content-decrypted', () => {
+            this.init();
         });
-
-        this.activeIndicator = document.getElementById("active-indicator");
-
-        this.tocEntries = Array.from(
-            this.querySelectorAll<HTMLAnchorElement>("a[href^='#']")
-        );
-
-        if (this.tocEntries.length === 0) return;
-
-        this.sections = new Array(this.tocEntries.length);
-        this.headings = new Array(this.tocEntries.length);
-        for (let i = 0; i < this.tocEntries.length; i++) {
-            const id = decodeURIComponent(this.tocEntries[i].hash?.substring(1));
-            const heading = document.getElementById(id);
-            const section = heading?.parentElement;
-            if (heading instanceof HTMLElement && section instanceof HTMLElement) {
-                this.headings[i] = heading;
-                this.sections[i] = section;
-                this.headingIdxMap.set(id, i);
-            }
-        }
-        this.active = new Array(this.tocEntries.length).fill(false);
-
-        this.sections.forEach((section) =>
-            this.observer.observe(section)
-        );
-
-        this.fallback();
-        this.update();
     };
-
-    regenerateTOC(retryCount = 0) {
-        const tocWidget = document.querySelector('widget-layout[data-id="toc-wrapper"]');
-        // 从当前页面重新获取标题
-        const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
-            .filter(h => h.id)
-            .map(h => ({
-                depth: parseInt(h.tagName.substring(1)),
-                slug: h.id,
-                text: (h.textContent || '').replace(/#+\s*$/, '')
-            }));
-        // 如果没有标题，延迟重试最多3次
-        if (headings.length === 0 && retryCount < 3) {
-            setTimeout(() => this.regenerateTOC(retryCount + 1), 120);
-            return;
-        }
-        if (headings.length === 0 && !this.isPostPage()) {
-            if (tocWidget instanceof HTMLElement) {
-                tocWidget.classList.add('toc-hide');
-                tocWidget.classList.remove('animate-show');
-            }
-            return;
-        }
-        if (tocWidget instanceof HTMLElement) {
-            tocWidget.classList.remove('toc-hide');
-            // 使用 requestAnimationFrame 确保在移除 toc-hide 之后触发动画
-            requestAnimationFrame(() => {
-                tocWidget.classList.add('animate-show');
-            });
-        }
-        // 重新生成TOC HTML
-        const minDepth = Math.min(...headings.map(h => h.depth));
-        const maxLevel = parseInt(this.dataset.depth || '3'); 
-        let heading1Count = 1;
-        const tocHTML = headings
-            .filter(heading => heading.depth < minDepth + maxLevel)
-            .map(heading => {
-                const depthClass = heading.depth === minDepth ? '' :
-                    heading.depth === minDepth + 1 ? 'ml-4' : 'ml-8';
-                const badgeContent = heading.depth === minDepth ? (heading1Count++) :
-                    heading.depth === minDepth + 1 ? '<div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>' :
-                    '<div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>';
-                return `<a href="#${heading.slug}" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2">
-                    <div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ${depthClass} ${heading.depth === minDepth ? 'bg-[var(--toc-badge-bg)] text-[var(--btn-content)]' : ''}">
-                        ${badgeContent}
-                    </div>
-                    <div class="transition text-sm ${heading.depth <= minDepth + 1 ? 'text-50' : 'text-30'}">${heading.text}</div>
-                </a>`;
-            }).join('');
-        this.innerHTML = tocHTML + '<div id="active-indicator" style="opacity: 0" class="-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"></div>';
-    }
 
     disconnectedCallback() {
         this.sections.forEach((section) =>
