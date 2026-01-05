@@ -77,16 +77,16 @@ export const siteConfig: SiteConfig = {
         mode: "banner",
         // 图片源配置 (fullscreen 和 banner 模式共享)
         src: {
-            // 桌面壁纸图片 (支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播)
+            // 桌面壁纸图片 (相对于 /public 目录; 支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播)
             desktop: [
-                "/assets/desktop-banner/desktopBanner_1.webp",
-                "/assets/desktop-banner/desktopBanner_2.webp",
-                "/assets/desktop-banner/desktopBanner_3.webp",
+                "/assets/images/desktopWallpaper_1.webp",
+                "/assets/images/desktopWallpaper_2.webp",
+                "/assets/images/desktopWallpaper_3.webp",
             ],
-            // 移动壁纸图片 (支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播)
+            // 移动壁纸图片 (相对于 /public 目录; 支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播)
             mobile: [
-                "/assets/mobile-banner/mobileBanner_1.webp",
-                "/assets/mobile-banner/mobileBanner_2.webp",
+                "/assets/images/mobileWallpaper_1.webp",
+                "/assets/images/mobileWallpaper_2.webp",
             ],
         },
         // 壁纸位置 ('top' | 'center' | 'bottom')
@@ -340,8 +340,8 @@ export const umamiConfig = {
 
 // 资料配置
 export const profileConfig: ProfileConfig = {
-    // 头像配置 (相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录)
-    avatar: "assets/images/avatar.png",
+    // 头像配置 (相对于 /public 目录)
+    avatar: "/assets/images/avatar.png",
     // 信息配置
     name: "Twilight",
     // 简介配置

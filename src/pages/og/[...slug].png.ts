@@ -103,7 +103,8 @@ export async function GET({
     const { regular: fontRegular, bold: fontBold } = await fetchNotoSansSCFonts();
 
     // Avatar + icon: still read from disk (small assets)
-    const avatarBuffer = fs.readFileSync(`./src/${profileConfig.avatar}`);
+    let avatarPath = `./public${profileConfig.avatar}`;
+    const avatarBuffer = fs.readFileSync(avatarPath);
     const avatarBase64 = `data:image/png;base64,${avatarBuffer.toString("base64")}`;
 
     let iconPath = `./public${defaultFavicons[0].src}`;
