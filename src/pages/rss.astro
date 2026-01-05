@@ -7,11 +7,13 @@ import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 
+
 const posts = (await getSortedPosts()).filter((post) => !post.data.encrypted);
 const recentPosts = posts.slice(0, 6);
 ---
 
 <MainGridLayout title={i18n(I18nKey.rss)} description={i18n(I18nKey.rssDescription)}>
+
     <div class="onload-animation">
         <!-- RSS 标题和介绍 -->
         <div class="card-base rounded-[var(--radius-large)] p-8 mb-6">
@@ -25,7 +27,6 @@ const recentPosts = posts.slice(0, 6);
                 </p>
             </div>
         </div>
-
         <!-- RSS 链接复制区域 -->
         <div class="card-base rounded-[var(--radius-large)] p-6 mb-6">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -52,7 +53,6 @@ const recentPosts = posts.slice(0, 6);
                 </div>
             </div>
         </div>
-
         <!-- 最新文章预览 -->
         <div class="card-base rounded-[var(--radius-large)] p-6 mb-6">
             <h2 class="text-xl font-bold text-90 mb-4 flex items-center">
@@ -81,7 +81,6 @@ const recentPosts = posts.slice(0, 6);
                 ))}
             </div>
         </div>
-
         <!-- RSS 说明 -->
         <div class="card-base rounded-[var(--radius-large)] p-6">
             <h2 class="text-xl font-bold text-90 mb-4 flex items-center">
@@ -106,7 +105,8 @@ const recentPosts = posts.slice(0, 6);
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Copy button functionality
+        const init = () => {
             const copyBtn = document.getElementById('copy-rss-btn');
             if (copyBtn) {
                 copyBtn.addEventListener('click', async function() {
@@ -115,22 +115,23 @@ const recentPosts = posts.slice(0, 6);
                     try {
                         await navigator.clipboard.writeText(url);
                         const originalText = this.textContent || "Copy Link";
-                        this.textContent = "RSS link copied to clipboard!";
-                        this.style.backgroundColor = 'var(--success-color, #10b981)';
+                        this.textContent = "Link Copied";
                         setTimeout(() => {
                             this.textContent = originalText;
-                            this.style.backgroundColor = '';
                         }, 2000);
                     } catch (err) {
                         console.error('复制失败:', err);
                         const originalText = this.textContent || "Copy Link";
-                        this.textContent = "Copy failed, please copy the link manually";
+                        this.textContent = "Copy Failed";
                         setTimeout(() => {
                             this.textContent = originalText;
                         }, 2000);
                     }
                 });
             }
-        });
+        }
+        init();
+        document.addEventListener("astro:after-swap", init);
     </script>
+
 </MainGridLayout>
