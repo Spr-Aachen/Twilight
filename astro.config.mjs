@@ -1,7 +1,7 @@
 import { defineConfig } from "astro/config";
 import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
-import svelte from "@astrojs/svelte";
+import svelte, { vitePreprocess } from "@astrojs/svelte";
 import tailwind from "@astrojs/tailwind";
 import swup from "@swup/astro";
 import sitemap from "@astrojs/sitemap";
@@ -52,10 +52,11 @@ export default defineConfig({
         swup({
             theme: false,
             animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
-            // The default value `transition-` cause transition delay when the Tailwind class `transition-all` is used
-            containers: ["#main-grid"],
+            containers: [
+                "#main-grid",
+            ],
             cache: true,
-            preload: false, // Disable preloading to reduce network requests
+            preload: true,
             accessibility: true,
             updateHead: true,
             updateBodyClass: false,
@@ -71,7 +72,6 @@ export default defineConfig({
         }),
         icon({
             include: {
-                "preprocess: vitePreprocess(),": ["*"],
                 "fa6-brands": ["*"],
                 "fa6-regular": ["*"],
                 "fa6-solid": ["*"],
@@ -129,7 +129,9 @@ export default defineConfig({
                 showCopyToClipboardButton: false,
             },
         }),
-        svelte(),
+        svelte({
+            preprocess: vitePreprocess(),
+        }),
         sitemap(),
     ],
     markdown: {
