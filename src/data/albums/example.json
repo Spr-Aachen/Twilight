@@ -1,0 +1,27 @@
+{
+    "title": "External Album Example",
+    "description": "This is an example album that uses images from external links",
+    "cover": "https://picsum.photos/800/600?random=1",
+    "date": "2025-01-01T00:00:00.000Z",
+    "location": "Internet",
+    "tags": ["external", "example", "scenary"],
+    "layout": "masonry",
+    "columns": 3,
+    "photos": [
+        {
+            "src": "https://picsum.photos/800/600?random=2",
+            "alt": "random image 1",
+            "title": "Random Image 1",
+            "description": "This is a beautiful image from external link",
+            "tags": ["scenary"]
+        },
+        {
+            "src": "https://picsum.photos/800/600?random=3",
+            "alt": "random image 2",
+            "title": "Random Image 2",
+            "description": "This is another beautiful image from external link",
+            "tags": ["scenary"]
+        }
+    ],
+    "visible": true
+}

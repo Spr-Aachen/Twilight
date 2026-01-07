@@ -1,12 +1,12 @@
 ---
-import { scanAlbums } from "@utils/album-scanner";
+import { sortedAlbums } from "@data/albums";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 
 // 获取所有相册
-const albumsData = await scanAlbums();
+const albumsData = sortedAlbums.filter(album => album.visible);
 ---
 
 <MainGridLayout title={i18n(I18nKey.albums)} description={i18n(I18nKey.albumsSubtitle)}>

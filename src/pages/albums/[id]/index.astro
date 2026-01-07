@@ -1,15 +1,13 @@
 ---
-import type { GetStaticPaths } from "astro";
 import type { AlbumGroup } from "@data/albums";
-import { scanAlbums } from "@utils/album-scanner";
+import { sortedAlbums } from "@data/albums";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 
 
 export const getStaticPaths = async () => {
-	const albumsData = await scanAlbums();
-    return albumsData.map((album) => ({
+    return sortedAlbums.filter(album => album.visible).map((album) => ({
         params: { id: album.id },
         props: { album },
     }));
