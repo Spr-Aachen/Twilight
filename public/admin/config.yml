@@ -114,6 +114,34 @@ collections:
         required: false
         default: []
         field: { label: "Image", name: "image", widget: "image" }
+  # 相册集合
+  - name: "albums"
+    label: "Albums"
+    folder: "src/data/albums"
+    create: true
+    slug: "{{slug}}"
+    format: "json"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text", required: false }
+      - { label: "Cover", name: "cover", widget: "image" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Location", name: "location", widget: "string", required: false }
+      - { label: "Tags", name: "tags", widget: "list", required: false, default: [] }
+      - { label: "Layout", name: "layout", widget: "select", options: ["grid", "masonry", "list"], default: "grid" }
+      - { label: "Columns", name: "columns", widget: "number", default: 3, value_type: "int", min: 1, max: 6 }
+      - label: "Photos"
+        name: "photos"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Image", name: "src", widget: "image" }
+          - { label: "Caption", name: "alt", widget: "string", required: false }
+          - { label: "Title", name: "title", widget: "string", required: false }
+          - { label: "Description", name: "description", widget: "text", required: false }
+          - { label: "Tags", name: "tags", widget: "list", required: false, default: [] }
+          - { label: "Date", name: "date", widget: "datetime", required: false }
+      - { label: "Visible", name: "visible", widget: "boolean", default: true, required: false }
   # 友链集合
   - name: "friends"
     label: "Friends"
