@@ -13,6 +13,7 @@ const recentPosts = posts.slice(0, 6);
 ---
 
 <MainGridLayout title={i18n(I18nKey.atom)} description={i18n(I18nKey.atomDescription)}>
+
     <div class="onload-animation">
         <!-- Atom 标题和介绍 -->
         <div class="card-base rounded-[var(--radius-large)] p-8 mb-6">
@@ -42,12 +43,12 @@ const recentPosts = posts.slice(0, 6);
                     <code class="bg-[var(--card-bg)] px-3 py-2 rounded-lg text-sm font-mono text-75 border border-[var(--line-divider)] break-all">
                         {Astro.site}atom.xml
                     </code>
-                    <button 
+                    <button
                         id="copy-atom-btn"
                         class="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:opacity-80 transition-all duration-200 font-medium text-sm whitespace-nowrap"
                         data-url={`${Astro.site}atom.xml`}
                     >
-                        {i18n(I18nKey.atomCopyLink) || "Copy Link"}
+                        {i18n(I18nKey.atomCopyLink)}
                     </button>
                 </div>
             </div>
@@ -99,27 +100,35 @@ const recentPosts = posts.slice(0, 6);
             </div>
         </div>
     </div>
-</MainGridLayout>
 
-<script>
-    // Copy button functionality
-    document.getElementById('copy-atom-btn')?.addEventListener('click', function() {
-        const url = this.getAttribute('data-url');
-        if (url) {
-            navigator.clipboard.writeText(url).then(() => {
-                const originalText = this.textContent || "Copy Link";
-                this.textContent = "Atom link copied to clipboard!";
-                setTimeout(() => {
-                    this.textContent = originalText;
-                }, 2000);
-            }).catch(err => {
-                console.error('复制失败:', err);
-                const originalText = this.textContent || "Copy Link";
-                this.textContent = "Copy failed, please copy the link manually";
-                setTimeout(() => {
-                    this.textContent = originalText;
-                }, 2000);
-            });
+    <script>
+        // Copy button functionality
+        const init = () => {
+            const copyBtn = document.getElementById('copy-atom-btn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', async function() {
+                    const url = this.getAttribute('data-url');
+                    if (!url) return;
+                    try {
+                        await navigator.clipboard.writeText(url);
+                        const originalText = this.textContent || "Copy Link";
+                        this.textContent = "Link Copied";
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 2000);
+                    } catch (err) {
+                        console.error('复制失败:', err);
+                        const originalText = this.textContent || "Copy Link";
+                        this.textContent = "Copy Failed";
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 2000);
+                    }
+                });
+            }
         }
-    });
-</script>
+        init();
+        document.addEventListener("astro:after-swap", init);
+    </script>
+
+</MainGridLayout>
