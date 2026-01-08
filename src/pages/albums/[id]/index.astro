@@ -84,9 +84,8 @@ if (!album) {
                     <figure class="photo-item group relative overflow-hidden rounded-lg">
                         <a
                             href={photo.src}
-                            data-pswp-width={photo.width || 1200}
-                            data-pswp-height={photo.height || 800}
-                            target="_blank"
+                            data-fancybox="gallery"
+                            data-caption={photo.alt}
                             class="block"
                         >
                             <img
@@ -102,33 +101,6 @@ if (!album) {
         </div>
     </div>
 </MainGridLayout>
-
-<script>
-    // 确保PhotoSwipe正确处理相册图片
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('=== 相册页面加载完成 ===');
-        // 检查页面中的图片元素
-        const albumImages = document.querySelectorAll('.moment-images img, .photo-gallery img');
-        console.log('相册图片数量:', albumImages.length);
-        // 预加载图片以确保正确显示
-        albumImages.forEach((img) => {
-            if (img instanceof HTMLImageElement) {
-                const preloadImg = new Image();
-                preloadImg.src = img.src;
-            }
-        });
-        // 修复相册图片链接，确保它们可以被PhotoSwipe正确处理
-        document.querySelectorAll('.photo-gallery a').forEach(link => {
-            if (link instanceof HTMLAnchorElement) {
-                // 阻止默认的新窗口打开行为
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    // 不需要额外操作，PhotoSwipe会处理点击事件
-                });
-            }
-        });
-    });
-</script>
 
 <style>
     .grid-layout {
