@@ -1,26 +1,28 @@
 {
-    "title": "External Album Example",
-    "description": "This is an example album that uses images from external links",
+    "title": "Album Example",
+    "description": "This is an example album. Note that the local image path is relative to the corresponding album folder in the public directory.",
     "cover": "https://picsum.photos/800/600?random=1",
     "date": "2025-01-01T00:00:00.000Z",
-    "location": "Internet",
-    "tags": ["external", "example", "scenary"],
+    "location": "Unknown",
+    "tags": ["example"],
     "layout": "masonry",
     "columns": 3,
     "photos": [
         {
-            "src": "https://picsum.photos/800/600?random=2",
-            "alt": "random image 1",
-            "title": "Random Image 1",
-            "description": "This is a beautiful image from external link",
-            "tags": ["scenary"]
+            "src": "智子_ASK.webp",
+            "alt": "智子",
+            "title": "智子 by ASK",
+            "description": "This is a beautiful image from local file",
+            "tags": ["human"]
         },
         {
-            "src": "https://picsum.photos/800/600?random=3",
-            "alt": "random image 2",
-            "title": "Random Image 2",
-            "description": "This is another beautiful image from external link",
-            "tags": ["scenary"]
+            "src": "https://picsum.photos/800/600?random=2",
+            "alt": "random image",
+            "title": "Random Image",
+            "description": "This is a beautiful image from external link",
+            "tags": [
+                "scenary"
+            ]
         }
     ],
     "visible": true
