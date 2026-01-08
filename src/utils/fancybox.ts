@@ -3,12 +3,12 @@ let Fancybox: any;
 
 // 图片灯箱按需加载
 export async function initFancybox() {
-    // 相册图片选择器
-    const albumImagesSelector = ".custom-md img, #post-cover img, .moment-images img, .photo-gallery img";
+    // 相册图片选择器 (只绑定不在 a 标签内的图片，避免与链接绑定冲突)
+    const albumImagesSelector = ".custom-md img:not(a *), #post-cover img:not(a *), .moment-images img:not(a *), .photo-gallery img:not(a *)";
     // 相册链接选择器
-    const albumLinksSelector = ".moment-images a[data-fancybox]";
+    const albumLinksSelector = ".moment-images a[data-fancybox], .photo-gallery a[data-fancybox]";
     // 单张图片选择器
-    const singleFancyboxSelector = "[data-fancybox]:not(.moment-images a)";
+    const singleFancyboxSelector = "[data-fancybox]:not(.moment-images a):not(.photo-gallery a)";
     // 检查是否有图片需要绑定
     const hasImages =
         document.querySelector(albumImagesSelector) ||
