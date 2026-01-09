@@ -14,7 +14,9 @@ const config = {
 ---
 
 <div id="tcomment"></div>
-<script is:inline src="/scroll-protection.js"></script>
+<script>
+    import "@/plugins/twikoo-scroll-protection";
+</script>
 <script is:inline src="/assets/js/twikoo.all.min.js"></script>
 <script is:inline define:vars={{ config }}>
     // 获取当前页面路径
