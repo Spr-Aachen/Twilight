@@ -172,33 +172,13 @@ export function initTranslateService(): void {
 // 加载并初始化翻译功能
 export async function loadAndInitTranslate(): Promise<void> {
     if (typeof window === "undefined" || !siteConfig.translate?.enable) return;
-    // 定义脚本加载逻辑
-    const loadScript = (): Promise<void> => {
-        if ((window as any).translateScriptLoaded) return Promise.resolve();
-        if ((window as any).translate || document.getElementById('translate-script')) {
-            (window as any).translateScriptLoaded = true;
-            return Promise.resolve();
-        }
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = '/translate.js';
-            script.id = 'translate-script';
-            script.async = true;
-            script.onload = () => {
-                if (typeof (window as any).translate !== 'undefined') {
-                    (window as any).translateScriptLoaded = true;
-                    resolve();
-                } else {
-                    reject(new Error('translate.js loaded but window.translate not available'));
-                }
-            };
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    };
     try {
-        // 加载脚本
-        await loadScript();
+        // 检查是否已经加载
+        if (!(window as any).translate) {
+            // 使用动态导入，Vite 会自动处理代码分割
+            await import("@/plugins/translate");
+            (window as any).translateScriptLoaded = true;
+        }
         // 初始化服务
         initTranslateService();
     } catch (error) {
