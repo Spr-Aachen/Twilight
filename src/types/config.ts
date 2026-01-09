@@ -51,15 +51,11 @@ export type SiteConfig = {
     timeZone: -12 | -11 | -10 | -9 | -8 | -7 | -6 | -5 | -4 | -3 | -2 | -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
     // 字体配置
     font: {
-        // zenMaruGothic 字体
-        zenMaruGothic: {
-            // 作为全局字体
-            enable: boolean;
-        };
-        // Hanalei 字体
-        hanalei: {
-            // 作为全局字体
-            enable: boolean;
+        [key: string]: {
+            // 字体源 (字体 CSS 链接 | 字体文件路径)
+            src: string;
+            // 字体名 (font-family)
+            family: string;
         };
     };
     // 主题色配置

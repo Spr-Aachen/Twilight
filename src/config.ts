@@ -51,16 +51,13 @@ export const siteConfig: SiteConfig = {
     timeZone: SITE_TIMEZONE,
     // 字体配置
     font: {
-        // zenMaruGothic 字体 (适合日语和英语，对中文适配一般)
-        zenMaruGothic: {
-            // 作为全局字体
-            enable: true,
-        },
-        // Hanalei 字体 (适合中文)
-        hanalei: {
-            // 作为全局字体
-            enable: false,
-        },
+        // 示例字体配置 - Zen Maru Gothic
+        "Example - ZenMaruGothic": {
+            // 字体源 (字体 CSS 链接 | 字体文件路径)
+            src: "https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap", // 使用 ZenMaruGothic CSS 链接
+            // 字体名 (font-family)
+            family: "Zen Maru Gothic",
+        }
     },
     // 主题色配置
     themeColor: {
