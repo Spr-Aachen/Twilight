@@ -239,6 +239,7 @@ const jsonLd = {
                 <script is:inline>
                     function runtime() {
                         const lastModifiedElement = document.getElementById('last-modified');
+                        if (!lastModifiedElement) return;
                         const startDate = new Date(lastModifiedElement.dataset.lastModified);
                         const currentDate = new Date();
                         const diff = currentDate - startDate;
