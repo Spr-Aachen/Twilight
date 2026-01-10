@@ -107,12 +107,12 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
             <div class="w-4/5 lg:w-3/4 text-center mb-0">
                 <div class="flex flex-col">
                     {config.banner?.homeText?.title && (
-                        <h1 class="banner-title text-6xl lg:text-8xl text-white drop-shadow-lg mb-2 lg:mb-4">
+                        <h1 class="banner-title text-6xl lg:text-8xl text-white mb-2 lg:mb-4">
                             {config.banner.homeText.title}
                         </h1>
                     )}
                     {config.banner?.homeText?.subtitle && (
-                        <h2 class="banner-subtitle text-xl lg:text-3xl text-white/90 drop-shadow-md">
+                        <h2 class="banner-subtitle text-xl lg:text-3xl text-white/90">
                             {config.banner.homeText.typewriter?.enable ? (
                                 <TypewriterText
                                     text={config.banner.homeText.subtitle}
