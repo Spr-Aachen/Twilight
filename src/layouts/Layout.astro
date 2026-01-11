@@ -119,7 +119,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 ---
 
 <!DOCTYPE html>
-<html lang={siteLang} class="bg-[var(--page-bg)] text-[14px] md:text-[16px] is-initial-load"
+<html lang={siteLang} class="bg-[var(--page-bg)] text-[14px] md:text-[16px] show-initial-animation"
 >
     <head>
         <title>{pageTitle}</title>
@@ -519,11 +519,11 @@ loadAndInitTranslate();
 // Initialize particle effects
 setupParticleEffects();
 
-// Remove is-initial-load class after page load
+// Remove show-initial-animation class after page load
 if (typeof window !== 'undefined') {
     window.addEventListener('load', () => {
         setTimeout(() => {
-            document.documentElement.classList.remove('is-initial-load');
+            document.documentElement.classList.remove('show-initial-animation');
         }, 1000);
     });
 }

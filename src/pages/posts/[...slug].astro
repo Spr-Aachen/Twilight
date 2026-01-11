@@ -115,7 +115,7 @@ const jsonLd = {
         >
             <!-- word count and reading time -->
             <div
-                class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation"
+                class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation-up"
             >
                 <div class="flex flex-row items-center">
                     <div
@@ -150,7 +150,7 @@ const jsonLd = {
                 </div>
             </div>
             <!-- title -->
-            <div class="relative onload-animation">
+            <div class="relative onload-animation-up">
                 <div
                     data-pagefind-body
                     data-pagefind-weight="10"
@@ -165,7 +165,7 @@ const jsonLd = {
                 </div>
             </div>
             <!-- metadata -->
-            <div class="onload-animation">
+            <div class="onload-animation-up">
                 <PostMetadata
                     className="mb-5"
                     published={entry.data.published}
@@ -189,7 +189,7 @@ const jsonLd = {
                             id="post-cover"
                             src={entry.data.cover}
                             basePath={getFileDirFromPath(entry.filePath || '')}
-                            class="mb-8 rounded-xl banner-container onload-animation"
+                            class="mb-8 rounded-xl banner-container onload-animation-up"
                         />
                     </>
                 )
@@ -198,7 +198,7 @@ const jsonLd = {
                 isEncrypted={isEncrypted}
                 password={entry.data.password}
             >
-                <Markdown class="mb-6 markdown-content onload-animation">
+                <Markdown class="mb-6 markdown-content onload-animation-up">
                     <Content />
                 </Markdown>
                 {
@@ -211,7 +211,7 @@ const jsonLd = {
                             sourceLink={entry.data.sourceLink}
                             licenseName={entry.data.licenseName}
                             licenseUrl={entry.data.licenseUrl}
-                            class="mb-6 rounded-xl license-container onload-animation"
+                            class="mb-6 rounded-xl license-container onload-animation-up"
                         />
                     )
                 }

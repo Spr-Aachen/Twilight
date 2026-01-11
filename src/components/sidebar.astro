@@ -39,9 +39,9 @@ function renderComponent(component: any, index: number, components: any[]) {
     const componentClass = widgetManager.getComponentClass(component, index);
     const componentStyle = widgetManager.getComponentStyle(component, index);
 
-    // 为在切换页面时需要动画的 TOC 组件添加 onload-animation 类
+    // 为在切换页面时需要动画的 TOC 组件添加 onload-animation-up 类
     const componentClass_animated = component.type === "toc" 
-        ? `${componentClass} onload-animation` 
+        ? `${componentClass} onload-animation-up` 
         : componentClass;
 
     return {

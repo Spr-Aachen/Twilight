@@ -260,7 +260,7 @@ const mainContentClass = `
                             rel="noopener"
                             aria-label="Visit image source"
                             class:list={[
-                                "group onload-animation transition-all absolute flex justify-center items-center rounded-full " +
+                                "group onload-animation-up transition-all absolute flex justify-center items-center rounded-full " +
                                     "px-3 right-4 -top-[3.25rem] bg-black/60 hover:bg-black/70 h-9",
                                 {
                                     "hover:pr-9 active:bg-black/80":
@@ -297,7 +297,7 @@ const mainContentClass = `
                             hasLeftSidebar && (
                                 <SideBar
                                     side="left"
-                                    class={`${leftSidebarClass} ${transparentClass} onload-animation`}
+                                    class={`${leftSidebarClass} ${transparentClass} onload-animation-up`}
                                     headings={headings}
                                 />
                             )
@@ -309,7 +309,7 @@ const mainContentClass = `
                             hasRightSidebar && (
                                 <SideBar
                                     side="right"
-                                    class={`${rightSidebarClass} ${transparentClass} onload-animation`}
+                                    class={`${rightSidebarClass} ${transparentClass} onload-animation-up`}
                                     headings={headings}
                                 />
                             )
@@ -322,18 +322,18 @@ const mainContentClass = `
                 >
                     <div
                         id="content-wrapper"
-                        class="onload-animation transition-leaving"
+                        class="onload-animation-up transition-leaving"
                     >
                         <slot />
                         <div
-                            class="footer col-span-2 onload-animation hidden lg:block transition-swup-fade"
+                            class="footer col-span-2 onload-animation-up hidden lg:block transition-swup-fade"
                         >
                             <Footer />
                         </div>
                     </div>
                 </main>
 
-                <div class="footer col-span-2 onload-animation block lg:hidden transition-swup-fade">
+                <div class="footer col-span-2 onload-animation-up block lg:hidden transition-swup-fade">
                     <Footer />
                 </div>
             </div>
