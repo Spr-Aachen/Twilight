@@ -1,0 +1,78 @@
+---
+
+---
+
+<div
+    id="loading-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--page-bg)] transition-opacity duration-600"
+>
+    <div class="flex flex-col items-center">
+        <!-- loading icon -->
+        <div class="loading-spinner mb-4"></div>
+        <!-- loading text -->
+        <div
+            class="loading-text text-[var(--primary)] font-medium tracking-widest"
+        >
+            LOADING
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    @keyframes spinner-glow {
+        0%,
+        100% {
+            box-shadow: 0 0 12px var(--primary);
+            border-top-color: var(--primary);
+        }
+        50% {
+            box-shadow: 0 0 24px var(--primary);
+            border-top-color: var(--primary);
+        }
+    }
+    .loading-spinner {
+        width: 48px;
+        height: 48px;
+        border: 3px solid color-mix(in oklch, var(--primary) 10%, transparent);
+        border-top: 3px solid var(--primary);
+        border-radius: 50%;
+        animation:
+            spin 1.5s linear infinite,
+            spinner-glow 1.5s ease-in-out infinite;
+    }
+
+    @keyframes text-glow {
+        0%,
+        100% {
+            opacity: 0.6;
+            text-shadow: 0 0 12px var(--primary);
+        }
+        50% {
+            opacity: 1;
+            text-shadow: 0 0 24px var(--primary);
+        }
+    }
+    .loading-text {
+        animation: text-glow 1.5s ease-in-out infinite;
+    }
+
+    /* 手动触发淡出类 */
+    #loading-overlay.fade-out {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* 当 html 移除 is-loading 类时，确保 overlay 隐藏 */
+    :global(html:not(.is-loading)) #loading-overlay {
+        opacity: 0;
+        pointer-events: none;
+    }
+</style>

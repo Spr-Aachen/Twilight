@@ -48,6 +48,11 @@ html.is-animating .transition-swup-fade {
     transform: translateY(1.5rem);
 }
 
+/* Loading 状态下禁止滚动 */
+html.is-loading {
+    overflow: hidden;
+}
+
 /* 淡入动画 */
 @keyframes fade-in-up {
     from {
@@ -81,28 +86,27 @@ html.is-animating .transition-swup-fade {
     }
 }
 
-/* 页面加载动画 */
-.onload-animation-up {
+/* 隐藏页面加载动画 */
+.onload-animation-up, .onload-animation-down {
+    opacity: 0;
+}
+/* 动画结束后或在非加载/非初始动画状态下保持可见 */
+html:not(.is-loading):not(.show-initial-animation) :is(.onload-animation-up, .onload-animation-down) {
     opacity: 1;
 }
-.show-initial-animation .onload-animation-up,
-#swup-container .onload-animation-up {
-    opacity: 0;
+/* 初始加载动画，仅在 .show-initial-animation 存在时触发以避免与 Swup 自身的过渡动画冲突 */
+.show-initial-animation .onload-animation-up {
     animation: fade-in-up 600ms ease-out forwards;
 }
-.onload-animation-down {
-    opacity: 1;
-}
 .show-initial-animation .onload-animation-down {
-    opacity: 0;
     animation: fade-in-down 600ms ease-out forwards;
 }
-/* 渐进式动画延迟 - 在初始加载和主内容切换时应用 */
-:is(.show-initial-animation, #swup-container) :is(.onload-animation-up, .onload-animation-down):nth-child(1) { animation-delay: 0ms; }
-:is(.show-initial-animation, #swup-container) :is(.onload-animation-up, .onload-animation-down):nth-child(2) { animation-delay: 150ms; }
-:is(.show-initial-animation, #swup-container) :is(.onload-animation-up, .onload-animation-down):nth-child(3) { animation-delay: 300ms; }
-:is(.show-initial-animation, #swup-container) :is(.onload-animation-up, .onload-animation-down):nth-child(4) { animation-delay: 450ms; }
-:is(.show-initial-animation, #swup-container) :is(.onload-animation-up, .onload-animation-down):nth-child(5) { animation-delay: 600ms; }
+/* 渐进式动画延迟 - 仅在初始加载时应用 */
+.show-initial-animation :is(.onload-animation-up, .onload-animation-down):nth-child(1) { animation-delay: 0ms; }
+.show-initial-animation :is(.onload-animation-up, .onload-animation-down):nth-child(2) { animation-delay: 150ms; }
+.show-initial-animation :is(.onload-animation-up, .onload-animation-down):nth-child(3) { animation-delay: 300ms; }
+.show-initial-animation :is(.onload-animation-up, .onload-animation-down):nth-child(4) { animation-delay: 450ms; }
+.show-initial-animation :is(.onload-animation-up, .onload-animation-down):nth-child(5) { animation-delay: 600ms; }
 
 /* 特殊元素的动画 */
 .transition-slide-in {

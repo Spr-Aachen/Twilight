@@ -16,6 +16,7 @@ import {
 } from "@constants/constants";
 import { pathsEqual, url } from "@utils/url-utils";
 import FontLoader from "@components/fontLoader.astro";
+import LoadingOverlay from "@components/loadingOverlay.astro";
 import ConfigCarrier from "@components/configCarrier.astro";
 import MusicPlayer from "@components/musicPlayer.svelte";
 import Pio from "@components/pio.svelte";
@@ -119,21 +120,23 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 ---
 
 <!DOCTYPE html>
-<html lang={siteLang} class="bg-[var(--page-bg)] text-[14px] md:text-[16px] show-initial-animation"
+<html lang={siteLang} class="bg-[var(--page-bg)] text-[14px] md:text-[16px] is-loading"
 >
     <head>
         <meta charset="UTF-8" />
         <!-- Font Loader -->
         <FontLoader />
-
+        <!-- title -->
         <title>{pageTitle}</title>
-
+        <!-- description -->
         <meta name="description" content={description || pageTitle}>
+        <!-- keywords -->
         {siteConfig.keywords && siteConfig.keywords.length > 0 && (
             <meta name="keywords" content={siteConfig.keywords.join(', ')} />
         )}
+        <!-- author -->
         <meta name="author" content={profileConfig.name}>
-
+        <!-- Open Graph -->
         <meta property="og:site_name" content={siteConfig.title}>
         <meta property="og:url" content={Astro.url}>
         <meta property="og:title" content={pageTitle}>
@@ -146,14 +149,16 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
                 <meta property="og:type" content="website" />
             )
         }
-
+        <!-- Twitter -->
         <meta name="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content={Astro.url}>
         <meta name="twitter:title" content={pageTitle}>
         <meta name="twitter:description" content={description || pageTitle}>
-
+        <!-- viewport -->
         <meta name="viewport" content="width=device-width" />
+        <!-- generator -->
         <meta name="generator" content={Astro.generator} />
+        <!-- favicons -->
         {favicons.map(favicon => (
             <link rel="icon"
                   href={favicon.src.startsWith('/') ? url(favicon.src) : favicon.src}
@@ -161,7 +166,6 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
                   media={favicon.theme && `(prefers-color-scheme: ${favicon.theme})`}
             />
         ))}
-
         <!-- Set the theme before the page is rendered to avoid a flash -->
         <script is:inline define:vars={{BREAKPOINT_LG, LIGHT_MODE, DARK_MODE, SYSTEM_MODE, BANNER_HEIGHT_EXTEND, PAGE_WIDTH, configHue, defaultTheme: siteConfig.defaultTheme}}>
             // Load the theme from local storage
@@ -197,39 +201,35 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
             offset = offset - offset % 4;
             document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
         </script>
-
         <!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why -->
         <style define:vars={{
             configHue,
             'page-width': `${PAGE_WIDTH}rem`,
         }}></style>
-
+        <!-- custom head -->
         <slot name="head"></slot>
-
         <!-- Pio 看板娘样式 - 仅在启用时加载 -->
         {pioConfig.enable && <link rel="stylesheet" href="/pio/static/pio.css" />}
-
+        <!-- rss feed -->
         <link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
-
         <!-- Umami Analytics -->
         {umamiEnabled && umamiScripts && <Fragment set:html={umamiScripts} />}
     </head>
 
     <body class=" min-h-screen " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
     >
+        <!-- 页面加载动画 -->
+        <LoadingOverlay />
+        <!-- 全局配置载体 -->
+        <ConfigCarrier />
         <!-- 页面顶部渐变高光效果 - 只在full和semifull模式下显示 -->
         {shouldShowTopHighlight && <div class="top-gradient-highlight"></div>}
-        <ConfigCarrier></ConfigCarrier>
+        <!-- 页面内容 -->
         <slot />
-
         <!-- Music Player - 仅在启用时加载 -->
         {musicPlayerConfig.enable && <MusicPlayer client:load />}
-
-        <!-- Pio 看板娘组件 -->
-        <!-- 注意：Pio 组件需要放在 body 标签内，但要在其他内容之前 -->
-        <!-- 如果启用了侧边栏，可能需要调整 z-index -->
+        <!-- Pio 看板娘组件 - 如果启用了侧边栏，可能需要调整 z-index -->
         {pioConfig.enable && <Pio client:load />}
-
         <!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
         <div id="page-height-extend" class="hidden h-[300vh]"></div>
     </body>
@@ -528,12 +528,26 @@ loadAndInitTranslate();
 // Initialize particle effects
 setupParticleEffects();
 
-// Remove show-initial-animation class after page load
+// Remove is-loading class and trigger initial-animation after page load
 if (typeof window !== 'undefined') {
     window.addEventListener('load', () => {
+        // 触发 LoadingOverlay 淡出，但不立即移除 is-loading，防止元素闪现
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+            overlay.classList.add('fade-out');
+        }
+        // 等待 LoadingOverlay 淡出（600ms）后，同步切换状态
         setTimeout(() => {
-            document.documentElement.classList.remove('show-initial-animation');
-        }, 1000);
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+            document.documentElement.classList.remove('is-loading');
+            document.documentElement.classList.add('show-initial-animation');
+            // 900ms 后移除 show-initial-animation 类，完成动画进入稳定状态
+            setTimeout(() => {
+                document.documentElement.classList.remove('show-initial-animation');
+            }, 900);
+        }, 600);
     });
 }
 </script>
