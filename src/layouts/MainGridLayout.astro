@@ -294,24 +294,30 @@ const mainContentClass = `
                         (mobileShowSidebar ||
                             tabletShowSidebar ||
                             desktopShowSidebar) &&
-                            hasLeftSidebar && (
+                            hasLeftSidebar ? (
                                 <SideBar
+                                    id="left-sidebar"
                                     side="left"
                                     class={`${leftSidebarClass} ${transparentClass} onload-animation-up`}
                                     headings={headings}
                                 />
+                            ) : (
+                                <div id="left-sidebar" class="hidden"></div>
                             )
                     }
                     {
                         (mobileShowSidebar ||
                             tabletShowSidebar ||
                             desktopShowSidebar) &&
-                            hasRightSidebar && (
+                            hasRightSidebar ? (
                                 <SideBar
+                                    id="right-sidebar"
                                     side="right"
                                     class={`${rightSidebarClass} ${transparentClass} onload-animation-up`}
                                     headings={headings}
                                 />
+                            ) : (
+                                <div id="right-sidebar" class="hidden"></div>
                             )
                     }
                 </div>
@@ -320,6 +326,7 @@ const mainContentClass = `
                     id="swup-container"
                     class={`${mainContentClass} transition-swup-fade`}
                 >
+                    <div id="grid-class-carrier" data-grid-class={gridCols} class="hidden"></div>
                     <div
                         id="content-wrapper"
                         class="onload-animation-up transition-leaving"
@@ -339,61 +346,6 @@ const mainContentClass = `
             </div>
 
             <BackToTop />
-        </div>
     </div>
+</div>
 </Layout>
-
-<script>
-    function adjustLayout() {
-        const mainGrid = document.getElementById('main-grid');
-        if (!mainGrid) return;
-
-        const sidebars = document.querySelectorAll('#sidebar');
-        sidebars.forEach(sidebar => {
-            const side = sidebar.getAttribute('data-side');
-            const children = Array.from(sidebar.children);
-            
-            // 检查侧边栏是否实际上是空的（所有子元素都隐藏了）
-            const isEmpty = children.length === 0 || children.every(child => {
-                const style = window.getComputedStyle(child);
-                return style.display === 'none' || style.visibility === 'hidden' || child.innerHTML.trim() === '';
-            });
-
-            if (isEmpty && sidebar instanceof HTMLElement) {
-                sidebar.style.display = 'none';
-                
-                // 如果侧边栏为空，调整网格布局
-                if (side === 'left') {
-                    mainGrid.classList.remove('lg:grid-cols-[17.5rem_1fr_17.5rem]', 'lg:grid-cols-[17.5rem_1fr]', 'md:grid-cols-[17.5rem_1fr]');
-                    if (!mainGrid.classList.contains('lg:grid-cols-[1fr_17.5rem]')) {
-                        mainGrid.classList.add('lg:grid-cols-1', 'md:grid-cols-1');
-                    }
-                } else if (side === 'right') {
-                    mainGrid.classList.remove('lg:grid-cols-[17.5rem_1fr_17.5rem]', 'lg:grid-cols-[1fr_17.5rem]');
-                    if (!mainGrid.classList.contains('lg:grid-cols-[17.5rem_1fr]')) {
-                        mainGrid.classList.add('lg:grid-cols-1', 'md:grid-cols-1');
-                    }
-                }
-            }
-        });
-    }
-
-    let layoutAdjustmentInitialized = false;
-    function initLayoutAdjustment() {
-        if (layoutAdjustmentInitialized) return;
-        
-        adjustLayout();
-        
-        // 注册 Swup 钩子
-        if (window.swup && window.swup.hooks) {
-            window.swup.hooks.on('content:replace', adjustLayout);
-            layoutAdjustmentInitialized = true;
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', initLayoutAdjustment);
-    document.addEventListener('swup:enable', initLayoutAdjustment);
-    
-    // 定时检查，处理 TOC 等组件动态隐藏的情况
-    setInterval(adjustLayout, 1000);
-</script>

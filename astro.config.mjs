@@ -53,7 +53,9 @@ export default defineConfig({
             theme: false,
             animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
             containers: [
-                "#main-grid",
+                "#swup-container",
+                "#left-sidebar",
+                "#right-sidebar",
             ],
             cache: true,
             preload: true,

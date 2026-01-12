@@ -324,19 +324,31 @@ const setup = () => {
         }
     })
     window.swup.hooks.on('content:replace', () => {
-        // 初始化 TOC 组件
+        // Update main grid layout class name after page transition
+        const gridClassCarrier = document.getElementById("grid-class-carrier");
+        if (gridClassCarrier) {
+            const gridClass = gridClassCarrier.getAttribute("data-grid-class");
+            const mainGrid = document.getElementById("main-grid");
+            if (mainGrid && gridClass) {
+                const currentClasses = mainGrid.className.split(" ");
+                const newClasses = currentClasses.filter(c => !c.startsWith("lg:grid-cols-") && !c.startsWith("md:grid-cols-") && !c.startsWith("grid-cols-"));
+                const gridClasses = gridClass.split(" ");
+                mainGrid.className = [...newClasses, ...gridClasses].join(" ");
+            }
+        }
+        // Initialize TOC component
         const tocElement = document.querySelector('table-of-contents');
         if (tocElement && typeof (tocElement as any).init === 'function') {
             setTimeout(() => {
                 (tocElement as any).init();
             }, 100);
         }
-        // 重新初始化 semifull 模式的滚动检测
+        // Reinitialize semifull mode scroll detection after page transition
         const navbar = document.getElementById('navbar')
         if (navbar) {
             const transparentMode = navbar.getAttribute('data-transparent-mode')
             if (transparentMode === 'semifull') {
-                // 重新调用初始化函数来重新绑定滚动事件
+                // Re-call the initialization function to rebind scroll events
                 if (typeof (window as any).initSemifullScrollDetection === 'function') {
                     (window as any).initSemifullScrollDetection()
                 }
@@ -344,7 +356,11 @@ const setup = () => {
         }
     })
     window.swup.hooks.on('visit:start', (visit: {to: {url: string}}) => {
-        // change banner height immediately when a link is clicked
+        // Disable scroll protection when a link is clicked to prevent interference with page jump scrolling to top
+        if ((window as any).scrollProtectionManager && typeof (window as any).scrollProtectionManager.disable === 'function') {
+            (window as any).scrollProtectionManager.disable();
+        }
+        // Change banner height immediately when a link is clicked
         const bodyElement = document.querySelector('body')
         const isHomePage = pathsEqual(visit.to.url, url('/'))
         if (isHomePage) {
@@ -365,10 +381,9 @@ const setup = () => {
         const navbar = document.getElementById('navbar')
         if (navbar) {
             navbar.setAttribute('data-is-home', isHomePage.toString())
-            // 重新初始化semifull模式的滚动检测
             const transparentMode = navbar.getAttribute('data-transparent-mode')
             if (transparentMode === 'semifull') {
-                // 重新调用初始化函数来重新绑定滚动事件
+                // Re-call the initialization function to rebind scroll events
                 if (typeof window.initSemifullScrollDetection === 'function') {
                     window.initSemifullScrollDetection()
                 }
@@ -410,20 +425,14 @@ const setup = () => {
         }, 300)
     });
     window.swup.hooks.on('page:view', () => {
-        // hide the temp high element when the transition is done
-        const heightExtend = document.getElementById('page-height-extend')
-        if (heightExtend) {
-            heightExtend.classList.remove('hidden')
-        }
-        // 确保页面滚动到顶部，特别是移动端banner关闭时
+        // Scroll to top of the page after page transition
         window.scrollTo({
             top: 0,
-            behavior: 'instant'
+            behavior: 'smooth'
         });
-        // 检查当前页面是否为文章页面，如果是则触发自定义事件用于初始化评论系统
+        // Check if the current page is a post page, if so, trigger a custom event to initialize the comment system
         setTimeout(() => {
             if (document.getElementById('tcomment')) {
-                // 触发自定义事件，通知评论系统页面已完全加载
                 const pageLoadedEvent = new CustomEvent('twilight:page:loaded', {
                     detail: {
                         path: window.location.pathname,
@@ -434,7 +443,7 @@ const setup = () => {
                 console.log('Layout: 触发 twilight:page:loaded 事件，路径:', window.location.pathname);
             }
         }, 300);
-        // 初始化 Fancybox
+        // Initialize Fancybox
         initFancybox();
     });
     initFancybox();
