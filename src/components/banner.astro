@@ -8,11 +8,10 @@ import ImageWrapper from "@/components/common/imageWrapper.astro";
 interface Props {
     config: SiteConfig["wallpaper"];
     isHomePage: boolean;
-    mobileNonHomeBannerClass: string;
     class?: string;
 }
 
-const { config, isHomePage, mobileNonHomeBannerClass, class: className } = Astro.props;
+const { config, isHomePage, class: className } = Astro.props;
 
 // 获取当前设备类型的图片源
 const getImageSources = () => {
@@ -44,8 +43,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
 <div
     id="banner-wrapper"
     class:list={[
-        "absolute z-10 w-full transition duration-600 overflow-hidden",
-        mobileNonHomeBannerClass,
+        "absolute z-10 w-full transition-all duration-600 overflow-hidden",
         className
     ]}
     style={`top: -${BANNER_HEIGHT_EXTEND}vh`}

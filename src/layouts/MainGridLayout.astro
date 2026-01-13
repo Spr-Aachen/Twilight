@@ -43,16 +43,14 @@ const hasBannerLink = !!siteConfig.wallpaper.banner?.credit?.url;
 
 // 检查是否为首页
 const isHomePage = Astro.url.pathname === "/" || Astro.url.pathname === "";
-// 手机端非首页不显示banner的CSS类
-const mobileNonHomeBannerClass = !isHomePage ? "mobile-hide-banner" : "";
 
 // 计算主内容区域位置
 const mainPanelTop = siteConfig.wallpaper.mode === "banner"
     ? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
-    : "4.5rem";
+    : "5.5rem";
 
 // 当banner被禁用时，主内容区域应该始终从顶栏下面开始
-const finalMainPanelTop = siteConfig.wallpaper.mode === "banner" ? mainPanelTop : "4.5rem";
+const finalMainPanelTop = siteConfig.wallpaper.mode === "banner" ? mainPanelTop : "5.5rem";
 
 // 检查是否应该启用半透明效果
 const shouldEnableTransparency = siteConfig.wallpaper.mode === "banner" || siteConfig.wallpaper.mode === "fullscreen";
@@ -234,13 +232,12 @@ const mainContentClass = `
     <Banner
         config={siteConfig.wallpaper}
         isHomePage={isHomePage}
-        mobileNonHomeBannerClass={mobileNonHomeBannerClass}
         class={siteConfig.wallpaper.mode === "banner" ? "" : "hidden"}
     />
 
     <!-- Main content -->
     <div
-        class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? "mobile-main-no-banner" : ""} ${siteConfig.wallpaper.mode !== "banner" ? "no-banner-layout" : ""} ${transparentClass}`}
+        class={`absolute w-full z-30 pointer-events-none transition-all duration-600 ${siteConfig.wallpaper.mode !== "banner" ? "no-banner-layout" : ""} ${transparentClass}`}
         style={`top: ${finalMainPanelTop}`}
     >
         <div

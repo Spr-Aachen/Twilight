@@ -4,7 +4,6 @@ import "katex/dist/katex.css";
 import { siteConfig, profileConfig, umamiConfig, musicPlayerConfig, pioConfig } from "@/config";
 import type { Favicon } from "@/types/config";
 import { defaultFavicons } from "@constants/icon";
-import { BREAKPOINT_LG } from "@/constants/breakpoints";
 import {
     BANNER_HEIGHT,
     BANNER_HEIGHT_EXTEND,
@@ -167,7 +166,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
             />
         ))}
         <!-- Set the theme before the page is rendered to avoid a flash -->
-        <script is:inline define:vars={{BREAKPOINT_LG, LIGHT_MODE, DARK_MODE, SYSTEM_MODE, BANNER_HEIGHT_EXTEND, PAGE_WIDTH, configHue, defaultTheme: siteConfig.defaultTheme}}>
+        <script is:inline define:vars={{LIGHT_MODE, DARK_MODE, SYSTEM_MODE, BANNER_HEIGHT_EXTEND, PAGE_WIDTH, configHue, defaultTheme: siteConfig.defaultTheme}}>
             // Load the theme from local storage
             const theme = localStorage.getItem('theme') || defaultTheme;
             // Apply the theme to the document
@@ -216,7 +215,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
         {umamiEnabled && umamiScripts && <Fragment set:html={umamiScripts} />}
     </head>
 
-    <body class=" min-h-screen " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
+    <body class=" min-h-screen " class:list={[{"is-home": isHomePage, "enable-banner": enableBanner}]}
     >
         <!-- 页面加载动画 -->
         <LoadingOverlay />
@@ -259,7 +258,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
         @apply translate-y-[var(--banner-height-extend)];
     }
     .enable-banner #top-row {
-        @apply h-[calc(var(--banner-height-home)_-_4.5rem)]
+        @apply h-[calc(var(--banner-height-home)_-_5.5rem)]
     }
     .enable-banner.is-home #sidebar-sticky {
         @apply top-[calc(1rem_-_var(--banner-height-extend))]
@@ -277,7 +276,6 @@ import {
     BANNER_HEIGHT_HOME,
     BANNER_HEIGHT_EXTEND,
 } from "@/constants/constants";
-import { BREAKPOINT_LG } from "@constants/breakpoints";
 import { pathsEqual, url } from "@utils/url-utils";
 import { initWallpaperMode } from "@utils/wallpaper";
 import { initTheme } from "@utils/theme";
@@ -315,7 +313,7 @@ const setup = () => {
         const bannerEnabled = !!document.getElementById('banner-wrapper')
         if (bannerEnabled) {
             const navbar = document.getElementById('navbar-wrapper')
-            if (navbar && document.body.classList.contains('lg:is-home')) {
+            if (navbar && document.body.classList.contains('is-home')) {
                 const threshold = window.innerHeight * (BANNER_HEIGHT / 100) - 88
                 if (document.documentElement.scrollTop >= threshold) {
                     navbar.classList.add('navbar-hidden')
@@ -364,9 +362,9 @@ const setup = () => {
         const bodyElement = document.querySelector('body')
         const isHomePage = pathsEqual(visit.to.url, url('/'))
         if (isHomePage) {
-            bodyElement!.classList.add('lg:is-home');
+            bodyElement!.classList.add('is-home');
         } else {
-            bodyElement!.classList.remove('lg:is-home');
+            bodyElement!.classList.remove('is-home');
         }
         // Control banner text visibility based on page
         const bannerTextOverlay = document.querySelector('.banner-text-overlay')
@@ -387,27 +385,6 @@ const setup = () => {
                 if (typeof window.initSemifullScrollDetection === 'function') {
                     window.initSemifullScrollDetection()
                 }
-            }
-        }
-        // Control mobile banner visibility based on page with improved staging animation
-        const bannerWrapper = document.getElementById('banner-wrapper')
-        const mainContentWrapper = document.querySelector('.absolute.w-full.z-30')
-        if (bannerWrapper && mainContentWrapper) {
-            if (isHomePage) {
-                // 首页：延迟移除隐藏类，让banner和内容优雅地出现
-                setTimeout(() => {
-                    bannerWrapper.classList.remove('mobile-hide-banner')
-                }, 100)
-                setTimeout(() => {
-                    mainContentWrapper.classList.remove('mobile-main-no-banner')
-                }, 150)
-            } else {
-                // 非首页：分阶段隐藏，先隐藏banner，再移动内容
-                bannerWrapper.classList.add('mobile-hide-banner')
-                // 延迟移动内容，让banner先完全消失
-                setTimeout(() => {
-                    mainContentWrapper.classList.add('mobile-main-no-banner')
-                }, 100)
             }
         }
         // increase the page height during page transition to prevent the scrolling animation from jumping
@@ -489,7 +466,7 @@ function scrollFunction() {
             }
         }
         if (bannerEnabled && navbar) {
-            const isHome = document.body.classList.contains('lg:is-home') && window.innerWidth >= BREAKPOINT_LG;
+            const isHome = document.body.classList.contains('is-home');
             const currentBannerHeight = isHome ? BANNER_HEIGHT_HOME : BANNER_HEIGHT;
             const threshold = window.innerHeight * (currentBannerHeight / 100) - 88;
             if (scrollTop >= threshold) {
@@ -531,22 +508,38 @@ setupParticleEffects();
 // Remove is-loading class and trigger initial-animation after page load
 if (typeof window !== 'undefined') {
     window.addEventListener('load', () => {
-        // 触发 LoadingOverlay 淡出，但不立即移除 is-loading，防止元素闪现
         const overlay = document.getElementById('loading-overlay');
+        const enableBanner = document.body.classList.contains('enable-banner');
+        // 触发 LoadingOverlay 淡出
         if (overlay) {
             overlay.classList.add('fade-out');
         }
-        // 等待 LoadingOverlay 淡出（600ms）后，同步切换状态
+        // 等待 LoadingOverlay 淡出（600ms）
         setTimeout(() => {
             if (overlay) {
                 overlay.style.display = 'none';
             }
-            document.documentElement.classList.remove('is-loading');
-            document.documentElement.classList.add('show-initial-animation');
-            // 900ms 后移除 show-initial-animation 类，完成动画进入稳定状态
-            setTimeout(() => {
-                document.documentElement.classList.remove('show-initial-animation');
-            }, 900);
+            if (enableBanner) {
+                // banner 开始恢复过渡：添加 banner-restoring 类（解除 CSS 中的 height: 0）
+                document.documentElement.classList.add('banner-restoring');
+                // 等待 banner 恢复过渡完成（600ms）
+                setTimeout(() => {
+                    // 触发各容器淡入动画
+                    document.documentElement.classList.remove('is-loading');
+                    document.documentElement.classList.add('show-initial-animation');
+                    setTimeout(() => {
+                        document.documentElement.classList.remove('show-initial-animation');
+                        document.documentElement.classList.remove('banner-restoring');
+                    }, 1200);
+                }, 600);
+            } else {
+                // 非 banner 模式，直接触发淡入
+                document.documentElement.classList.remove('is-loading');
+                document.documentElement.classList.add('show-initial-animation');
+                setTimeout(() => {
+                    document.documentElement.classList.remove('show-initial-animation');
+                }, 1200);
+            }
         }, 600);
     });
 }

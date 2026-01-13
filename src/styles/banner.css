@@ -20,16 +20,61 @@
     }
 }
 
-/* Banner 文本样式 */
-.banner-title {
-    text-shadow: 0px 3px 12px rgba(0, 0, 0, 0.36), 0 0 24px color-mix(in srgb, var(--primary), transparent 48%);
-    animation: fadeInUp 1s ease-out;
-    font-weight: bold;
+/* 初始加载中且未开始恢复时，高度归零；退出 Banner 模式时，高度归零 */
+html.is-loading:not(.banner-restoring) #banner-wrapper,
+html.banner-transitioning #banner-wrapper,
+html.banner-hiding #banner-wrapper {
+    height: 0 !important;
 }
 
+/* 退出动画时，强制子组件同步上移，避免主内容区域出现“两段式”位移 */
+html.banner-hiding #main-grid {
+    transform: translateY(0) !important;
+}
+html.banner-hiding #top-row {
+    height: 0 !important;
+}
+html.banner-hiding #sidebar-sticky {
+    top: 1rem !important;
+}
+
+/* 切换模式时隐藏标题，以便后续触发动画 */
+html.banner-transitioning .banner-title,
+html.banner-transitioning .banner-subtitle {
+    opacity: 0 !important;
+}
+
+/* 标题样式 */
+.banner-title {
+    text-shadow: 0px 3px 12px rgba(0, 0, 0, 0.36), 0 0 24px color-mix(in srgb, var(--primary), transparent 48%);
+    font-weight: bold;
+    opacity: 0;
+}
 .banner-subtitle {
     text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.36), 0 0 12px color-mix(in srgb, var(--primary), transparent 48%);
+    opacity: 0;
+}
+/* 标题动画 */
+.show-initial-animation .banner-title,
+.show-banner-animation .banner-title {
+    animation: fadeInUp 1s ease-out forwards;
+}
+.show-initial-animation .banner-subtitle,
+.show-banner-animation .banner-subtitle {
     animation: fadeInUp 1s ease-out 0.3s both;
+}
+/* 动画结束后的状态 */
+html:not(.is-loading):not(.show-initial-animation):not(.show-banner-animation) .banner-title,
+html:not(.is-loading):not(.show-initial-animation):not(.show-banner-animation) .banner-subtitle {
+    opacity: 1;
+}
+
+/* 页面背景平滑过渡（Fullscreen 与 Banner 模式切换时） */
+body {
+    transition: background-color 0.6s ease, background-image 0.6s ease;
+}
+html.is-wallpaper-transitioning body {
+    transition: background-color 0.6s ease, background-image 0.6s ease !important;
 }
 
 /**
@@ -95,29 +140,7 @@
 }
 
 
-/* 移动端非首页隐藏 banner */
-@media (max-width: 1023px) {
-    #banner-wrapper {
-        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease-out;
-        transform-origin: top center;
-        /* 硬件加速 */
-        will-change: transform, opacity;
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-    }
-
-    .mobile-hide-banner {
-        transform: translateY(-100%) translateZ(0) !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        /* 快速消失 */
-        transition: transform 0.6s ease-in, opacity 0.3s ease-in !important;
-    }
-}
-
-/* 移动端图片 */
+/* 移动端轮播图片 */
 @media (max-width: 1023px) {
     /* 确保轮播容器有正确的 overflow 设置 */
     #banner-carousel {
@@ -166,7 +189,7 @@
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
     }
-    /* 移动端图片 */
+    /* 图片 */
     .banner-container img {
         /* 图片渲染 */
         image-rendering: -webkit-optimize-contrast;
@@ -209,7 +232,7 @@
         user-select: none;
     }
 
-    /* 移动端轮播指示器 */
+    /* 轮播指示器 */
     .carousel-indicators {
         position: absolute;
         bottom: 20px;
@@ -248,16 +271,6 @@
 
 /* 移动端横屏 */
 @media (max-width: 1023px) and (orientation: landscape) {
-    #banner-wrapper:not(.mobile-hide-banner) {
-        top: 0 !important; /* 横屏模式从顶部开始，避免被导航栏覆盖 */
-        height: 60vh !important;
-    }
-
-    .banner-container {
-        height: 60vh;
-        min-height: 300px;
-    }
-
     .banner-text-overlay {
         padding: 1rem 1.5rem;
         align-items: center !important; /* 垂直居中 */
@@ -278,13 +291,6 @@
 
 /* 平板 */
 @media (min-width: 769px) and (max-width: 1023px) {
-    /* Banner wrapper 高度 */
-    #banner-wrapper {
-        height: 70vh !important;
-        min-height: 500px;
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
-    }
-
     /* 横幅文本覆盖层 */
     .banner-text-overlay {
         align-items: center !important; /* 垂直居中 */
@@ -315,14 +321,6 @@
 
 /* 中屏手机 */
 @media (min-width: 513px) and (max-width: 768px) {
-    /* Banner wrapper 高度 - 优先保持 banner 显示 */
-    #banner-wrapper {
-        height: 75vh !important;
-        min-height: 500px;
-        max-height: none; /* 移除最大高度限制 */
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
-    }
-
     /* 横幅文本覆盖层 */
     .banner-text-overlay {
         align-items: center !important; /* 垂直居中 */
@@ -353,14 +351,6 @@
 
 /* 小屏手机 */
 @media (max-width: 512px) {
-    /* Banner wrapper 高度 - 优先保持 banner 显示 */
-    #banner-wrapper {
-        height: 70vh !important; /* 保持较大高度优先显示 banner */
-        min-height: 450px;
-        max-height: none; /* 移除最大高度限制 */
-        top: 0 !important; /* 移动端从顶部开始，避免被导航栏覆盖 */
-    }
-
     /* 横幅文本覆盖层 */
     .banner-text-overlay {
         align-items: center !important; /* 垂直居中 */
@@ -476,128 +466,10 @@
         /* 确保水波纹容器不被裁剪 */
         overflow: visible;
         z-index: 5;
-        /* 水波纹快速消失动画 */
-        transition: transform 0.3s ease-in, opacity 0.2s ease-in;
-    }
-
-    /* 当banner隐藏时，水波纹快速消失 */
-    .mobile-hide-banner #header-waves {
-        transform: translateY(-100%);
-        opacity: 0;
-        /* 水波纹比banner更快消失 */
-        transition: transform 0.25s ease-in, opacity 0.15s ease-in;
     }
 
     #header-waves .waves {
         /* 移动端SVG */
         min-height: 60px;
-    }
-}
-
-/**
- * 基于屏幕高度的 banner
- */
-
-/* 中等高度屏幕 (高度 601px - 700px) */
-@media (min-height: 601px) and (max-height: 700px) {
-    #banner-wrapper {
-        height: 75vh !important;
-        min-height: 450px !important;
-    }
-
-    .banner-text-overlay {
-        padding: 2rem !important;
-        align-items: center !important; /* 垂直居中 */
-        justify-content: center !important; /* 水平居中 */
-        text-align: center !important; /* 文字居中对齐 */
-    }
-
-    .banner-title {
-        font-size: 3.8rem !important; /* 增大字体大小 */
-        line-height: 1.1 !important;
-        margin-bottom: 1rem !important;
-    }
-
-    .banner-subtitle {
-        font-size: 1.125rem !important;
-        line-height: 1.4 !important;
-    }
-}
-
-/* 小高度屏幕 (高度 501px - 600px) */
-@media (min-height: 501px) and (max-height: 600px) {
-    #banner-wrapper {
-        height: 80vh !important;
-        min-height: 400px !important;
-    }
-
-    .banner-text-overlay {
-        padding: 1.5rem !important;
-        align-items: center !important; /* 垂直居中 */
-        justify-content: center !important; /* 水平居中 */
-        text-align: center !important; /* 文字居中对齐 */
-    }
-
-    .banner-title {
-        font-size: 3.2rem !important; /* 增大字体大小 */
-        line-height: 1.1 !important;
-        margin-bottom: 0.75rem !important;
-    }
-
-    .banner-subtitle {
-        font-size: 1rem !important;
-        line-height: 1.3 !important;
-    }
-}
-
-/* 极小高度屏幕 (高度 ≤ 500px) */
-@media (max-height: 500px) {
-    #banner-wrapper {
-        height: 85vh !important; /* 占用更多高度确保 banner 显示 */
-        min-height: 350px !important;
-    }
-
-    .banner-text-overlay {
-        padding: 1rem !important;
-        align-items: center !important; /* 垂直居中 */
-        justify-content: center !important; /* 水平居中 */
-        text-align: center !important; /* 文字居中对齐 */
-    }
-
-    .banner-title {
-        font-size: 2.8rem !important; /* 增大字体大小 */
-        line-height: 1.1 !important;
-        margin-bottom: 0.5rem !important;
-    }
-
-    .banner-subtitle {
-        font-size: 0.9rem !important;
-        line-height: 1.2 !important;
-    }
-}
-
-/* 横屏模式特殊处理 - 优先显示 banner */
-@media (orientation: landscape) and (max-height: 500px) {
-    #banner-wrapper {
-        height: 90vh !important; /* 横屏时占用更多高度 */
-        min-height: 300px !important;
-    }
-
-    .banner-text-overlay {
-        padding: 1rem 2rem !important;
-        align-items: center !important; /* 垂直居中 */
-        justify-content: center !important; /* 水平居中 */
-        text-align: center !important; /* 文字居中对齐 */
-    }
-
-    .banner-title {
-        font-size: 2.8rem !important; /* 增大字体大小 */
-        line-height: 1.1 !important;
-        margin-bottom: 0.5rem !important;
-    }
-
-    .banner-subtitle {
-        font-size: 1rem !important;
-        line-height: 1.2 !important;
     }
 }
