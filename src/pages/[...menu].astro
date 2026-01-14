@@ -1,0 +1,105 @@
+---
+import { Icon } from "astro-icon/components";
+
+import { type NavBarLink } from "@/types/config";
+import { navBarConfig } from "@/config";
+import { LinkPresets } from "@constants/link-presets";
+import { url } from "@utils/url";
+import GridLayout from "@layouts/grid.astro";
+
+
+export async function getStaticPaths() {
+    return navBarConfig.links
+        .filter(link => typeof link !== "number" && link.children && link.children.length > 0)
+        .map(link => {
+            const navLink = link as NavBarLink;
+            // 提取 slug，去掉前后的斜杠
+            const slug = navLink.url.replace(/^\/|\/$/g, '');
+            return {
+                params: { menu: slug },
+                props: { link: navLink }
+            };
+        });
+}
+
+
+interface Props {
+    link: NavBarLink;
+}
+
+const { link } = Astro.props;
+
+// 获取子链接，并将 LinkPreset 转换为完整的 NavBarLink 对象
+const childrenLinks = link.children || [];
+
+const processedLinks = childrenLinks.map(child => {
+    if (typeof child === "number") {
+        return LinkPresets[child];
+    }
+    return child;
+});
+
+const pageTitle = link.name;
+const pageDescription = link.description || "";
+---
+
+<GridLayout title={pageTitle} description={pageDescription}>
+    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+        <div class="card-base z-10 px-9 py-6 relative w-full">
+            <!-- 标题 -->
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
+                    {pageTitle}
+                </h1>
+                {pageDescription && (
+                    <p class="text-neutral-600 dark:text-neutral-400">
+                        {pageDescription}
+                    </p>
+                )}
+            </header>
+            <!-- 链接网格 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {processedLinks.map(child => (
+                    <a
+                        href={child.external ? child.url : url(child.url)}
+                        target={child.external ? "_blank" : null}
+                        class="menu-card group flex flex-col items-center justify-center p-8 rounded-xl border transition-all duration-300"
+                    >
+                        <div class="icon-wrapper w-16 h-16 flex items-center justify-center rounded-full mb-4 transition-all duration-300">
+                            {child.icon && <Icon name={child.icon} class="text-3xl" />}
+                        </div>
+                        <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-[var(--primary)] transition-colors duration-300 text-center">
+                            {child.name}
+                        </h2>
+                    </a>
+                ))}
+            </div>
+        </div>
+    </div>
+</GridLayout>
+
+<style>
+    .menu-card {
+        cursor: pointer;
+        background-color: none;
+        border-color: var(--line-divider);
+    }
+
+    .icon-wrapper {
+        background-color: color-mix(in oklch, var(--primary), transparent 85%);
+        color: var(--primary);
+    }
+
+    .menu-card:hover {
+        background-color: color-mix(in oklch, var(--primary), transparent 95%);
+        border-color: var(--primary);
+        box-shadow: 0 0 20px color-mix(in oklch, var(--primary), transparent 80%);
+        transform: translateY(-4px);
+    }
+
+    .menu-card:hover .icon-wrapper {
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 0 15px color-mix(in oklch, var(--primary), transparent 50%);
+    }
+</style>

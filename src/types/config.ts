@@ -216,15 +216,17 @@ export enum LinkPreset {
 
 
 export type NavBarLink = {
-    // 菜单项名称
+    // 链接名称
     name: string;
-    // 菜单项链接
+    // 链接
     url: string;
     // 是否为外部链接
     external?: boolean;
-    // 菜单项图标
+    // 链接图标
     icon?: string;
-    // 子菜单，可以是NavBarLink或LinkPreset
+    // 中转页描述
+    description?: string;
+    // 子链接，可以是NavBarLink或LinkPreset
     children?: (NavBarLink | LinkPreset)[];
 };
 
