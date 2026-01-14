@@ -2,6 +2,8 @@
 export const prerender = true;
 
 
+import { LinkPresets } from "@constants/link-presets";
+import { LinkPreset } from "@/types/config";
 import { UNCATEGORIZED } from "@constants/constants";
 import {
     getAdvancedSkills,
@@ -17,6 +19,8 @@ import SkillCard from "@components/data/skillCard.astro";
 import GridLayout from "@layouts/grid.astro";
 
 
+const title = LinkPresets[LinkPreset.Skills].name;
+const subtitle = LinkPresets[LinkPreset.Skills].description;
 
 // 获取技能统计信息
 const stats = getSkillStats();
@@ -34,38 +38,6 @@ const skillsByCategory = categories.reduce(
     },
     {} as Record<string, typeof skillsData>,
 );
-
-// 技能等级颜色映射
-const getLevelColor = (level: string) => {
-    switch (level) {
-        case "expert":
-            return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
-        case "advanced":
-            return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
-        case "intermediate":
-            return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
-        case "beginner":
-            return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
-        default:
-            return "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400";
-    }
-};
-
-// 技能等级进度条宽度
-const getLevelWidth = (level: string) => {
-    switch (level) {
-        case "expert":
-            return "100%";
-        case "advanced":
-            return "80%";
-        case "intermediate":
-            return "60%";
-        case "beginner":
-            return "40%";
-        default:
-            return "20%";
-    }
-};
 
 // 获取分类的翻译文本
 const getCategoryText = (category: string) => {
@@ -92,9 +64,6 @@ const getCategoryText = (category: string) => {
             return category;
     }
 };
-
-const title = i18n(I18nKey.skills);
-const subtitle = i18n(I18nKey.skillsSubtitle);
 
 // 收集所有技能图标用于预加载
 const allIcons = skillsData.map((skill) => skill.icon).filter(Boolean);

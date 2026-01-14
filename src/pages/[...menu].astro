@@ -71,6 +71,11 @@ const pageDescription = link.description || "";
                         <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-[var(--primary)] transition-colors duration-300 text-center">
                             {child.name}
                         </h2>
+                        {child.description && (
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400 text-center mt-2 line-clamp-2">
+                                {child.description}
+                            </p>
+                        )}
                     </a>
                 ))}
             </div>

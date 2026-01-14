@@ -4,11 +4,14 @@ export const prerender = true;
 
 import { getEntry, render } from "astro:content";
 
-import I18nKey from "@i18n/i18nKey";
-import { i18n } from "@i18n/translation";
+import { LinkPresets } from "@constants/link-presets";
+import { LinkPreset } from "@/types/config";
 import Markdown from "@components/common/markdown.astro";
 import GridLayout from "@layouts/grid.astro";
 
+
+const pageTitle = LinkPresets[LinkPreset.About].name;
+const pageDescription = LinkPresets[LinkPreset.About].description;
 
 const aboutPost = await getEntry("spec", "about");
 
@@ -19,7 +22,7 @@ if (!aboutPost) {
 const { Content } = await render(aboutPost);
 ---
 
-<GridLayout title={i18n(I18nKey.about)} description={i18n(I18nKey.about)}>
+<GridLayout title={pageTitle} description={pageDescription}>
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
         <div class="card-base z-10 px-9 py-6 relative w-full ">
             <Markdown class="mt-2">

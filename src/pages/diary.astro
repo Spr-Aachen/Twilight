@@ -1,10 +1,15 @@
 ---
+import { LinkPresets } from "@constants/link-presets";
+import { LinkPreset } from "@/types/config";
 import { siteConfig } from "@/config";
 import { sortedMoments } from "@/utils/diary";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import GridLayout from "@layouts/grid.astro";
 
+
+const pageTitle = LinkPresets[LinkPreset.Diary].name;
+const pageDescription = LinkPresets[LinkPreset.Diary].description;
 
 // 时间格式化函数
 function formatTime(dateString: string): string {
@@ -29,7 +34,7 @@ function formatTime(dateString: string): string {
 }
 ---
 
-<GridLayout title={i18n(I18nKey.diary)} description="即刻短文">
+<GridLayout title={pageTitle} description={pageDescription}>
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
         <div class="card-base z-10 px-4 py-4 md:px-6 md:py-5 relative w-full">
             <div class="relative max-w-4xl">
@@ -37,8 +42,8 @@ function formatTime(dateString: string): string {
                 <div class="moments-header mb-6">
                     <div class="header-content">
                         <div class="header-info">
-                            <h1 class="moments-title text-xl md:text-2xl lg:text-3xl font-bold text-90 mb-1">{i18n(I18nKey.diary)}</h1>
-                            <p class="moments-subtitle text-sm md:text-base lg:text-lg text-75">{i18n(I18nKey.diarySubtitle)}</p>
+                            <h1 class="moments-title text-xl md:text-2xl lg:text-3xl font-bold text-90 mb-1">{pageTitle}</h1>
+                            <p class="moments-subtitle text-sm md:text-base lg:text-lg text-75">{pageDescription}</p>
                         </div>
                         <div class="header-stats">
                             <div class="stat-item text-center">

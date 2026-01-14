@@ -90,7 +90,7 @@ onMount(async () => {
 });
 </script>
 
-<div class="card-base px-8 py-6">
+<div>
     {#each groups as group}
         <div>
             <div class="flex flex-row w-full items-center h-[3.75rem]">

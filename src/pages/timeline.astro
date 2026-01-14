@@ -2,6 +2,8 @@
 export const prerender = true;
 
 
+import { LinkPresets } from "@constants/link-presets";
+import { LinkPreset } from "@/types/config";
 import {
     timelineData,
     getTimelineStats,
@@ -16,6 +18,9 @@ import IconifyLoader from "@components/common/iconifyLoader.astro";
 import TimelineItem from "@components/data/timelineItem.astro";
 import GridLayout from "@layouts/grid.astro";
 
+
+const title = LinkPresets[LinkPreset.Timeline].name;
+const subtitle = LinkPresets[LinkPreset.Timeline].description;
 
 // 收集所有时间线图标用于预加载
 const allIcons = timelineData
@@ -46,9 +51,6 @@ const getTypeIcon = (type: string) => {
             return "material-symbols:event";
     }
 };
-
-const title = i18n(I18nKey.timeline);
-const subtitle = i18n(I18nKey.timelineSubtitle);
 ---
 
 <GridLayout title={title} description={subtitle}>

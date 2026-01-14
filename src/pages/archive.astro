@@ -1,14 +1,33 @@
 ---
-import I18nKey from "@i18n/i18nKey";
-import { i18n } from "@i18n/translation";
+import { LinkPresets } from "@constants/link-presets";
+import { LinkPreset } from "@/types/config";
 import { getSortedPostsList } from "@utils/content";
 import ArchivePanel from "@components/archivePanel.svelte";
 import GridLayout from "@layouts/grid.astro";
 
 
+const pageTitle = LinkPresets[LinkPreset.Archive].name;
+const pageDescription = LinkPresets[LinkPreset.Archive].description;
+
 const sortedPostsList = await getSortedPostsList();
 ---
 
-<GridLayout title={i18n(I18nKey.archive)}>
-    <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte"></ArchivePanel>
+<GridLayout title={pageTitle} description={pageDescription}>
+    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+        <div class="card-base z-10 px-9 py-6 relative w-full ">
+            <!-- 标题 -->
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
+                    {pageTitle}
+                </h1>
+                {pageDescription && (
+                    <p class="text-neutral-600 dark:text-neutral-400">
+                        {pageDescription}
+                    </p>
+                )}
+            </header>
+            <!-- 归档面板 -->
+            <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte"></ArchivePanel>
+        </div>
+    </div>
 </GridLayout>
