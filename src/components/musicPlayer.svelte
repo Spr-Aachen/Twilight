@@ -20,9 +20,8 @@ let meting_server = musicPlayerConfig.meting?.server ?? "netease";
 let meting_type = musicPlayerConfig.meting?.type ?? "playlist";
 // Meting API 的 ID，从配置中获取或使用默认值
 let meting_id = musicPlayerConfig.meting?.id ?? "2161912966";
-
-// 是否启用自动播放
-let isAutoplayEnabled = false;
+// 是否启用自动播放，从配置中获取或使用默认值
+let isAutoplayEnabled = musicPlayerConfig.autoplay ?? false;
 
 // 当前歌曲信息
 let currentSong: MusicPlayerTrack = {

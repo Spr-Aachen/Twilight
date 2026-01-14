@@ -535,6 +535,8 @@ export const musicPlayerConfig: MusicPlayerConfig = {
             },
         ],
     },
+    // 是否自动播放
+    autoplay: true,
 };
 
 

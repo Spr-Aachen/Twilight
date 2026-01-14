@@ -496,6 +496,8 @@ export type MusicPlayerConfig = {
         // 播放列表
         playlist: MusicPlayerTrack[];
     };
+    // 是否自动播放
+    autoplay?: boolean;
 };
 
 /**
