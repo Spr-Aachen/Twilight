@@ -44,14 +44,14 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
         url: "/anime/",
         icon: "material-symbols:movie",
     },
-    [LinkPreset.About]: {
-        name: i18n(I18nKey.about),
-        url: "/about/",
-        icon: "material-symbols:person",
-    },
     [LinkPreset.Friends]: {
         name: i18n(I18nKey.friends),
         url: "/friends/",
         icon: "material-symbols:group",
+    },
+    [LinkPreset.About]: {
+        name: i18n(I18nKey.about),
+        url: "/about/",
+        icon: "material-symbols:info",
     },
 };

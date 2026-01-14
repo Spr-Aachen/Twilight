@@ -196,33 +196,15 @@ export const siteConfig: SiteConfig = {
 
 // 导航栏配置
 export const navBarConfig: NavBarConfig = {
-    // 链接配置 (支持多级菜单)
+    // 链接配置
     links: [
         LinkPreset.Home,
         LinkPreset.Archive,
         {
-            name: "Links",
-            url: "/links/",
-            icon: "material-symbols:link",
-            children: [
-                {
-                    name: "GitHub",
-                    url: "https://github.com/Example",
-                    external: true,
-                    icon: "fa6-brands:github",
-                },
-                {
-                    name: "Bilibili",
-                    url: "https://space.bilibili.com/Example",
-                    external: true,
-                    icon: "fa6-brands:bilibili",
-                },
-            ],
-        },
-        {
-            name: "My",
-            url: "/content/",
+            name: "Exhibition",
+            url: "/exhibition/",
             icon: "material-symbols:person",
+            description: "A collection of my creative works and experiences",
             children: [
                 LinkPreset.Projects,
                 LinkPreset.Skills,
@@ -232,15 +214,8 @@ export const navBarConfig: NavBarConfig = {
                 LinkPreset.Anime,
             ],
         },
-        {
-            name: "About",
-            url: "/content/",
-            icon: "material-symbols:info",
-            children: [
-                LinkPreset.About,
-                LinkPreset.Friends,
-            ],
-        },
+        LinkPreset.Friends,
+        LinkPreset.About,
     ],
 };
 
