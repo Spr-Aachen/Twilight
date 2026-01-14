@@ -20,6 +20,29 @@ export type Favicon = {
 };
 
 
+// 加载页配置
+export type LoadingOverlayConfig = {
+    // 是否启用加载页
+    enable: boolean;
+    // 加载标题配置
+    title: {
+        // 是否启用加载标题
+        enable: boolean;
+        // 加载标题文本
+        content: string;
+        // 动画周期 (s)
+        interval: number;
+    };
+    // 加载动画配置
+    spinner: {
+        // 是否启用加载动画
+        enable: boolean;
+        // 动画周期 (s)
+        interval: number;
+    };
+};
+
+
 // 站点配置
 export type SiteConfig = {
     // 站点 URL (以斜杠结尾) 
@@ -146,8 +169,8 @@ export type SiteConfig = {
             };
         };
     };
-    // OpenGraph 配置
-    generateOgImages: boolean;
+    // 加载页配置
+    loadingOverlay?: LoadingOverlayConfig;
     // Favicon 配置
     favicon: Favicon[];
     // bangumi 配置
@@ -155,6 +178,8 @@ export type SiteConfig = {
         // 用户 ID
         userId?: string;
     };
+    // OpenGraph 配置
+    generateOgImages: boolean;
 };
 
 /**

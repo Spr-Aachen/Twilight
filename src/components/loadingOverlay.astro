@@ -1,24 +1,37 @@
 ---
+import { siteConfig } from "@/config";
 
+
+const config = siteConfig.loadingOverlay;
+const showOverlay = config?.enable ?? true;
+const showSpinner = config?.spinner?.enable ?? true;
+const showTitle = config?.title?.enable ?? true;
+const titleContent = config?.title?.content ?? "LOADING";
+const spinnerInterval = config?.spinner?.interval ?? 1.5;
+const titleInterval = config?.title?.interval ?? 1.5;
 ---
 
+{showOverlay && (
 <div
     id="loading-overlay"
     class="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--page-bg)] transition-opacity duration-600"
 >
     <div class="flex flex-col items-center">
         <!-- loading icon -->
-        <div class="loading-spinner mb-4"></div>
-        <!-- loading text -->
+        {showSpinner && <div class="loading-spinner mb-4"></div>}
+        <!-- loading title -->
+        {showTitle && (
         <div
-            class="loading-text text-[var(--primary)] font-medium tracking-widest"
+            class="loading-title text-[var(--primary)] font-medium tracking-widest"
         >
-            LOADING
+            {titleContent}
         </div>
+        )}
     </div>
 </div>
+)}
 
-<style>
+<style define:vars={{ spinnerInterval: `${spinnerInterval}s`, titleInterval: `${titleInterval}s` }}>
     @keyframes spin {
         0% {
             transform: rotate(0deg);
@@ -45,8 +58,8 @@
         border-top: 3px solid var(--primary);
         border-radius: 50%;
         animation:
-            spin 1.5s linear infinite,
-            spinner-glow 1.5s ease-in-out infinite;
+            spin var(--spinnerInterval) linear infinite,
+            spinner-glow var(--spinnerInterval) ease-in-out infinite;
     }
 
     @keyframes text-glow {
@@ -60,8 +73,8 @@
             text-shadow: 0 0 24px var(--primary);
         }
     }
-    .loading-text {
-        animation: text-glow 1.5s ease-in-out infinite;
+    .loading-title {
+        animation: text-glow var(--titleInterval) ease-in-out infinite;
     }
 
     /* 手动触发淡出类 */

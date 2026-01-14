@@ -157,8 +157,27 @@ export const siteConfig: SiteConfig = {
             },
         },
     },
-    // OpenGraph 配置
-    generateOgImages: false, // 注意开启图片生成后要渲染很长时间，不建议本地调试的时候开启
+    // 加载页配置
+    loadingOverlay: {
+        // 是否启用加载页
+        enable: true,
+        // 加载标题配置
+        title: {
+            // 是否启用加载标题
+            enable: true,
+            // 加载标题文本
+            content: "LOADING",
+            // 动画周期 (s)
+            interval: 1.5,
+        },
+        // 加载动画配置
+        spinner: {
+            // 是否启用加载动画
+            enable: true,
+            // 动画周期 (s)
+            interval: 1.5,
+        },
+    },
     // favicon 配置
     favicon: [
     ],
@@ -167,6 +186,8 @@ export const siteConfig: SiteConfig = {
         // 用户 ID
         userId: "your-bangumi-id", // 可以设置为 "sai" 测试
     },
+    // OpenGraph 配置
+    generateOgImages: false, // 注意开启图片生成后要渲染很长时间，不建议本地调试的时候开启
 };
 
 /**

@@ -48,7 +48,7 @@ English | [**中文**](docs/README_ZH.md)
 - **PIO Widget**: Interactive live2d character support
 
 ### VFX
-- **Code Highlighting**: Beautiful syntax highlighting for code blocks
+- **Smooth Transition Animations**: Polished page component transition animations
 - **Customizable Theme Colors**: Realtime customizable color schemes
 - **Dynamic Wallpaper System**: Carousel support with multiple display modes
 - **Immersive Particle Effects**: Highly customizable animated particles
