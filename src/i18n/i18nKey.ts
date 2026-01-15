@@ -7,8 +7,10 @@ enum I18nKey {
     tags = "tags",
     categories = "categories",
     series = "series",
+    posts = "posts",
     recentPosts = "recentPosts",
     postList = "postList",
+    statistics = "statistics",
     tableOfContents = "tableOfContents",
 
     // 公告栏

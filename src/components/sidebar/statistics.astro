@@ -1,0 +1,12 @@
+---
+import { getCategoryList, getSortedPostsList, getTagList } from "@utils/content";
+import StatsCharts from "./statistics.svelte";
+
+const posts = await getSortedPostsList();
+const categories = await getCategoryList();
+const tags = await getTagList();
+
+const { class: className, style } = Astro.props;
+---
+
+<StatsCharts client:load {posts} {categories} {tags} class={className} style={style} />

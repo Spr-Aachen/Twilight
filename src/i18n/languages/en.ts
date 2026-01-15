@@ -11,8 +11,10 @@ export const en: Translation = {
     [Key.tags]: "Tags",
     [Key.categories]: "Categories",
     [Key.series]: "Series",
+    [Key.posts]: "Posts",
     [Key.recentPosts]: "Recent Posts",
     [Key.postList]: "Post List",
+    [Key.statistics]: "Statistics",
     [Key.tableOfContents]: "Table of Contents",
 
     // Announcement

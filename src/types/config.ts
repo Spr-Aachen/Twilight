@@ -246,6 +246,7 @@ export type WidgetComponentType =
     | "announcement"
     | "categories"
     | "tags"
+    | "statistics"
     | "toc"
     | "custom";
 

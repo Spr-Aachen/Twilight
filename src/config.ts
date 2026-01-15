@@ -302,6 +302,18 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
                 depth: 3,
             },
         },
+        {
+            // 组件类型
+            type: "statistics", // 文章统计组件
+            // 是否启用该组件
+            enable: true,
+            // 组件所属侧边栏
+            side: "right",
+            // 组件显示顺序 (数字越小越靠前)
+            order: 2,
+            // 组件位置
+            position: "sticky", // 固定在顶部
+        },
     ],
     // 响应式布局配置
     responsive: {
