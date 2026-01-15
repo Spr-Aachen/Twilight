@@ -16,6 +16,7 @@ import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import ProjectCard from "@components/data/projectCard.astro";
 import GridLayout from "@layouts/grid.astro";
+import BackwardButton from "@components/backwardButton.astro";
 
 
 const title = LinkPresets[LinkPreset.Projects].name;
@@ -62,6 +63,7 @@ const getCategoryText = (category: string) => {
 <GridLayout title={title} description={subtitle}>
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
         <div class="card-base z-10 px-9 py-6 relative w-full">
+            <BackwardButton currentPath={Astro.url.pathname} />
             <!-- 页面标题 -->
             <div class="flex flex-col items-start justify-center mb-8">
                 <h1 class="text-4xl font-bold text-black/90 dark:text-white/90 mb-2">

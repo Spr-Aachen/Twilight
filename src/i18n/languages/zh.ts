@@ -44,6 +44,8 @@ export const zh: Translation = {
 
     [Key.more]: "更多",
 
+    [Key.backTo]: "返回",
+
     [Key.author]: "作者",
     [Key.publishedAt]: "发布于",
     [Key.license]: "许可协议",

@@ -1,0 +1,45 @@
+---
+import { getParentLink } from "@utils/navigation";
+import { url } from "@utils/url";
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
+
+
+interface Props {
+    currentPath?: string;
+    href?: string;
+    text?: string;
+}
+
+const { currentPath, href, text } = Astro.props;
+
+let targetUrl = href;
+let targetText = text;
+
+if (currentPath && !targetUrl) {
+    const parentLink = getParentLink(currentPath);
+    if (parentLink) {
+        targetUrl = url(parentLink.url);
+        targetText = `${i18n(I18nKey.backTo)} ${parentLink.name}`;
+    }
+}
+
+// 如果既没有传入 href，也没能根据 currentPath 找到父级菜单，则不渲染
+if (!targetUrl) {
+    return null;
+}
+---
+
+<div class="mb-6">
+    <a
+        href={targetUrl}
+        class="inline-flex items-center gap-2 text-neutral-600 dark:text-neutral-400 hover:text-[var(--primary)] transition-colors group"
+    >
+        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        <span class="text-sm font-medium">
+            {targetText}
+        </span>
+    </a>
+</div>

@@ -41,6 +41,8 @@ enum I18nKey {
 
     more = "more",
 
+    backTo = "backTo",
+
     author = "author",
     publishedAt = "publishedAt",
     license = "license",

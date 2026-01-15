@@ -4,6 +4,7 @@ import { sortedAlbums } from "@utils/albums";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import GridLayout from "@layouts/grid.astro";
+import BackwardButton from "@components/backwardButton.astro";
 
 
 export const getStaticPaths = async () => {
@@ -28,18 +29,7 @@ if (!album) {
 <GridLayout title={album.title} description={album.description || album.title}>
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
         <div class="card-base z-10 px-9 py-6 relative w-full">
-            <!-- 返回按钮 -->
-            <div class="mb-6">
-                <a
-                    href="/albums/"
-                    class="inline-flex items-center gap-2 text-neutral-600 dark:text-neutral-400 hover:text-[var(--primary)] transition-colors"
-                >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                    {i18n(I18nKey.albumsBackToList)}
-                </a>
-            </div>
+            <BackwardButton href="/albums/" text={i18n(I18nKey.albumsBackToList)} />
             <!-- 相册标题信息 -->
             <header class="mb-8">
                 <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">

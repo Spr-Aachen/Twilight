@@ -2,6 +2,57 @@
  * 导航工具函数
  * 提供统一的页面导航功能，支持 Swup 无刷新跳转
  */
+import { navBarConfig } from "@/config";
+import { LinkPresets } from "@constants/link-presets";
+import { type NavBarLink } from "@/types/config";
+import { pathsEqual } from "./url";
+
+
+/**
+ * 根据当前路径查找其所属的父级页面（如 [...menu].astro 生成的中转页）
+ * @param currentPath 当前页面的路径
+ * @returns 如果找到父级页面，则返回该页面的 NavBarLink 对象，否则返回 undefined
+ */
+export function getParentLink(currentPath: string): NavBarLink | undefined {
+    // 遍历导航栏中的所有链接
+    for (const link of navBarConfig.links) {
+        // 检查是否有子链接且不是 LinkPreset 枚举
+        if (typeof link !== "number" && link.children && link.children.length > 0) {
+            // 检查子链接中是否包含当前路径
+            for (const child of link.children) {
+                let childLink: NavBarLink;
+                if (typeof child === "number") {
+                    childLink = LinkPresets[child];
+                } else {
+                    childLink = child;
+                }
+                // 比较路径是否匹配
+                if (pathsEqual(childLink.url, currentPath)) {
+                    return link;
+                }
+            }
+        }
+    }
+    return undefined;
+}
+
+/**
+ * 降级导航函数
+ * 当 Swup 不可用时使用普通的页面跳转
+ */
+function fallbackNavigation(
+    url: string,
+    options?: {
+        replace?: boolean;
+        force?: boolean;
+    },
+): void {
+    if (options?.replace) {
+        window.location.replace(url);
+    } else {
+        window.location.href = url;
+    }
+}
 
 /**
  * 导航到指定页面
@@ -61,82 +112,6 @@ export function navigateToPage(
 }
 
 /**
- * 降级导航函数
- * 当 Swup 不可用时使用普通的页面跳转
- */
-function fallbackNavigation(
-    url: string,
-    options?: {
-        replace?: boolean;
-        force?: boolean;
-    },
-): void {
-    if (options?.replace) {
-        window.location.replace(url);
-    } else {
-        window.location.href = url;
-    }
-}
-
-/**
- * 检查 Swup 是否已准备就绪
- */
-export function isSwupReady(): boolean {
-    return typeof window !== "undefined" && !!(window as any).swup;
-}
-
-/**
- * 等待 Swup 准备就绪
- * @param timeout 超时时间（毫秒）
- */
-export function waitForSwup(timeout: number = 5000): Promise<boolean> {
-    return new Promise((resolve) => {
-        if (isSwupReady()) {
-            resolve(true);
-            return;
-        }
-
-        let timeoutId: NodeJS.Timeout;
-
-        const checkSwup = () => {
-            if (isSwupReady()) {
-                clearTimeout(timeoutId);
-                document.removeEventListener("swup:enable", checkSwup);
-                resolve(true);
-            }
-        };
-
-        // 监听 Swup 启用事件
-        document.addEventListener("swup:enable", checkSwup);
-
-        // 设置超时
-        timeoutId = setTimeout(() => {
-            document.removeEventListener("swup:enable", checkSwup);
-            resolve(false);
-        }, timeout);
-    });
-}
-
-/**
- * 预加载页面
- * @param url 要预加载的页面URL
- */
-export function preloadPage(url: string): void {
-    if (!url || typeof url !== "string") {
-        return;
-    }
-
-    // 如果 Swup 可用，使用其预加载功能
-    if (isSwupReady() && (window as any).swup.preload) {
-        try {
-            (window as any).swup.preload(url);
-        } catch (error) {
-            console.warn("Failed to preload page:", error);
-        }
-    }
-}
-
-/**
  * 获取当前页面路径
  */
 export function getCurrentPath(): string {
@@ -149,24 +124,4 @@ export function getCurrentPath(): string {
 export function isHomePage(): boolean {
     const path = getCurrentPath();
     return path === "/" || path === "";
-}
-
-/**
- * 检查是否为文章页面
- */
-export function isPostPage(): boolean {
-    const path = getCurrentPath();
-    return path.startsWith("/posts/");
-}
-
-/**
- * 检查两个路径是否相等
- */
-export function pathsEqual(path1: string, path2: string): boolean {
-    // 标准化路径（移除末尾斜杠）
-    const normalize = (path: string) => {
-        return path.endsWith("/") && path.length > 1 ? path.slice(0, -1) : path;
-    };
-
-    return normalize(path1) === normalize(path2);
 }
