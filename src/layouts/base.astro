@@ -12,6 +12,7 @@ import {
     DARK_MODE,
     SYSTEM_MODE,
     PAGE_WIDTH,
+    NAVBAR_HEIGHT,
 } from "@constants/constants";
 import { pathsEqual, url } from "@utils/url";
 import FontLoader from "@components/fontLoader.astro";
@@ -166,7 +167,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
             />
         ))}
         <!-- Set the theme before the page is rendered to avoid a flash -->
-        <script is:inline define:vars={{LIGHT_MODE, DARK_MODE, SYSTEM_MODE, BANNER_HEIGHT_EXTEND, PAGE_WIDTH, configHue, defaultTheme: siteConfig.defaultTheme}}>
+        <script is:inline define:vars={{LIGHT_MODE, DARK_MODE, SYSTEM_MODE, BANNER_HEIGHT_EXTEND, PAGE_WIDTH, NAVBAR_HEIGHT, configHue, defaultTheme: siteConfig.defaultTheme}}>
             // Load the theme from local storage
             const theme = localStorage.getItem('theme') || defaultTheme;
             // Apply the theme to the document
@@ -272,6 +273,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
 
 <script>
 import {
+    NAVBAR_HEIGHT,
     BANNER_HEIGHT,
     BANNER_HEIGHT_HOME,
     BANNER_HEIGHT_EXTEND,
@@ -314,7 +316,7 @@ const setup = () => {
         if (bannerEnabled) {
             const navbar = document.getElementById('navbar-wrapper')
             if (navbar && document.body.classList.contains('is-home')) {
-                const threshold = window.innerHeight * (BANNER_HEIGHT / 100) - 88
+                const threshold = window.innerHeight * (BANNER_HEIGHT / 100) - NAVBAR_HEIGHT
                 if (document.documentElement.scrollTop >= threshold) {
                     navbar.classList.add('navbar-hidden')
                 }
@@ -333,13 +335,6 @@ const setup = () => {
                 const gridClasses = gridClass.split(" ");
                 mainGrid.className = [...newClasses, ...gridClasses].join(" ");
             }
-        }
-        // Initialize TOC component
-        const tocElement = document.querySelector('table-of-contents');
-        if (tocElement && typeof (tocElement as any).init === 'function') {
-            setTimeout(() => {
-                (tocElement as any).init();
-            }, 100);
         }
         // Reinitialize semifull mode scroll detection after page transition
         const navbar = document.getElementById('navbar')
@@ -467,7 +462,7 @@ function scrollFunction() {
         if (bannerEnabled && navbar) {
             const isHome = document.body.classList.contains('is-home');
             const currentBannerHeight = isHome ? BANNER_HEIGHT_HOME : BANNER_HEIGHT;
-            const threshold = window.innerHeight * (currentBannerHeight / 100) - 88;
+            const threshold = window.innerHeight * (currentBannerHeight / 100) - NAVBAR_HEIGHT;
             if (scrollTop >= threshold) {
                 navbar.classList.add('navbar-hidden')
             } else {

@@ -10,11 +10,12 @@ import { sidebarLayoutConfig } from "@/config";
  * 组件映射表 - 将组件类型映射到实际的组件路径
  */
 export const WIDGET_COMPONENT_MAP = {
-    profile: "@components/widget/Profile.astro",
-    announcement: "@components/widget/Announcement.astro",
-    categories: "@components/widget/Categories.astro",
-    tags: "@components/widget/Tags.astro",
-    toc: "@components/widget/TOC.astro",
+    profile: "@components/sidebar/profile.astro",
+    announcement: "@components/sidebar/announcement.astro",
+    categories: "@components/sidebar/categories.astro",
+    tags: "@components/sidebar/tags.astro",
+    toc: "@components/sidebar/toc.astro",
+    statistics: "@components/sidebar/statistics.astro",
     custom: null, // 自定义组件需要在配置中指定路径
 } as const;
 
@@ -242,6 +243,98 @@ export class WidgetManager {
      */
     isSidebarComponent(componentType: WidgetComponentType): boolean {
         return true;
+    }
+
+    /**
+     * 获取页面中的标题列表
+     * @returns 格式化后的标题数组
+     */
+    getPageHeadings() {
+        return Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
+            .filter((h) => h.id)
+            .map((h) => ({
+                depth: parseInt(h.tagName.substring(1)),
+                slug: h.id,
+                text: (h.textContent || "").replace(/#+\s*$/, ""),
+            }));
+    }
+
+    /**
+     * 获取网格布局相关的类名
+     * @param headings 页面标题列表
+     */
+    getGridLayout(headings: any[] = []) {
+        const hasLeftSidebar = this.hasContentOnSide("left", headings);
+        const hasRightSidebar = this.hasContentOnSide("right", headings);
+
+        const mobileShowSidebar = (hasLeftSidebar || hasRightSidebar) && this.shouldShowSidebar("mobile");
+        const tabletShowSidebar = (hasLeftSidebar || hasRightSidebar) && this.shouldShowSidebar("tablet");
+        const desktopShowSidebar = (hasLeftSidebar || hasRightSidebar) && this.shouldShowSidebar("desktop");
+
+        // 动态网格布局类名
+        const gridCols = `
+            grid-cols-1
+            ${tabletShowSidebar ? "md:grid-cols-[17.5rem_1fr]" : "md:grid-cols-1"}
+            ${
+                desktopShowSidebar
+                    ? hasLeftSidebar && hasRightSidebar
+                        ? "lg:grid-cols-[17.5rem_1fr_17.5rem]"
+                        : hasLeftSidebar
+                            ? "lg:grid-cols-[17.5rem_1fr]"
+                            : "lg:grid-cols-[1fr_17.5rem]"
+                    : "lg:grid-cols-1"
+            }
+        `.trim().replace(/\s+/g, " ");
+
+        // 左侧侧边栏容器类名
+        const leftSidebarClass = `
+            mb-0 col-span-1
+            ${mobileShowSidebar && hasLeftSidebar ? "block row-start-2 row-end-3" : "hidden"}
+            ${tabletShowSidebar && hasLeftSidebar ? "md:block md:max-w-[17.5rem]" : "md:hidden"}
+            ${desktopShowSidebar && hasLeftSidebar ? "lg:block lg:max-w-[17.5rem] lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2" : "lg:hidden"}
+        `.trim().replace(/\s+/g, " ");
+
+        // 右侧侧边栏容器类名
+        const rightSidebarClass = `
+            mb-0 col-span-1
+            ${mobileShowSidebar && hasRightSidebar ? "block row-start-3 row-end-4" : "hidden"}
+            ${tabletShowSidebar && hasRightSidebar ? "md:block md:max-w-[17.5rem]" : "md:hidden"}
+            ${
+                desktopShowSidebar && hasRightSidebar
+                    ? hasLeftSidebar
+                        ? "lg:block lg:max-w-[17.5rem] lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2"
+                        : "lg:block lg:max-w-[17.5rem] lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
+                    : "lg:hidden"
+            }
+        `.trim().replace(/\s+/g, " ");
+
+        // 主内容区域类名
+        const mainContentClass = `
+            overflow-hidden w-full
+            col-span-1 row-start-1 row-end-2
+            ${tabletShowSidebar ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2" : "md:col-span-1"}
+            ${
+                desktopShowSidebar
+                    ? hasLeftSidebar
+                        ? "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
+                        : hasRightSidebar
+                            ? "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2"
+                            : "lg:col-span-1"
+                    : "lg:col-span-1"
+            }
+        `.trim().replace(/\s+/g, " ");
+
+        return {
+            hasLeftSidebar,
+            hasRightSidebar,
+            mobileShowSidebar,
+            tabletShowSidebar,
+            desktopShowSidebar,
+            gridCols,
+            leftSidebarClass,
+            rightSidebarClass,
+            mainContentClass,
+        };
     }
 }
 

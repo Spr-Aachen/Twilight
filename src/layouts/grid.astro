@@ -63,128 +63,17 @@ const transparentClass = shouldEnableTransparency ? "wallpaper-transparent" : ""
  */
 
 // 检查侧边栏是否启用，动态调整网格布局
-// 判断左右侧边栏是否有启用组件且具有实际内容
-const hasLeftSidebar = widgetManager.hasContentOnSide("left", headings);
-const hasRightSidebar = widgetManager.hasContentOnSide("right", headings);
-// 响应式配置：不同设备上的侧边栏显示状态（只要任一侧存在组件且布局为 sidebar 即视为显示）
-const mobileShowSidebar =
-    (hasLeftSidebar || hasRightSidebar) &&
-    widgetManager.shouldShowSidebar("mobile");
-const tabletShowSidebar =
-    (hasLeftSidebar || hasRightSidebar) &&
-    widgetManager.shouldShowSidebar("tablet");
-const desktopShowSidebar =
-    (hasLeftSidebar || hasRightSidebar) &&
-    widgetManager.shouldShowSidebar("desktop");
-
-// 动态网格布局类名 - 根据左右侧边栏情况调整列宽
-// 手机端：单列布局，主内容在上，侧栏在下
-// 平板端：双列布局，左侧栏+右侧栏（上下堆叠）在左列，主内容在右列
-// 桌面端：三列布局，左侧栏 | 主内容 | 右侧栏
-const gridCols = `
-    grid-cols-1
-    ${
-        tabletShowSidebar
-            ? hasLeftSidebar || hasRightSidebar
-                    ? "md:grid-cols-[17.5rem_1fr]"
-                    : "md:grid-cols-1"
-            : "md:grid-cols-1"
-    }
-    ${
-        desktopShowSidebar
-            ? hasLeftSidebar && hasRightSidebar
-                ? "lg:grid-cols-[17.5rem_1fr_17.5rem]"
-                : hasLeftSidebar
-                    ? "lg:grid-cols-[17.5rem_1fr]"
-                    : hasRightSidebar
-                        ? "lg:grid-cols-[1fr_17.5rem]"
-                        : "lg:grid-cols-1"
-            : "lg:grid-cols-1"
-    }
-`
-    .trim()
-    .replace(/\s+/g, " ");
-
-// 左侧侧边栏容器类名
-// 手机端：显示在主内容下方
-// 平板端：显示在左列第1行
-// 桌面端：显示在第1列
-const leftSidebarClass = `
-    mb-0 col-span-1
-    ${
-        mobileShowSidebar && hasLeftSidebar
-            ? "block row-start-2 row-end-3"
-            : "hidden"
-    }
-    ${
-        tabletShowSidebar && hasLeftSidebar
-            ? "md:block md:max-w-[17.5rem]"
-            : "md:hidden"
-    }
-    ${
-        desktopShowSidebar && hasLeftSidebar
-            ? "lg:block lg:max-w-[17.5rem] lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2"
-            : "lg:hidden"
-    }
-`
-    .trim()
-    .replace(/\s+/g, " ");
-
-// 右侧侧边栏容器类名
-// 手机端：显示在左侧栏下方
-// 平板端：显示在左列第2行（左侧栏下方）
-// 桌面端：显示在第3列（右侧）
-const rightSidebarClass = `
-    mb-0 col-span-1
-    ${
-        mobileShowSidebar && hasRightSidebar
-            ? "block row-start-3 row-end-4"
-            : "hidden"
-    }
-    ${
-        tabletShowSidebar && hasRightSidebar
-            ? "md:block md:max-w-[17.5rem]"
-            : "md:hidden"
-    }
-    ${
-        desktopShowSidebar && hasRightSidebar
-            ? hasLeftSidebar
-                ? "lg:block lg:max-w-[17.5rem] lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2"
-                : "lg:block lg:max-w-[17.5rem] lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
-            : "lg:hidden"
-    }
-`
-    .trim()
-    .replace(/\s+/g, " ");
-
-// 主内容区域类名
-// 手机端：主内容在第1行
-// 平板端：主内容在右列，纵向跨越所有侧栏行
-// 桌面端：主内容在第2列
-const mainContentClass = `
-    overflow-hidden w-full
-    col-span-1 row-start-1 row-end-2
-    ${
-        tabletShowSidebar
-            ? hasLeftSidebar || hasRightSidebar
-                ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2"
-                : "md:col-start-1 md:col-end-2 md:row-start-1 md:row-end-2"
-            : "md:col-span-1"
-    }
-    ${
-        desktopShowSidebar
-            ? hasLeftSidebar && hasRightSidebar
-                ? "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
-                : hasLeftSidebar
-                    ? "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
-                    : hasRightSidebar
-                        ? "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2"
-                        : "lg:col-span-1"
-            : "lg:col-span-1"
-    }
-`
-    .trim()
-    .replace(/\s+/g, " ");
+const {
+    hasLeftSidebar,
+    hasRightSidebar,
+    mobileShowSidebar,
+    tabletShowSidebar,
+    desktopShowSidebar,
+    gridCols,
+    leftSidebarClass,
+    rightSidebarClass,
+    mainContentClass,
+} = widgetManager.getGridLayout(headings);
 ---
 
 <BaseLayout
@@ -288,10 +177,7 @@ const mainContentClass = `
 
                 <div class="contents lg:contents md:flex md:flex-col md:col-start-1 md:row-start-1 md:gap-4">
                     {
-                        (mobileShowSidebar ||
-                            tabletShowSidebar ||
-                            desktopShowSidebar) &&
-                            hasLeftSidebar ? (
+                        hasLeftSidebar ? (
                                 <SideBar
                                     id="left-sidebar"
                                     side="left"
@@ -303,10 +189,7 @@ const mainContentClass = `
                             )
                     }
                     {
-                        (mobileShowSidebar ||
-                            tabletShowSidebar ||
-                            desktopShowSidebar) &&
-                            hasRightSidebar ? (
+                        hasRightSidebar ? (
                                 <SideBar
                                     id="right-sidebar"
                                     side="right"

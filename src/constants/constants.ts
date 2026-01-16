@@ -8,6 +8,9 @@ export const WALLPAPER_FULLSCREEN = "fullscreen",
     WALLPAPER_BANNER = "banner",
     WALLPAPER_NONE = "none";
 
+// Navbar height (px)
+export const NAVBAR_HEIGHT = 88;
+
 // Banner height unit (vh)
 export const BANNER_HEIGHT = 30;
 export const BANNER_HEIGHT_EXTEND = 36;
