@@ -19,14 +19,27 @@ const LANG_STORAGE_KEY = "selected-language";
 
 // 存储语言设置
 export function setStoredLanguage(lang: string): void {
-    if (typeof window === "undefined") return;
-    localStorage.setItem(LANG_STORAGE_KEY, lang);
+    if (typeof localStorage !== "undefined") {
+        localStorage.setItem(LANG_STORAGE_KEY, lang);
+    }
 }
 
 // 获取存储的语言设置
 export function getStoredLanguage(): string | null {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(LANG_STORAGE_KEY);
+    if (typeof localStorage !== "undefined") {
+        return localStorage.getItem(LANG_STORAGE_KEY);
+    }
+    return null;
+}
+
+// 获取默认语言配置
+export function getDefaultLanguage(): string {
+    const fallback = siteConfig.lang;
+    if (typeof document !== "undefined") {
+        const configCarrier = document.getElementById("config-carrier");
+        return configCarrier?.dataset.lang || fallback;
+    }
+    return fallback;
 }
 
 // 将配置文件的语言代码转换为翻译服务的语言代码
@@ -36,7 +49,7 @@ export function getTranslateLanguageFromConfig(configLang: string): string {
 
 // 获取解析后的站点语言代码
 export function getResolvedSiteLang(): SupportedLanguage {
-    const configLang = siteConfig.lang as any;
+    const configLang = getDefaultLanguage() as any;
     if (SUPPORTED_LANGUAGES.includes(configLang)) {
         return configLang as SupportedLanguage;
     }
@@ -90,9 +103,10 @@ export function getSiteLanguage(configLang?: string): string {
     // 优先从缓存读取
     const storedLang = getStoredLanguage();
     if (storedLang) return storedLang;
-    // 其次使用配置语言
-    if (configLang && SUPPORTED_LANGUAGES.includes(configLang as SupportedLanguage)) {
-        return langToTranslateMap[configLang];
+    // 其次使用传入的配置语言或从 carrier 获取的默认语言
+    const defaultLang = configLang || getDefaultLanguage();
+    if (SUPPORTED_LANGUAGES.includes(defaultLang as SupportedLanguage)) {
+        return langToTranslateMap[defaultLang];
     }
     // 最后自动检测浏览器语言并转换为翻译服务代码
     const browserLang = detectBrowserLanguage();

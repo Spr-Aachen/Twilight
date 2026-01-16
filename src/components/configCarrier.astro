@@ -3,7 +3,13 @@ import { siteConfig } from "@/config";
 ---
 
 <!-- 全局配置载体 -->
-<div id="config-carrier" data-hue={siteConfig.themeColor.hue}>
+<div
+    id="config-carrier"
+    data-hue={siteConfig.themeColor.hue}
+    data-lang={siteConfig.lang}
+    data-theme={siteConfig.defaultTheme}
+    data-wallpaper-mode={siteConfig.wallpaper.mode}
+>
 </div>
 
 <!-- 引入Umami Share工具脚本 -->

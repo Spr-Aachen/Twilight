@@ -5,7 +5,7 @@ import { navBarConfig, siteConfig } from "@/config";
 import { LinkPresets } from "@constants/link-presets";
 import { LinkPreset, type NavBarLink } from "@/types/config";
 import { url } from "@utils/url";
-import { getNavbarTransparentModeForWallpaperMode } from "@utils/wallpaper";
+import { getNavbarTransparentModeForWallpaperMode, getDefaultWallpaperMode } from "@utils/wallpaper";
 import DropdownMenu from "@components/navbar/dropdownMenu.astro";
 import NavMenuPanel from "@components/navbar/navMenuPanel.astro";
 import Search from "@components/navbar/search.svelte";
@@ -18,7 +18,7 @@ import WallpaperSwitch from "@components/navbar/wallpaperSwitch.svelte";
 const className = Astro.props.class;
 
 // 获取导航栏透明模式配置 - 根据当前壁纸模式读取正确的配置
-const navbarTransparentMode = getNavbarTransparentModeForWallpaperMode(siteConfig.wallpaper.mode);
+const navbarTransparentMode = getNavbarTransparentModeForWallpaperMode(getDefaultWallpaperMode());
 
 // 检查是否为首页
 const isHomePage = Astro.url.pathname === "/" || Astro.url.pathname === "";

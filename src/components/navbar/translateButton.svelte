@@ -3,7 +3,7 @@ import { onDestroy, onMount } from "svelte";
 import Icon from "@iconify/svelte";
 
 import { siteConfig } from "@/config";
-import { getTranslateLanguageFromConfig, getSiteLanguage, setStoredLanguage } from "@/utils/language";
+import { getTranslateLanguageFromConfig, getSiteLanguage, setStoredLanguage, getDefaultLanguage } from "@/utils/language";
 import { getSupportedTranslateLanguages } from "@/i18n/language";
 
 
@@ -16,7 +16,7 @@ const languages = getSupportedTranslateLanguages();
 
 // 根据配置文件的语言设置获取源语言
 const sourceLanguage = getTranslateLanguageFromConfig(
-    siteConfig.lang,
+    getDefaultLanguage(),
 );
 
 function togglePanel() {
@@ -83,7 +83,7 @@ function handleClickOutside(event: MouseEvent) {
 onMount(() => {
     document.addEventListener("click", handleClickOutside);
     // 初始化当前语言为站点语言（优先缓存）
-    currentLanguage = getSiteLanguage(siteConfig.translate.defaultLanguage);
+    currentLanguage = getSiteLanguage();
 });
 
 onDestroy(() => {

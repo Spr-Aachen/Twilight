@@ -68,13 +68,28 @@ export function applyThemeToDocument(theme: LIGHT_DARK_MODE, force = false) {
 
 // Function to set theme
 export function setTheme(theme: LIGHT_DARK_MODE): void {
-    localStorage.setItem("theme", theme);
+    if (typeof localStorage !== "undefined") {
+        localStorage.setItem("theme", theme);
+    }
     applyThemeToDocument(theme);
+}
+
+// Function to get default theme from config-carrier
+export function getDefaultTheme(): LIGHT_DARK_MODE {
+    const fallback = siteConfig.defaultTheme;
+    if (typeof document !== "undefined") {
+        const configCarrier = document.getElementById("config-carrier");
+        return (configCarrier?.dataset.theme as LIGHT_DARK_MODE) || fallback;
+    }
+    return fallback;
 }
 
 // Function to get stored theme from local storage or default
 export function getStoredTheme(): LIGHT_DARK_MODE {
-    return (localStorage.getItem("theme") as LIGHT_DARK_MODE) || siteConfig.defaultTheme;
+    if (typeof localStorage !== "undefined") {
+        return (localStorage.getItem("theme") as LIGHT_DARK_MODE) || getDefaultTheme();
+    }
+    return getDefaultTheme();
 }
 
 // Function to initialize theme from local storage or default
