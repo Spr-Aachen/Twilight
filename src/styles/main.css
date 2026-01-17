@@ -89,8 +89,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
         color: var(--page-bg);
         /* 确保与页面在同一合成层 */
         isolation: isolate;
-        /* 优化渲染性能 */
-        contain: layout style paint;
+        /* 优化渲染性能 - 移除 strict containment 改用 none */
+        contain: none;
         /* GPU层合成 */
         transform: translateZ(0);
         /* 确保没有背景色 */
