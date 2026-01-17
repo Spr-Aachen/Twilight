@@ -60,6 +60,7 @@ const blur = config.fullscreen?.blur || 0;
                             src={src}
                             position={config.position}
                             style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
+                            loading={index === 0 ? "eager" : "lazy"}
                         />
                     </li>
                 ))}
@@ -75,6 +76,7 @@ const blur = config.fullscreen?.blur || 0;
                             src={src}
                             position={config.position}
                             style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
+                            loading={index === 0 ? "eager" : "lazy"}
                         />
                     </li>
                 ))}
@@ -88,6 +90,7 @@ const blur = config.fullscreen?.blur || 0;
                 src={imageSources.mobile[0] || imageSources.desktop[0] || ''}
                 position={config.position}
                 style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
+                loading="eager"
             />
             <ImageWrapper
                 id="fullscreen-wallpaper"
@@ -96,6 +99,7 @@ const blur = config.fullscreen?.blur || 0;
                 src={imageSources.desktop[0] || imageSources.mobile[0] || ''}
                 position={config.position}
                 style={blur > 0 ? `filter: blur(${blur}px);` : undefined}
+                loading="eager"
             />
         </div>
     )}

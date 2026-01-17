@@ -62,6 +62,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
                             class:list={["object-cover h-full w-full"]}
                             src={src}
                             position={config.position}
+                            loading={index === 0 ? "eager" : "lazy"}
                         />
                     </li>
                 ))}
@@ -76,6 +77,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
                             class:list={["object-cover h-full w-full"]}
                             src={src}
                             position={config.position}
+                            loading={index === 0 ? "eager" : "lazy"}
                         />
                     </li>
                 ))}
@@ -88,6 +90,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
                 class:list={["block lg:hidden object-cover h-full w-full transition duration-600 opacity-100"]}
                 src={imageSources.mobile[0] || imageSources.desktop[0] || ''}
                 position={config.position}
+                loading="eager"
             />
             <ImageWrapper
                 id="banner"
@@ -95,6 +98,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
                 class:list={["hidden lg:block object-cover h-full w-full transition duration-600 opacity-100"]}
                 src={imageSources.desktop[0] || imageSources.mobile[0] || ''}
                 position={config.position}
+                loading="eager"
             />
         </div>
     )}
