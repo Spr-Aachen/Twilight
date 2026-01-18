@@ -1,5 +1,6 @@
 <script lang="ts">
 import Icon from "@iconify/svelte";
+import { onMount } from "svelte";
 
 import { BREAKPOINT_LG } from "@/constants/breakpoints";
 import { WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "@constants/constants";
@@ -10,10 +11,18 @@ import {
 import type { WALLPAPER_MODE } from "@/types/config";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
+import { siteConfig } from "@/config";
+import DropdownItem from "@/components/common/DropdownItem.svelte";
+import DropdownPanel from "@/components/common/DropdownPanel.svelte";
 
 
 const seq: WALLPAPER_MODE[] = [WALLPAPER_BANNER, WALLPAPER_FULLSCREEN, WALLPAPER_NONE];
-let mode: WALLPAPER_MODE = $state(getStoredWallpaperMode());
+let mode: WALLPAPER_MODE = $state(siteConfig.wallpaper.mode || WALLPAPER_BANNER);
+
+
+onMount(() => {
+    mode = getStoredWallpaperMode();
+});
 
 
 function switchWallpaperMode(newMode: WALLPAPER_MODE) {
@@ -61,28 +70,31 @@ function hidePanel() {
         </div>
     </button>
     <div id="wallpaper-mode-panel" class="absolute transition float-panel-closed top-11 -right-2 pt-5" >
-        <div class="card-base float-panel p-2">
-            <button class="flex transition whitespace-nowrap items-center !justify-start w-full btn-plain scale-animation rounded-lg h-9 px-3 font-medium active:scale-95 mb-0.5"
-                    class:current-theme-btn={mode === WALLPAPER_BANNER}
+        <DropdownPanel>
+            <DropdownItem
+                    isActive={mode === WALLPAPER_BANNER}
+                    isLast={false}
                     onclick={() => switchWallpaperMode(WALLPAPER_BANNER)}
             >
                 <Icon icon="material-symbols:image-outline" class="text-[1.25rem] mr-3"></Icon>
                 {i18n(I18nKey.wallpaperBanner)}
-            </button>
-            <button class="flex transition whitespace-nowrap items-center !justify-start w-full btn-plain scale-animation rounded-lg h-9 px-3 font-medium active:scale-95 mb-0.5"
-                    class:current-theme-btn={mode === WALLPAPER_FULLSCREEN}
+            </DropdownItem>
+            <DropdownItem
+                    isActive={mode === WALLPAPER_FULLSCREEN}
+                    isLast={false}
                     onclick={() => switchWallpaperMode(WALLPAPER_FULLSCREEN)}
             >
                 <Icon icon="material-symbols:wallpaper" class="text-[1.25rem] mr-3"></Icon>
                 {i18n(I18nKey.wallpaperFullscreen)}
-            </button>
-            <button class="flex transition whitespace-nowrap items-center !justify-start w-full btn-plain scale-animation rounded-lg h-9 px-3 font-medium active:scale-95"
-                    class:current-theme-btn={mode === WALLPAPER_NONE}
+            </DropdownItem>
+            <DropdownItem
+                    isActive={mode === WALLPAPER_NONE}
+                    isLast={true}
                     onclick={() => switchWallpaperMode(WALLPAPER_NONE)}
             >
                 <Icon icon="material-symbols:hide-image-outline" class="text-[1.25rem] mr-3"></Icon>
                 {i18n(I18nKey.wallpaperNone)}
-            </button>
-        </div>
+            </DropdownItem>
+        </DropdownPanel>
     </div>
 </div>

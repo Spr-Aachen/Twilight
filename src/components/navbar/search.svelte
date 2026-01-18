@@ -7,15 +7,17 @@ import { navigateToPage } from "@utils/navigation";
 import type { SearchResult } from "@/global";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
+import DropdownPanel from "@/components/common/DropdownPanel.svelte";
 
 
-let keywordDesktop = "";
-let keywordMobile = "";
-let result: SearchResult[] = [];
-let isSearching = false;
+let keywordDesktop = $state("");
+let keywordMobile = $state("");
+let result: SearchResult[] = $state([]);
+let isSearching = $state(false);
 let pagefindLoaded = false;
-let initialized = false;
-let isDesktopSearchExpanded = false;
+let initialized = $state(false);
+let isDesktopSearchExpanded = $state(false);
+let debounceTimer: NodeJS.Timeout;
 
 const fakeResult: SearchResult[] = [
     {
@@ -134,8 +136,6 @@ onMount(() => {
             !!window.pagefind &&
             typeof window.pagefind.search === "function";
         console.log("Pagefind status on init:", pagefindLoaded);
-        if (keywordDesktop) search(keywordDesktop, true);
-        if (keywordMobile) search(keywordMobile, false);
     };
     if (import.meta.env.DEV) {
         console.log(
@@ -163,19 +163,24 @@ onMount(() => {
     }
 });
 
-$: if (initialized && keywordDesktop) {
-    (async () => {
-        await search(keywordDesktop, true);
-    })();
-}
+$effect(() => {
+    if (initialized) {
+        const keyword = keywordDesktop || keywordMobile;
+        const isDesktop = !!keywordDesktop || isDesktopSearchExpanded;
+        
+        clearTimeout(debounceTimer);
+        if (keyword) {
+            debounceTimer = setTimeout(() => {
+                search(keyword, isDesktop);
+            }, 300);
+        } else {
+            result = [];
+            setPanelVisibility(false, isDesktop);
+        }
+    }
+});
 
-$: if (initialized && keywordMobile) {
-    (async () => {
-        await search(keywordMobile, false);
-    })();
-}
-
-$: {
+$effect(() => {
     if (typeof document !== 'undefined') {
         const navbar = document.getElementById('navbar');
         if (isDesktopSearchExpanded) {
@@ -184,13 +189,14 @@ $: {
             navbar?.classList.remove('is-searching');
         }
     }
-}
+});
 
 onDestroy(() => {
     if (typeof document !== 'undefined') {
         const navbar = document.getElementById('navbar');
         navbar?.classList.remove('is-searching');
     }
+    clearTimeout(debounceTimer);
 });
 </script>
 
@@ -203,27 +209,29 @@ onDestroy(() => {
     role="button"
     tabindex="0"
     aria-label="Search"
-    on:mouseenter={() => {if (!isDesktopSearchExpanded) toggleDesktopSearch()}}
-    on:mouseleave={collapseDesktopSearch}
+    onmouseenter={() => {if (!isDesktopSearchExpanded) toggleDesktopSearch()}}
+    onmouseleave={collapseDesktopSearch}
 >
     <Icon icon="material-symbols:search" class="absolute text-[1.25rem] pointer-events-none {isDesktopSearchExpanded ? 'ml-3' : 'left-1/2 -translate-x-1/2'} transition my-auto {isDesktopSearchExpanded ? 'text-black/30 dark:text-white/30' : ''}"></Icon>
     <input id="search-input-desktop" placeholder="{i18n(I18nKey.search)}" bind:value={keywordDesktop}
-        on:focus={() => {if (!isDesktopSearchExpanded) toggleDesktopSearch(); search(keywordDesktop, true)}}
-        on:blur={handleBlur}
+        onfocus={() => {if (!isDesktopSearchExpanded) toggleDesktopSearch(); search(keywordDesktop, true)}}
+        onblur={handleBlur}
         class="transition-all pl-10 text-sm bg-transparent outline-0
             h-full {isDesktopSearchExpanded ? 'w-36' : 'w-0'} text-black/50 dark:text-white/50"
     >
 </div>
 
 <!-- toggle btn for phone/tablet view -->
-<button on:click={togglePanel} aria-label="Search Panel" id="search-switch"
+<button onclick={togglePanel} aria-label="Search Panel" id="search-switch"
         class="btn-plain scale-animation lg:!hidden rounded-lg w-11 h-11 active:scale-90">
     <Icon icon="material-symbols:search" class="text-[1.25rem]"></Icon>
 </button>
 
 <!-- search panel -->
-<div id="search-panel" class="float-panel float-panel-closed search-panel absolute md:w-[30rem]
-top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
+<DropdownPanel
+        id="search-panel"
+        class="float-panel-closed absolute md:w-[30rem] top-20 left-4 md:left-[unset] right-4 z-50 search-panel"
+>
     <!-- search bar inside panel for phone/tablet -->
     <div id="search-bar-inside" class="flex relative lg:hidden transition-all items-center h-11 rounded-xl
       bg-black/[0.04] hover:bg-black/[0.06] focus-within:bg-black/[0.06]
@@ -238,7 +246,7 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
     <!-- search results -->
     {#each result as item}
         <a href={item.url}
-           on:click={(e) => handleResultClick(e, item.url)}
+           onclick={(e) => handleResultClick(e, item.url)}
            class="transition first-of-type:mt-2 lg:first-of-type:mt-0 group block
        rounded-xl text-lg px-3 py-2 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)]">
             <div class="transition text-90 inline-flex font-bold group-hover:text-[var(--primary)]">
@@ -249,13 +257,13 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
             </div>
         </a>
     {/each}
-</div>
+</DropdownPanel>
 
 <style>
     input:focus {
         outline: 0;
     }
-    .search-panel {
+    :global(.search-panel) {
         max-height: calc(100vh - 100px);
         overflow-y: auto;
     }

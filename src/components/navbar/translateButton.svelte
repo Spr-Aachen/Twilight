@@ -5,11 +5,13 @@ import Icon from "@iconify/svelte";
 import { siteConfig } from "@/config";
 import { getTranslateLanguageFromConfig, getSiteLanguage, setStoredLanguage, getDefaultLanguage } from "@/utils/language";
 import { getSupportedTranslateLanguages } from "@/i18n/language";
+import DropdownItem from "@/components/common/DropdownItem.svelte";
+import DropdownPanel from "@/components/common/DropdownPanel.svelte";
 
 
-let isOpen = false;
-let translatePanel: HTMLElement;
-let currentLanguage = "";
+let isOpen = $state(false);
+let translatePanel = $state<HTMLElement>();
+let currentLanguage = $state("");
 
 // 从统一配置动态获取支持的语言列表
 const languages = getSupportedTranslateLanguages();
@@ -87,7 +89,9 @@ onMount(() => {
 });
 
 onDestroy(() => {
-    document.removeEventListener("click", handleClickOutside);
+    if (typeof document !== "undefined") {
+        document.removeEventListener("click", handleClickOutside);
+    }
 });
 </script>
 
@@ -98,7 +102,7 @@ onDestroy(() => {
         aria-label="Language Translation"
         class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90"
         id="translate-switch"
-        on:click={togglePanel}
+        onclick={togglePanel}
     >
         <Icon icon="material-symbols:translate" class="text-[1.25rem] transition" />
     </button>
@@ -106,26 +110,29 @@ onDestroy(() => {
     <div
         bind:this={translatePanel}
         id="translate-panel"
-        class="float-panel-closed absolute top-[3.5rem] right-0 z-50 w-64 bg-[var(--float-panel-bg)] rounded-[var(--radius-large)] shadow-lg border border-[var(--line-divider)] p-4"
+        class="float-panel-closed absolute top-[3.5rem] right-0 z-50 w-64 pt-2"
     >
-        <div class="text-sm font-medium text-[var(--primary)] mb-3">
-            选择语言 / Select Language
-        </div>
-        <div class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
-            {#each languages as lang}
-                <button
-                    class="btn-plain flex items-center gap-3 p-2 rounded-lg transition-colors w-full"
-                    class:current-theme-btn={currentLanguage === lang.code}
-                    on:click={() => changeLanguage(lang.code)}
-                >
-                    <span class="text-lg transition">{lang.icon}</span>
-                    <span class="text-sm transition flex-grow text-left">{lang.name}</span>
-                    {#if currentLanguage === lang.code}
-                        <span class="ml-auto">✓</span>
-                    {/if}
-                </button>
-            {/each}
-        </div>
+        <DropdownPanel class="p-4">
+            <div class="text-sm font-medium text-[var(--primary)] mb-3 px-1">
+                选择语言 / Select Language
+            </div>
+            <div class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                {#each languages as lang}
+                    <DropdownItem
+                        isActive={currentLanguage === lang.code}
+                        onclick={() => changeLanguage(lang.code)}
+                        class="gap-3 !p-2 !h-auto"
+                        isLast={false}
+                    >
+                        <span class="text-lg transition">{lang.icon}</span>
+                        <span class="text-sm transition flex-grow text-left">{lang.name}</span>
+                        {#if currentLanguage === lang.code}
+                            <span class="ml-auto">✓</span>
+                        {/if}
+                    </DropdownItem>
+                {/each}
+            </div>
+        </DropdownPanel>
     </div>
 </div>
 {/if}

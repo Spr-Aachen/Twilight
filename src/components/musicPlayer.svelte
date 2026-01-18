@@ -11,7 +11,7 @@ import "@styles/musicplayer.css";
 
 
 // 音乐播放器模式，可选 "local" 或 "meting"
-let mode = musicPlayerConfig.mode ?? "meting";
+let mode = $state(musicPlayerConfig.mode ?? "meting");
 // Meting API 地址，从配置中获取或使用默认值
 let meting_api = musicPlayerConfig.meting?.meting_api ?? "https://api.i-meto.com/meting/api";
 // Meting API 的数据源，从配置中获取或使用默认值
@@ -21,53 +21,53 @@ let meting_type = musicPlayerConfig.meting?.type ?? "playlist";
 // Meting API 的 ID，从配置中获取或使用默认值
 let meting_id = musicPlayerConfig.meting?.id ?? "2161912966";
 // 是否启用自动播放，从配置中获取或使用默认值
-let isAutoplayEnabled = musicPlayerConfig.autoplay ?? false;
+let isAutoplayEnabled = $state(musicPlayerConfig.autoplay ?? false);
 
 // 当前歌曲信息
-let currentSong: MusicPlayerTrack = {
+let currentSong: MusicPlayerTrack = $state({
     id: 0,
     title: "Music",
     artist: "Artist",
     cover: "/favicon/icon-light.ico",
     url: "",
     duration: 0,
-};
-let playlist: MusicPlayerTrack[] = [];
-let currentIndex = 0;
-let audio: HTMLAudioElement;
-let progressBar: HTMLElement;
-let volumeBar: HTMLElement;
+});
+let playlist: MusicPlayerTrack[] = $state([]);
+let currentIndex = $state(0);
+let audio: HTMLAudioElement | undefined = $state();
+let progressBar: HTMLElement | undefined = $state();
+let volumeBar: HTMLElement | undefined = $state();
 
 // 是否正在播放
-let isPlaying = false;
+let isPlaying = $state(false);
 // 是否应该播放（用于切换歌曲时的自动播放）
-let shouldPlay = false;
+let shouldPlay = $state(false);
 // 是否折叠播放器
-let isCollapsed = true;
+let isCollapsed = $state(true);
 // 是否显示播放列表
-let showPlaylist = false;
+let showPlaylist = $state(false);
 // 当前播放时间
-let currentTime = 0;
+let currentTime = $state(0);
 // 歌曲总时长
-let duration = 0;
+let duration = $state(0);
 // 音量
-let volume = 0.75;
+let volume = $state(0.75);
 // 是否静音
-let isMuted = false;
+let isMuted = $state(false);
 // 是否正在加载
-let isLoading = false;
+let isLoading = $state(false);
 // 是否随机播放
-let isShuffled = false;
+let isShuffled = $state(false);
 // 循环模式，0: 不循环, 1: 单曲循环, 2: 列表循环
-let isRepeating = 0;
+let isRepeating = $state(0);
 // 待恢复的进度
-let pendingProgress = 0;
+let pendingProgress = $state(0);
 // 上次保存进度的时间，用于节流
 let lastSaveTime = 0;
 // 错误信息
-let errorMessage = "";
+let errorMessage = $state("");
 // 是否显示错误信息
-let showError = false;
+let showError = $state(false);
 
 // 存储键名常量
 const STORAGE_KEYS = {
@@ -304,7 +304,7 @@ function loadSong(song: MusicPlayerTrack) {
     }
 }
 
-let autoplayFailed = false;
+let autoplayFailed = $state(false);
 
 function handleLoadSuccess() {
     isLoading = false;
@@ -323,7 +323,7 @@ function handleLoadSuccess() {
     }
     // 如果是自动播放模式，或者当前处于播放状态（如切换歌曲），则尝试播放
     if (isAutoplayEnabled || isPlaying || shouldPlay) {
-        const playPromise = audio.play();
+        const playPromise = audio?.play();
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 // 播放成功后，关闭自动播放标记，后续由用户控制
@@ -375,10 +375,10 @@ function setProgress(event: MouseEvent) {
     currentTime = newTime;
 }
 
-let isVolumeDragging = false;
-let isMouseDown = false;
-let volumeBarRect: DOMRect | null = null;
-let rafId: number | null = null;
+let isVolumeDragging = $state(false);
+let isMouseDown = $state(false);
+let volumeBarRect: DOMRect | null = $state(null);
+let rafId: number | null = $state(null);
 
 function startVolumeDrag(event: MouseEvent) {
     if (!volumeBar) return;
@@ -450,6 +450,7 @@ function handleAudioEvents() {
         // 注意：这里不自动设置 userPaused 为 true，因为音频结束或切换也可能触发 pause。（只在 togglePlay 中显式记录用户的暂停操作。）
     });
     audio.addEventListener("timeupdate", () => {
+        if (!audio) return;
         currentTime = audio.currentTime;
         // 每 2.1 秒保存一次进度，或者在歌曲接近结束时（虽然结束时可能不需要记忆，但为了保险）
         const now = Date.now();
@@ -461,6 +462,7 @@ function handleAudioEvents() {
         }
     });
     audio.addEventListener("ended", () => {
+        if (!audio) return;
         // 歌曲结束，重置保存的进度
         if (typeof localStorage !== 'undefined') {
             localStorage.setItem(STORAGE_KEYS.LAST_SONG_PROGRESS, "0");
@@ -547,8 +549,8 @@ onDestroy(() => {
 </script>
 
 <svelte:window
-    on:mousemove={handleVolumeMove}
-    on:mouseup={stopVolumeDrag}
+    onmousemove={handleVolumeMove}
+    onmouseup={stopVolumeDrag}
 />
 
 {#if musicPlayerConfig.enable}
@@ -557,7 +559,7 @@ onDestroy(() => {
     <div class="bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-up">
         <Icon icon="material-symbols:error" class="text-xl flex-shrink-0" />
         <span class="text-sm flex-1">{errorMessage}</span>
-        <button on:click={hideError} class="text-white/80 hover:text-white transition-colors">
+        <button onclick={hideError} class="text-white/80 hover:text-white transition-colors">
             <Icon icon="material-symbols:close" class="text-lg" />
         </button>
     </div>
@@ -572,8 +574,8 @@ onDestroy(() => {
          class:opacity-0={!isCollapsed}
          class:scale-0={!isCollapsed}
          class:pointer-events-none={!isCollapsed}
-         on:click={toggleCollapse}
-         on:keydown={(e) => {
+         onclick={toggleCollapse}
+         onkeydown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 toggleCollapse();
@@ -615,13 +617,13 @@ onDestroy(() => {
             </div>
             <div class="flex items-center gap-1">
                 <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                        on:click={toggleMode}
+                        onclick={toggleMode}
                         title={mode === "meting" ? "切换到 Local 模式" : "切换到 Meting 模式"}>
                     <Icon icon={mode === "meting" ? "material-symbols:cloud" : "material-symbols:folder"} class="text-lg" />
                 </button>
                 <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
                         class:text-[var(--primary)]={showPlaylist}
-                        on:click={togglePlaylist}
+                        onclick={togglePlaylist}
                         title="播放列表">
                     <Icon icon="material-symbols:queue-music" class="text-lg" />
                 </button>
@@ -630,16 +632,18 @@ onDestroy(() => {
         <div class="progress-section mb-4">
             <div class="progress-bar flex-1 h-2 bg-[var(--btn-regular-bg)] rounded-full cursor-pointer"
                 bind:this={progressBar}
-                on:click={setProgress}
-                on:keydown={(e) => {
+                onclick={setProgress}
+                onkeydown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        const rect = progressBar.getBoundingClientRect();
-                        const percent = 0.5;
-                        const newTime = percent * duration;
-                        if (audio) {
-                            audio.currentTime = newTime;
-                            currentTime = newTime;
+                        const rect = progressBar?.getBoundingClientRect();
+                        if (rect) {
+                            const percent = 0.5;
+                            const newTime = percent * duration;
+                            if (audio) {
+                                audio.currentTime = newTime;
+                                currentTime = newTime;
+                            }
                         }
                     }
                 }}
@@ -659,18 +663,18 @@ onDestroy(() => {
             <button class="w-10 h-10 rounded-lg"
                     class:btn-regular={isShuffled}
                     class:btn-plain={!isShuffled}
-                    on:click={toggleShuffle}
+                    onclick={toggleShuffle}
                     disabled={playlist.length <= 1}>
                 <Icon icon="material-symbols:shuffle" class="text-lg" />
             </button>
-            <button class="btn-plain w-10 h-10 rounded-lg" on:click={previousSong}
+            <button class="btn-plain w-10 h-10 rounded-lg" onclick={previousSong}
                     disabled={playlist.length <= 1}>
                 <Icon icon="material-symbols:skip-previous" class="text-xl" />
             </button>
             <button class="btn-regular w-12 h-12 rounded-full"
                     class:opacity-50={isLoading}
                     disabled={isLoading}
-                    on:click={togglePlay}>
+                    onclick={togglePlay}>
                 {#if isLoading}
                     <Icon icon="eos-icons:loading" class="text-xl" />
                 {:else if isPlaying}
@@ -679,7 +683,7 @@ onDestroy(() => {
                     <Icon icon="material-symbols:play-arrow" class="text-xl" />
                 {/if}
             </button>
-            <button class="btn-plain w-10 h-10 rounded-lg" on:click={nextSong}
+            <button class="btn-plain w-10 h-10 rounded-lg" onclick={nextSong}
                     disabled={playlist.length <= 1}>
                 <Icon icon="material-symbols:skip-next" class="text-xl" />
             </button>
@@ -687,7 +691,7 @@ onDestroy(() => {
             <button class="w-10 h-10 rounded-lg"
                     class:btn-regular={isRepeating > 0}
                     class:btn-plain={isRepeating === 0}
-                    on:click={toggleRepeat}>
+                    onclick={toggleRepeat}>
                 {#if isRepeating === 1}
                     <Icon icon="material-symbols:repeat-one" class="text-lg" />
                 {:else if isRepeating === 2}
@@ -698,7 +702,7 @@ onDestroy(() => {
             </button>
         </div>
         <div class="bottom-controls flex items-center gap-2">
-            <button class="btn-plain w-8 h-8 rounded-lg" on:click={toggleMute}>
+            <button class="btn-plain w-8 h-8 rounded-lg" onclick={toggleMute}>
                 {#if isMuted || volume === 0}
                     <Icon icon="material-symbols:volume-off" class="text-lg" />
                 {:else if volume < 0.5}
@@ -709,8 +713,8 @@ onDestroy(() => {
             </button>
             <div class="flex-1 h-2 bg-[var(--btn-regular-bg)] rounded-full cursor-pointer"
                 bind:this={volumeBar}
-                on:mousedown={startVolumeDrag}
-                on:keydown={(e) => {
+                onmousedown={startVolumeDrag}
+                onkeydown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         if (e.key === 'Enter') toggleMute();
@@ -729,7 +733,7 @@ onDestroy(() => {
                 </div>
             </div>
             <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                    on:click={toggleCollapse}
+                    onclick={toggleCollapse}
                     title="折叠播放器">
                 <Icon icon="material-symbols:expand-more" class="text-lg" />
             </button>
@@ -740,7 +744,7 @@ onDestroy(() => {
              transition:slide={{ duration: 300, axis: 'y' }}>
             <div class="playlist-header flex items-center justify-between p-4 border-b border-[var(--line-divider)]">
                 <h3 class="text-lg font-semibold text-90">{i18n(Key.playlist)}</h3>
-                <button class="btn-plain w-8 h-8 rounded-lg" on:click={togglePlaylist}>
+                <button class="btn-plain w-8 h-8 rounded-lg" onclick={togglePlaylist}>
                     <Icon icon="material-symbols:close" class="text-lg" />
                 </button>
             </div>
@@ -749,8 +753,8 @@ onDestroy(() => {
                     <div class="playlist-item flex items-center gap-3 p-3 hover:bg-[var(--btn-plain-bg-hover)] cursor-pointer transition-colors"
                          class:bg-[var(--btn-plain-bg)]={index === currentIndex}
                          class:text-[var(--primary)]={index === currentIndex}
-                         on:click={() => playSong(index)}
-                         on:keydown={(e) => {
+                         onclick={() => playSong(index)}
+                         onkeydown={(e) => {
                              if (e.key === 'Enter' || e.key === ' ') {
                                  e.preventDefault();
                                  playSong(index);
