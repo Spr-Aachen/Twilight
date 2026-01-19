@@ -37,6 +37,7 @@ class TableOfContents extends HTMLElement {
     tocEntries: HTMLAnchorElement[] = [];
     active: boolean[] = [];
     activeIndicator: HTMLElement | null = null;
+    _retryCount = 0;
 
     constructor() {
         super();
@@ -57,8 +58,11 @@ class TableOfContents extends HTMLElement {
         if (!this.sections.length) return;
 
         for (let i = 0; i < this.sections.length; i++) {
-            let offsetTop = this.sections[i].getBoundingClientRect().top;
-            let offsetBottom = this.sections[i].getBoundingClientRect().bottom;
+            const section = this.sections[i];
+            if (!section) continue;
+
+            let offsetTop = section.getBoundingClientRect().top;
+            let offsetBottom = section.getBoundingClientRect().bottom;
 
             if (this.isInRange(offsetTop, 0, window.innerHeight)
                 || this.isInRange(offsetBottom, 0, window.innerHeight)
@@ -182,17 +186,19 @@ class TableOfContents extends HTMLElement {
                document.querySelector('.custom-md, .markdown-content') !== null;
     }
 
-    regenerateTOC(retryCount = 0) {
+    regenerateTOC() {
         const tocWidget = document.querySelector('widget-layout[data-id="toc-wrapper"]') as HTMLElement;
-        if (!tocWidget) return;
+        if (!tocWidget) return false;
 
         // 从当前页面重新获取标题
         const headings = widgetManager.getPageHeadings();
-        // 如果没有标题，延迟重试最多3次
-        if (headings.length === 0 && retryCount < 3) {
-            setTimeout(() => this.regenerateTOC(retryCount + 1), 120);
-            return;
+        // 如果没有标题，且是文章页，延迟重试最多3次
+        if (headings.length === 0 && this.isPostPage() && this._retryCount < 3) {
+            this._retryCount++;
+            setTimeout(() => this.init(), 120);
+            return false;
         }
+        this._retryCount = 0;
 
         const isPost = this.isPostPage();
 
@@ -203,7 +209,7 @@ class TableOfContents extends HTMLElement {
                 tocWidget.classList.add('toc-hide');
                 tocWidget.style.maxHeight = '';
             }
-            return;
+            return true;
         }
 
         if (tocWidget.classList.contains('toc-hide')) {
@@ -238,15 +244,21 @@ class TableOfContents extends HTMLElement {
                 </a>`;
             }).join('');
         this.innerHTML = tocHTML + '<div id="active-indicator" style="opacity: 0" class="-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"></div>';
+        return true;
     }
 
     init() {
         // 先清理之前的监听器
         this.observer.disconnect();
         this.headingIdxMap.clear();
+        
+        // 重新重置数据
+        this.sections = [];
+        this.headings = [];
+        this.active = [];
 
         // 重新生成TOC内容
-        this.regenerateTOC();
+        if (!this.regenerateTOC()) return;
 
         this.tocEl = this.parentElement;
 
@@ -256,25 +268,33 @@ class TableOfContents extends HTMLElement {
 
         this.activeIndicator = document.getElementById("active-indicator");
 
-        this.tocEntries = Array.from(
+        const allEntries = Array.from(
             this.querySelectorAll<HTMLAnchorElement>("a[href^='#']")
         );
 
-        if (this.tocEntries.length === 0) return;
+        const validHeadings: HTMLElement[] = [];
+        const validSections: HTMLElement[] = [];
+        const validEntries: HTMLAnchorElement[] = [];
 
-        this.sections = new Array(this.tocEntries.length);
-        this.headings = new Array(this.tocEntries.length);
-        for (let i = 0; i < this.tocEntries.length; i++) {
-            const id = decodeURIComponent(this.tocEntries[i].hash?.substring(1));
+        for (let i = 0; i < allEntries.length; i++) {
+            const entry = allEntries[i];
+            const id = decodeURIComponent(entry.hash?.substring(1));
             const heading = document.getElementById(id);
             const section = heading?.parentElement;
             if (heading instanceof HTMLElement && section instanceof HTMLElement) {
-                this.headings[i] = heading;
-                this.sections[i] = section;
-                this.headingIdxMap.set(id, i);
+                validHeadings.push(heading);
+                validSections.push(section);
+                validEntries.push(entry);
+                this.headingIdxMap.set(id, validEntries.length - 1);
             }
         }
+
+        this.headings = validHeadings;
+        this.sections = validSections;
+        this.tocEntries = validEntries;
         this.active = new Array(this.tocEntries.length).fill(false);
+
+        if (this.tocEntries.length === 0) return;
 
         this.sections.forEach((section) =>
             this.observer.observe(section)
