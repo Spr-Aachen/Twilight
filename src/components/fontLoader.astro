@@ -19,17 +19,19 @@ const finalFontFamily = customFontFamily ? `${customFontFamily}, ${fallbacks}` :
 ---
 
 <!-- Font Loading -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 {
   fonts.map((font) => {
     const isCss = font.src.endsWith('.css') || font.src.includes('fonts.googleapis.com') || font.src.includes('unpkg.com');
     if (isCss) {
+        // If it's a Google Font, we can append &display=swap if it's not already there
+        let fontSrc = font.src;
+        if (fontSrc.includes('fonts.googleapis.com') && !fontSrc.includes('display=')) {
+            fontSrc += (fontSrc.includes('?') ? '&' : '?') + 'display=swap';
+        }
         return (
             <>
-                <link rel="preload" href={font.src} as="style" />
-                <link rel="stylesheet" href={font.src} />
+                <link rel="preload" href={fontSrc} as="style" />
+                <link rel="stylesheet" href={fontSrc} />
             </>
         );
     } else if (font.src) {
