@@ -20,11 +20,11 @@ const { class: className, style, depth = 3, isFloating = false } = Astro.props;
 {isFloating ? (
     <table-of-contents class:list={[className, "toc-floating group"]} data-is-floating="true" data-depth={depth} data-navbar-height={NAVBAR_HEIGHT}>
         <div class="toc-floating-container fixed bottom-[5.5rem] right-[0.5rem] z-[100] md:hidden toc-hide transition-all duration-300">
-            <button class="toc-floating-btn btn-card flex items-center justify-center rounded-2xl shadow-lg border border-black/5 dark:border-white/10 w-[3rem] h-[3rem] text-[var(--primary)] hover:scale-110 active:scale-95 transition-all">
-                <Icon name="material-symbols:list-alt-outline-rounded" class="text-[1.75rem]" />
+            <button class="toc-floating-btn btn-card flex items-center justify-center rounded-2xl w-[3rem] h-[3rem] text-[var(--primary)] text-[2rem] font-bold hover:scale-110 active:scale-95 transition-all overflow-hidden">
+                <Icon name="material-symbols:list-alt-outline-rounded" />
             </button>
             <div class="toc-floating-panel absolute bottom-[3.5rem] right-0 w-[15rem] max-h-[25rem] bg-[var(--card-bg)] rounded-2xl shadow-xl border border-black/5 dark:border-white/10 overflow-hidden opacity-0 translate-y-4 pointer-events-none transition-all duration-300">
-                <div class="p-4 border-b border-black/5 dark:border-white/10 font-bold text-sm flex items-center gap-2">
+                <div class="p-4 border-b border-black/5 dark:border-white/10 font-bold text-sm flex items-center gap-2 text-black/75 dark:text-white/75">
                     <Icon name="material-symbols:list-alt-outline-rounded" class="text-lg" />
                     {i18n(I18nKey.tableOfContents)}
                 </div>
@@ -465,6 +465,13 @@ if (!customElements.get("table-of-contents")) {
         display: block;
     }
 
+    /* 高亮当前项文字 */
+    :global(.toc-inner-content a.visible .text-50),
+    :global(.toc-inner-content a.visible .text-30) {
+        color: var(--primary);
+        font-weight: 500;
+    }
+
     /* 基础过渡样式 */
     :global(widget-layout[data-id="toc-wrapper"]) {
         transition:
@@ -477,7 +484,6 @@ if (!customElements.get("table-of-contents")) {
         overflow: hidden;
         display: none; /* 默认隐藏，由媒体查询控制在桌面端显示 */
     }
-
     @media (min-width: 768px) {
         :global(widget-layout[data-id="toc-wrapper"]) {
             display: block;
@@ -503,11 +509,9 @@ if (!customElements.get("table-of-contents")) {
             transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
             opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
     }
-
     .toc-floating-container.move-up {
         --toc-ty: -3.5rem;
     }
-
     .toc-floating-container.toc-hide {
         --toc-tx: 6rem;
         --toc-scale: 0.9;
@@ -515,10 +519,9 @@ if (!customElements.get("table-of-contents")) {
         pointer-events: none;
     }
 
-    /* 高亮当前项文字 */
-    :global(.toc-inner-content a.visible .text-50),
-    :global(.toc-inner-content a.visible .text-30) {
-        color: var(--primary);
-        font-weight: 500;
+    .toc-floating-btn {
+        box-shadow:
+            0 0 0 1px var(--btn-regular-bg),
+            0 0 1em var(--btn-regular-bg);
     }
 </style>
