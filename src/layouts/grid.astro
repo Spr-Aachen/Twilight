@@ -12,7 +12,7 @@ import IconifyLoader from "@components/common/iconifyLoader.astro";
 import Navbar from "@components/navbar.astro";
 import FullscreenWallpaper from "@components/fullscreenWallpaper.astro";
 import Banner from "@components/banner.astro";
-import SideBar from "@components/sidebar.astro";
+import Sidebar from "@components/sidebar.astro";
 import Footer from "@components/footer.astro";
 import TocButton from "@components/tocButton.astro";
 import BackToTopButton from "@components/back2TopButton.astro";
@@ -63,7 +63,7 @@ const shouldEnableTransparency = siteConfig.wallpaper.mode === "banner" || siteC
 const transparentClass = shouldEnableTransparency ? "wallpaper-transparent" : "";
 
 /**
- * SideBar
+ * Sidebar
  */
 
 // 检查侧边栏是否启用，动态调整网格布局
@@ -182,7 +182,7 @@ const {
                 <div class="contents lg:contents md:flex md:flex-col md:col-start-1 md:row-start-1 md:gap-4">
                     {
                         hasLeftSidebar ? (
-                            <SideBar
+                            <Sidebar
                                 id="left-sidebar"
                                 side="left"
                                 class={`${leftSidebarClass} ${transparentClass} onload-animation-up`}
@@ -194,7 +194,7 @@ const {
                     }
                     {
                         hasRightSidebar ? (
-                            <SideBar
+                            <Sidebar
                                 id="right-sidebar"
                                 side="right"
                                 class={`${rightSidebarClass} ${transparentClass} onload-animation-up`}

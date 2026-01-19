@@ -2,25 +2,25 @@
  * 导航工具函数
  * 提供统一的页面导航功能，支持 Swup 无刷新跳转
  */
-import { navBarConfig } from "@/config";
+import { navbarConfig } from "@/config";
 import { LinkPresets } from "@constants/link-presets";
-import { type NavBarLink } from "@/types/config";
+import { type NavbarLink } from "@/types/config";
 import { pathsEqual } from "./url";
 
 
 /**
  * 根据当前路径查找其所属的父级页面（如 [...menu].astro 生成的中转页）
  * @param currentPath 当前页面的路径
- * @returns 如果找到父级页面，则返回该页面的 NavBarLink 对象，否则返回 undefined
+ * @returns 如果找到父级页面，则返回该页面的 NavbarLink 对象，否则返回 undefined
  */
-export function getParentLink(currentPath: string): NavBarLink | undefined {
+export function getParentLink(currentPath: string): NavbarLink | undefined {
     // 遍历导航栏中的所有链接
-    for (const link of navBarConfig.links) {
+    for (const link of navbarConfig.links) {
         // 检查是否有子链接且不是 LinkPreset 枚举
         if (typeof link !== "number" && link.children && link.children.length > 0) {
             // 检查子链接中是否包含当前路径
             for (const child of link.children) {
-                let childLink: NavBarLink;
+                let childLink: NavbarLink;
                 if (typeof child === "number") {
                     childLink = LinkPresets[child];
                 } else {

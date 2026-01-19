@@ -213,7 +213,7 @@ export enum LinkPreset {
 }
 
 
-export type NavBarLink = {
+export type NavbarLink = {
     // 链接名称
     name: string;
     // 链接
@@ -224,15 +224,15 @@ export type NavBarLink = {
     icon?: string;
     // 中转页描述
     description?: string;
-    // 子链接，可以是NavBarLink或LinkPreset
-    children?: (NavBarLink | LinkPreset)[];
+    // 子链接，可以是NavbarLink或LinkPreset
+    children?: (NavbarLink | LinkPreset)[];
 };
 
 
 // 导航栏配置
-export type NavBarConfig = {
+export type NavbarConfig = {
     // 链接配置
-    links: (NavBarLink | LinkPreset)[]; // 支持多级菜单
+    links: (NavbarLink | LinkPreset)[]; // 支持多级菜单
 };
 
 /**
@@ -274,8 +274,8 @@ export type WidgetComponentConfig = {
 };
 
 
-// 侧边栏布局配置
-export type SidebarLayoutConfig = {
+// 侧边栏配置
+export type SidebarConfig = {
     // 侧边栏组件配置列表
     components: WidgetComponentConfig[];
     // 响应式布局配置

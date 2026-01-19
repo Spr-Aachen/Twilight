@@ -2,12 +2,12 @@
 import Icon from "@iconify/svelte";
 import { onMount } from "svelte";
 
-import type { NavBarLink } from "@/types/config";
+import type { NavbarLink } from "@/types/config";
 import { url } from "@utils/url";
 
 
 interface Props {
-    links: NavBarLink[];
+    links: NavbarLink[];
 }
 
 let { links }: Props = $props();

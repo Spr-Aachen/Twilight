@@ -1,9 +1,9 @@
-import { LinkPreset, type NavBarLink } from "@/types/config";
+import { LinkPreset, type NavbarLink } from "@/types/config";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 
 
-export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
+export const LinkPresets: { [key in LinkPreset]: NavbarLink } = {
     [LinkPreset.Home]: {
         name: i18n(I18nKey.home),
         url: "/",

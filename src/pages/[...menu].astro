@@ -1,8 +1,8 @@
 ---
 import { Icon } from "astro-icon/components";
 
-import { type NavBarLink } from "@/types/config";
-import { navBarConfig } from "@/config";
+import { type NavbarLink } from "@/types/config";
+import { navbarConfig } from "@/config";
 import { LinkPresets } from "@constants/link-presets";
 import { url } from "@utils/url";
 import GridLayout from "@layouts/grid.astro";
@@ -10,10 +10,10 @@ import BackwardButton from "@components/backwardButton.astro";
 
 
 export async function getStaticPaths() {
-    return navBarConfig.links
+    return navbarConfig.links
         .filter(link => typeof link !== "number" && link.children && link.children.length > 0)
         .map(link => {
-            const navLink = link as NavBarLink;
+            const navLink = link as NavbarLink;
             // 提取 slug，去掉前后的斜杠
             const slug = navLink.url.replace(/^\/|\/$/g, '');
             return {
@@ -25,12 +25,12 @@ export async function getStaticPaths() {
 
 
 interface Props {
-    link: NavBarLink;
+    link: NavbarLink;
 }
 
 const { link } = Astro.props;
 
-// 获取子链接，并将 LinkPreset 转换为完整的 NavBarLink 对象
+// 获取子链接，并将 LinkPreset 转换为完整的 NavbarLink 对象
 const childrenLinks = link.children || [];
 
 const processedLinks = childrenLinks.map(child => {

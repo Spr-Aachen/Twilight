@@ -1,7 +1,7 @@
 import type {
     SiteConfig,
-    NavBarConfig,
-    SidebarLayoutConfig,
+    NavbarConfig,
+    SidebarConfig,
     ProfileConfig,
     AnnouncementConfig,
     PostConfig,
@@ -193,7 +193,7 @@ export const siteConfig: SiteConfig = {
  */
 
 // 导航栏配置
-export const navBarConfig: NavBarConfig = {
+export const navbarConfig: NavbarConfig = {
     // 链接配置
     links: [
         LinkPreset.Home,
@@ -221,8 +221,8 @@ export const navBarConfig: NavBarConfig = {
  * 
  */
 
-// 侧边栏布局配置
-export const sidebarLayoutConfig: SidebarLayoutConfig = {
+// 侧边栏配置
+export const sidebarConfig: SidebarConfig = {
     // 侧边栏组件配置列表
     components: [
         {

@@ -1,9 +1,9 @@
 ---
 import { Icon } from "astro-icon/components";
 
-import { navBarConfig, siteConfig } from "@/config";
+import { navbarConfig, siteConfig } from "@/config";
 import { LinkPresets } from "@constants/link-presets";
-import { LinkPreset, type NavBarLink } from "@/types/config";
+import { LinkPreset, type NavbarLink } from "@/types/config";
 import { url } from "@utils/url";
 import { getNavbarTransparentModeForWallpaperMode, getDefaultWallpaperMode } from "@utils/wallpaper";
 import NavLinks from "@components/navbar/navLinks.astro";
@@ -23,8 +23,8 @@ const navbarTransparentMode = getNavbarTransparentModeForWallpaperMode(getDefaul
 // 检查是否为首页
 const isHomePage = Astro.url.pathname === "/" || Astro.url.pathname === "";
 
-let links: NavBarLink[] = navBarConfig.links.map(
-    (item: NavBarLink | LinkPreset): NavBarLink => {
+let links: NavbarLink[] = navbarConfig.links.map(
+    (item: NavbarLink | LinkPreset): NavbarLink => {
         if (typeof item === "number") {
             return LinkPresets[item];
         }

@@ -1,9 +1,9 @@
 import type {
     WidgetComponentConfig,
     WidgetComponentType,
-    SidebarLayoutConfig,
+    SidebarConfig,
 } from "@/types/config";
-import { sidebarLayoutConfig } from "@/config";
+import { sidebarConfig } from "@/config";
 
 
 /**
@@ -24,10 +24,10 @@ export const WIDGET_COMPONENT_MAP = {
  * 负责管理侧边栏组件的动态加载、排序和渲染
  */
 export class WidgetManager {
-    private config: SidebarLayoutConfig;
+    private config: SidebarConfig;
     private enabledComponents: WidgetComponentConfig[];
 
-    constructor(config: SidebarLayoutConfig = sidebarLayoutConfig) {
+    constructor(config: SidebarConfig = sidebarConfig) {
         this.config = config;
         this.enabledComponents = this.getEnabledComponents();
     }
@@ -35,7 +35,7 @@ export class WidgetManager {
     /**
      * 获取配置
      */
-    getConfig(): SidebarLayoutConfig {
+    getConfig(): SidebarConfig {
         return this.config;
     }
 
@@ -182,7 +182,7 @@ export class WidgetManager {
      * 更新组件配置
      * @param newConfig 新的配置
      */
-    updateConfig(newConfig: Partial<SidebarLayoutConfig>): void {
+    updateConfig(newConfig: Partial<SidebarConfig>): void {
         this.config = { ...this.config, ...newConfig };
         this.enabledComponents = this.getEnabledComponents();
     }
