@@ -449,6 +449,14 @@
     // 主初始化函数
     async function initialize() {
         try {
+            // 首先检查是否有 Mermaid 图表
+            const mermaidElements = document.querySelectorAll(
+                ".mermaid[data-mermaid-code]",
+            );
+            if (mermaidElements.length === 0) {
+                return;
+            }
+
             // 设置监听器
             setupMutationObserver();
             setupEventListeners();

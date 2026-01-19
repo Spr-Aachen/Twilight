@@ -9,4 +9,4 @@ const tags = await getTagList();
 const { class: className, style } = Astro.props;
 ---
 
-<StatsCharts client:load {posts} {categories} {tags} class={className} style={style} />
+<StatsCharts client:visible {posts} {categories} {tags} class={className} style={style} />

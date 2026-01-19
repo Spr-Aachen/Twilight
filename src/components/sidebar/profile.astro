@@ -57,21 +57,22 @@ const umamiBaseUrl = umamiConfig.baseUrl || "";
         function generateStatsText(pageViews, visits) {
             return `浏览量 ${pageViews} · 访问次数 ${visits}`;
         }
-
         // 获取访问量统计
-        async function fetchSiteStats(isRetry = false) {
+        async function fetchSiteStats() {
             if (!umamiConfig.enabled) {
                 return;
             }
-
             try {
+                // 动态加载 umami-share 插件
+                if (typeof getUmamiWebsiteStats === 'undefined') {
+                    await import("@/plugins/umami-share");
+                }
                 // 调用全局工具获取 Umami 统计数据
                 const stats = await getUmamiWebsiteStats(umamiBaseUrl, umamiApiKey, umamiWebsiteId);
-
                 // 从返回的数据中提取页面浏览量和访客数
                 const pageViews = stats.pageviews || 0;
                 const visits = stats.visits || 0;
-
+                // 更新页面上的显示内容
                 const displayElement = document.getElementById('site-stats-display');
                 if (displayElement) {
                     displayElement.textContent = generateStatsText(pageViews, visits);
@@ -84,7 +85,6 @@ const umamiBaseUrl = umamiConfig.baseUrl || "";
                 }
             }
         }
-
         // 页面加载完成后获取统计数据
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', fetchSiteStats);

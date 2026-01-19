@@ -54,21 +54,40 @@
         };
     };
 
+    // 使用全局 Promise 避免重复加载脚本
     const loadECharts = async () => {
         if (typeof window === 'undefined') return;
         isDark = document.documentElement.classList.contains('dark');
+
         if ((window as any).echarts) {
             echarts = (window as any).echarts;
-        } else {
+            return;
+        }
+
+        if ((window as any)._echartsLoadingPromise) {
+            await (window as any)._echartsLoadingPromise;
+            echarts = (window as any).echarts;
+            return;
+        }
+
+        (window as any)._echartsLoadingPromise = new Promise((resolve, reject) => {
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js';
             script.async = true;
+            script.onload = () => {
+                const lib = (window as any).echarts;
+                if (lib) {
+                    echarts = lib;
+                    resolve(lib);
+                } else {
+                    reject(new Error('ECharts not found after script load'));
+                }
+            };
+            script.onerror = () => reject(new Error('Failed to load ECharts script'));
             document.head.appendChild(script);
-            await new Promise((resolve) => {
-                script.onload = resolve;
-            });
-            echarts = (window as any).echarts;
-        }
+        });
+
+        await (window as any)._echartsLoadingPromise;
     };
 
     let isInitialized = $state(false);

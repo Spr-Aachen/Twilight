@@ -39,12 +39,10 @@ const {
 } = Astro.props;
 ---
 
-
 <div class:list={["flex flex-wrap text-neutral-500 dark:text-neutral-400 items-center gap-4 gap-x-4 gap-y-2", className]}>
     <!-- publish date -->
     <div class="flex items-center">
-        <div class="meta-icon"
-        >
+        <div class="meta-icon">
             <Icon name="material-symbols:calendar-today-outline-rounded" class="text-xl"></Icon>
         </div>
         <span class="text-50 text-sm font-medium">{formatDateToYYYYMMDD(published)}</span>
@@ -52,8 +50,7 @@ const {
     <!-- update date -->
     {!hideUpdateDate && updated && updated.getTime() !== published.getTime() && (
         <div class="flex items-center">
-            <div class="meta-icon"
-            >
+            <div class="meta-icon">
                 <Icon name="material-symbols:edit-calendar-outline-rounded" class="text-xl"></Icon>
             </div>
             <span class="text-50 text-sm font-medium">{formatDateToYYYYMMDD(updated)}</span>
@@ -61,8 +58,7 @@ const {
     )}
     <!-- categories -->
     <div class="flex items-center">
-        <div class="meta-icon"
-        >
+        <div class="meta-icon">
             <Icon name="material-symbols:book-2-outline-rounded" class="text-xl"></Icon>
         </div>
         <div class="flex flex-row flex-nowrap items-center">
@@ -75,8 +71,7 @@ const {
     </div>
     <!-- tags -->
     <div class:list={["items-center", {"flex": !hideTagsForMobile, "hidden md:flex": hideTagsForMobile}]}>
-        <div class="meta-icon"
-        >
+        <div class="meta-icon">
             <Icon name="material-symbols:tag-rounded" class="text-xl"></Icon>
         </div>
         <div class="flex flex-row flex-nowrap items-center">
@@ -117,6 +112,10 @@ const {
             try {
                 // 构造文章页面的URL路径
                 const pageUrl = `/posts/${slug}/`;
+                // 动态加载 umami-share 插件
+                if (typeof getUmamiPageStats === 'undefined') {
+                    await import("@/plugins/umami-share");
+                }
                 // 调用全局工具获取特定页面的 Umami 统计数据
                 const stats = await getUmamiPageStats(umamiBaseUrl, umamiApiKey, umamiWebsiteId, pageUrl);
                 // 从返回的数据中提取页面浏览量和访客数
