@@ -3,12 +3,16 @@ import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
 
 import { siteConfig } from "@/config";
-import { BANNER_HEIGHT, MAIN_PANEL_OVERLAPS_BANNER_HEIGHT } from "@constants/constants";
+import {
+    BANNER_HEIGHT,
+    MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
+} from "@constants/constants";
 import { widgetManager } from "@utils/widget";
 import IconifyLoader from "@components/common/iconifyLoader.astro";
 import Navbar from "@components/navbar.astro";
 import FullscreenWallpaper from "@components/fullscreenWallpaper.astro";
 import Banner from "@components/banner.astro";
+import TableOfContents from "@components/sidebar/toc.astro";
 import SideBar from "@components/sidebar.astro";
 import Footer from "@components/footer.astro";
 import BackToTop from "@components/backToTop.astro";
@@ -178,27 +182,27 @@ const {
                 <div class="contents lg:contents md:flex md:flex-col md:col-start-1 md:row-start-1 md:gap-4">
                     {
                         hasLeftSidebar ? (
-                                <SideBar
-                                    id="left-sidebar"
-                                    side="left"
-                                    class={`${leftSidebarClass} ${transparentClass} onload-animation-up`}
-                                    headings={headings}
-                                />
-                            ) : (
-                                <div id="left-sidebar" class="hidden"></div>
-                            )
+                            <SideBar
+                                id="left-sidebar"
+                                side="left"
+                                class={`${leftSidebarClass} ${transparentClass} onload-animation-up`}
+                                headings={headings}
+                            />
+                        ) : (
+                            <div id="left-sidebar" class="hidden"></div>
+                        )
                     }
                     {
                         hasRightSidebar ? (
-                                <SideBar
-                                    id="right-sidebar"
-                                    side="right"
-                                    class={`${rightSidebarClass} ${transparentClass} onload-animation-up`}
-                                    headings={headings}
-                                />
-                            ) : (
-                                <div id="right-sidebar" class="hidden"></div>
-                            )
+                            <SideBar
+                                id="right-sidebar"
+                                side="right"
+                                class={`${rightSidebarClass} ${transparentClass} onload-animation-up`}
+                                headings={headings}
+                            />
+                        ) : (
+                            <div id="right-sidebar" class="hidden"></div>
+                        )
                     }
                 </div>
 
@@ -223,9 +227,14 @@ const {
                 <div class="footer col-span-2 onload-animation-up block lg:hidden transition-swup-fade">
                     <Footer />
                 </div>
+
             </div>
 
             <BackToTop />
+
+        </div>
     </div>
-</div>
+
+    <TableOfContents isFloating={true} />
+
 </BaseLayout>
