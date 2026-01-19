@@ -13,6 +13,7 @@ import {
 
 // Function to apply theme to document
 export function applyThemeToDocument(theme: LIGHT_DARK_MODE, force = false) {
+    if (typeof document === "undefined") return;
     // 获取当前主题状态的完整信息
     const currentIsDark = document.documentElement.classList.contains("dark");
     const currentTheme = document.documentElement.getAttribute("data-theme");
@@ -94,6 +95,7 @@ export function getStoredTheme(): LIGHT_DARK_MODE {
 
 // Function to initialize theme from local storage or default
 export function initTheme(): void {
+    if (typeof window === "undefined") return;
     const storedTheme = getStoredTheme();
     applyThemeToDocument(storedTheme, true);
     // 监听系统主题变化

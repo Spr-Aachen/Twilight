@@ -199,7 +199,7 @@ export class ParticleManager {
     }
     // 初始化粒子特效
     async init(): Promise<void> {
-        if (!this.config.enable || this.isRunning) {
+        if (typeof document === "undefined" || !this.config.enable || this.isRunning) {
             return;
         }
         // 创建图片对象
@@ -224,6 +224,7 @@ export class ParticleManager {
     }
     // 创建画布
     private createCanvas(): void {
+        if (typeof document === "undefined") return;
         this.canvas = document.createElement("canvas");
         this.canvas.height = window.innerHeight;
         this.canvas.width = window.innerWidth;
@@ -235,7 +236,9 @@ export class ParticleManager {
         document.body.appendChild(this.canvas);
         this.ctx = this.canvas.getContext("2d");
         // 监听窗口大小变化
-        window.addEventListener("resize", this.handleResize.bind(this));
+        if (typeof window !== "undefined") {
+            window.addEventListener("resize", this.handleResize.bind(this));
+        }
     }
     // 创建粒子列表
     private createParticleList(): void {
@@ -296,15 +299,17 @@ export class ParticleManager {
     }
     // 停止粒子特效
     stop(): void {
-        if (this.animationId) {
+        if (this.animationId && typeof window !== "undefined") {
             cancelAnimationFrame(this.animationId);
             this.animationId = null;
         }
-        if (this.canvas) {
+        if (this.canvas && typeof document !== "undefined") {
             document.body.removeChild(this.canvas);
             this.canvas = null;
         }
-        window.removeEventListener("resize", this.handleResize.bind(this));
+        if (typeof window !== "undefined") {
+            window.removeEventListener("resize", this.handleResize.bind(this));
+        }
         this.isRunning = false;
     }
     // 切换粒子特效

@@ -3,6 +3,7 @@ let Fancybox: any;
 
 // 图片灯箱按需加载
 export async function initFancybox() {
+    if (typeof document === "undefined") return;
     // 相册图片选择器 (只绑定不在 a 标签内的图片，避免与链接绑定冲突)
     const albumImagesSelector = ".custom-md img:not(a *), #post-cover img:not(a *), .moment-images img:not(a *), .photo-gallery img:not(a *)";
     // 相册链接选择器

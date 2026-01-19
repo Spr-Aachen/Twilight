@@ -47,6 +47,7 @@ function fallbackNavigation(
         force?: boolean;
     },
 ): void {
+    if (typeof window === "undefined") return;
     if (options?.replace) {
         window.location.replace(url);
     } else {
@@ -84,9 +85,11 @@ export function navigateToPage(
 
     // 如果是锚点链接，滚动到对应位置
     if (url.startsWith("#")) {
-        const element = document.getElementById(url.slice(1));
-        if (element) {
-            element.scrollIntoView({ behavior: "smooth" });
+        if (typeof document !== "undefined") {
+            const element = document.getElementById(url.slice(1));
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+            }
         }
         return;
     }

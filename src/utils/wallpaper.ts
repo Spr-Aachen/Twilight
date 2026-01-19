@@ -47,18 +47,27 @@ export function getNavbarTransparentModeForWallpaperMode(mode: WALLPAPER_MODE): 
 }
 
 // Cache for elements
-const getElements = () => ({
-    navbar: document.getElementById('navbar'),
-    bannerWrapper: document.getElementById('banner-wrapper'),
-    banner: document.getElementById('banner'),
-    fullscreenContainer: document.querySelector('[data-fullscreen-wallpaper]') as HTMLElement,
-    mainContent: document.querySelector('.absolute.w-full.z-30') as HTMLElement,
-});
+const getElements = () => {
+    if (typeof document === 'undefined') return {
+        navbar: null,
+        bannerWrapper: null,
+        banner: null,
+        fullscreenContainer: null,
+        mainContent: null,
+    };
+    return {
+        navbar: document.getElementById('navbar'),
+        bannerWrapper: document.getElementById('banner-wrapper'),
+        banner: document.getElementById('banner'),
+        fullscreenContainer: document.querySelector('[data-fullscreen-wallpaper]') as HTMLElement,
+        mainContent: document.querySelector('.absolute.w-full.z-30') as HTMLElement,
+    };
+};
 
 // Helper to safely execute after a delay if mode hasn't changed
 function runIfMode(mode: WALLPAPER_MODE, callback: () => void, delay = 600) {
     setTimeout(() => {
-        if (document.documentElement.getAttribute('data-wallpaper-mode') === mode) {
+        if (typeof document !== 'undefined' && document.documentElement.getAttribute('data-wallpaper-mode') === mode) {
             callback();
         }
     }, delay);
@@ -138,8 +147,8 @@ function showBannerMode() {
         requestAnimationFrame(showBannerMode);
         return;
     }
-    const isAlreadyVisible = !bannerWrapper.classList.contains('hidden') && !document.documentElement.classList.contains('banner-hiding');
-    if (!isAlreadyVisible) {
+    const isAlreadyVisible = typeof document !== 'undefined' && !bannerWrapper.classList.contains('hidden') && !document.documentElement.classList.contains('banner-hiding');
+    if (!isAlreadyVisible && typeof document !== 'undefined') {
         // 如果正在隐藏中，先移除隐藏类
         document.documentElement.classList.remove('banner-hiding');
         // 添加过渡类到 html
@@ -182,7 +191,7 @@ function showFullscreenMode() {
     fullscreenContainer.style.opacity = siteConfig.wallpaper.fullscreen?.opacity?.toString() || '0.8';
     // 隐藏banner
     if (bannerWrapper) {
-        if (document.documentElement.classList.contains('banner-hiding')) {
+        if (typeof document !== 'undefined' && document.documentElement.classList.contains('banner-hiding')) {
             runIfMode(WALLPAPER_FULLSCREEN, () => {
                 bannerWrapper.classList.add('hidden');
             });
@@ -219,6 +228,7 @@ function reinitializeComponents(mode: WALLPAPER_MODE) {
 
 // Function to apply wallpaper mode to document
 export function applyWallpaperModeToDocument(mode: WALLPAPER_MODE, force = false) {
+    if (typeof document === 'undefined') return;
     // 获取当前的壁纸模式
     const currentMode = document.documentElement.getAttribute('data-wallpaper-mode') as WALLPAPER_MODE;
     // 如果模式没有变化且不是强制更新，直接返回

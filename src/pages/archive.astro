@@ -29,7 +29,7 @@ const sortedPostsList = await getSortedPostsList();
                 )}
             </header>
             <!-- 归档面板 -->
-            <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte"></ArchivePanel>
+            <ArchivePanel sortedPosts={sortedPostsList} client:load="svelte"></ArchivePanel>
         </div>
     </div>
 </GridLayout>

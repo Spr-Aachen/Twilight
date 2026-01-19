@@ -250,6 +250,7 @@ export class WidgetManager {
      * @returns 格式化后的标题数组
      */
     getPageHeadings() {
+        if (typeof document === "undefined") return [];
         return Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
             .filter((h) => h.id)
             .map((h) => ({
