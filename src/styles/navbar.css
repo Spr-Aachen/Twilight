@@ -160,7 +160,7 @@
     }
 }
 
-/* 手机端导航栏全宽优化 */
+/* 手机端导航栏 */
 @media (max-width: 768px) {
     #navbar > div {
         max-width: none !important;
@@ -169,48 +169,60 @@
         margin-right: 0 !important;
     }
 }
-
-/* 小屏手机优化 */
+/* 手机端导航栏 - 小屏 */
 @media (max-width: 512px) {
     #navbar > div {
-        border-radius: 0.5rem !important;
+        border-radius: 0.3rem !important;
         margin: 0 !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+        padding-left: 0.6rem !important;
+        padding-right: 0.6rem !important;
         max-width: none !important;
         width: 100% !important;
     }
-}
 
-/* 小屏幕优化 - 减少按钮间距 */
-@media (min-width: 333px) and (max-width: 512px) {
     #navbar-buttons {
         gap: 0.123rem !important;
     }
-    /* Only size direct button children; do not affect nested buttons inside panels */
-    #navbar-buttons > button {
+    /* Only size the trigger buttons; do not affect nested buttons inside panels */
+    #navbar-buttons button:not(.float-panel *) {
         width: 2.4rem !important;
+        height: 2.4rem !important;
+        padding: 0 !important;
+    }
+
+    /* home button */
+    #navbar > div > a:first-child {
+        width: 7.2rem !important;
         height: 2.4rem !important;
         padding: 0 !important;
     }
 }
 
-/* 超小屏幕优化 - 只显示菜单按钮 */
+/* 手机端导航栏 - 更小屏 */
+@media (min-width: 333px) and (max-width: 444px) {
+    #navbar-buttons {
+        gap: 0.111rem !important;
+    }
+    /* Only size the trigger buttons; do not affect nested buttons inside panels */
+    #navbar-buttons button:not(.float-panel *) {
+        width: 2.1rem !important;
+        height: 2.1rem !important;
+        padding: 0 !important;
+    }
+
+    /* home button */
+    #navbar > div > a:first-child {
+        width: 6.3rem !important;
+        height: 2.1rem !important;
+        padding: 0 !important;
+    }
+}
+
+/* 手机端导航栏按钮 -超小屏 */
 @media (max-width: 333px) {
     #navbar-buttons {
         gap: 0 !important;
         justify-content: flex-end !important;
-    }
-
-    #navbar-buttons button:not(#nav-menu-switch),
-    #navbar-buttons > *:not(#nav-menu-switch) {
-        display: none !important;
-    }
-
-    #navbar-buttons #nav-menu-switch {
-        width: 2.75rem !important;
-        height: 2.75rem !important;
-        margin-left: auto !important;
     }
 
     /* Hide home button text (keep icon) */
