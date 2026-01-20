@@ -9,7 +9,7 @@ import { getNavbarTransparentModeForWallpaperMode, getDefaultWallpaperMode } fro
 import NavLinks from "@components/navbar/navLinks.astro";
 import NavMenu from "@components/navbar/navMenu.svelte";
 import Search from "@components/navbar/search.svelte";
-import TranslateButton from "@components/navbar/translateButton.svelte";
+import Translator from "@components/navbar/translator.svelte";
 import DisplaySettings from "@components/navbar/displaySettings.svelte";
 import LightDarkSwitch from "@components/navbar/lightDarkSwitch.svelte";
 import WallpaperSwitch from "@components/navbar/wallpaperSwitch.svelte";
@@ -51,7 +51,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
         </div>
         <div class="flex items-center navbar-buttons" id="navbar-buttons">
             <Search client:load="svelte"></Search>
-            <TranslateButton client:load="svelte"></TranslateButton>
+            <Translator client:load="svelte"></Translator>
             <DisplaySettings client:load="svelte"></DisplaySettings>
             <LightDarkSwitch client:load="svelte"></LightDarkSwitch>
             <WallpaperSwitch client:load="svelte"></WallpaperSwitch>

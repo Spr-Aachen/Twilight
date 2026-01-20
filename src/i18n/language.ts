@@ -137,7 +137,7 @@ export const langToLocaleMap: Record<string, string> = Object.fromEntries(
 );
 
 /**
- * 获取所有支持翻译的语言列表（用于 TranslateButton）
+ * 获取所有支持翻译的语言列表（用于 Translator）
  */
 export function getSupportedTranslateLanguages() {
     return Object.entries(LANGUAGE_CONFIG).map(([code, config]) => ({

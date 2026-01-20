@@ -7,15 +7,16 @@ import type { Snippet } from "svelte";
 
 
 interface Props {
+    id?: string;
     class?: string;
     children?: Snippet;
     element?: HTMLElement;
 }
 
-let { class: className = "", children, element = $bindable(), ...restProps }: Props = $props();
+let { id, class: className = "", children, element = $bindable(), ...restProps }: Props = $props();
 </script>
 
-<div bind:this={element} class={`card-base float-panel p-2 ${className}`.trim()} {...restProps}>
+<div {id} bind:this={element} class={`card-base float-panel p-2 ${className}`.trim()} {...restProps}>
     {#if children}
         {@render children()}
     {/if}
