@@ -54,7 +54,7 @@ $effect(() => {
     >
         <Icon icon="material-symbols:palette-outline" class="text-[1.25rem]"></Icon>
     </button>
-    <div id="display-setting" class="float-panel absolute transition-all w-80 right-0 px-4 py-4" class:float-panel-closed={!isOpen}>
+    <div id="display-setting" class="float-panel transition-all px-4 py-4 fixed top-[4.5rem] right-4 w-[calc(100vw-2rem)] max-w-80 md:absolute md:top-auto md:right-0 md:w-80" class:float-panel-closed={!isOpen}>
         <div class="flex flex-row gap-2 mb-3 items-center justify-between">
             <div class="flex gap-2 font-bold text-lg text-neutral-900 dark:text-neutral-100 transition relative ml-3
                 before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]

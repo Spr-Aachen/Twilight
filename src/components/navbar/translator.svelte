@@ -100,11 +100,11 @@ onDestroy(() => {
         <Icon icon="material-symbols:translate" class="text-[1.25rem] transition" />
     </button>
     <!-- 翻译面板 -->
-     <DropdownPanel
-         element={translatePanel}
-         id="translate-panel"
-         class="absolute top-[3.75rem] right-0 z-50 w-64 p-4 transition-all duration-200 {isOpen ? '' : 'float-panel-closed'}"
-     >
+    <DropdownPanel
+        element={translatePanel}
+        id="translate-panel"
+        class="z-50 p-4 transition-all duration-200 fixed top-[4.5rem] right-4 w-[calc(100vw-2rem)] max-w-64 md:absolute md:top-[3.75rem] md:right-0 md:w-64 {isOpen ? '' : 'float-panel-closed'}"
+    >
         <div class="text-sm font-medium text-[var(--primary)] mb-3 px-1">
             选择语言 / Select Language
         </div>
