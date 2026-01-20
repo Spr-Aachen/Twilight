@@ -63,8 +63,6 @@ export const siteConfig: SiteConfig = {
     themeColor: {
         // 主题色的默认色相 (范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345)
         hue: 255,
-        // 对访问者隐藏主题色选择器
-        fixed: false,
     },
     // 默认主题 ("system" 跟随系统 | "light" 浅色 | "dark" 深色)
     defaultTheme: "dark",

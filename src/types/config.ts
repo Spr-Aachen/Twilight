@@ -85,8 +85,6 @@ export type SiteConfig = {
     themeColor: {
         // 主题色的默认色相 (0-360)
         hue: number;
-        // 对访问者隐藏主题色选择器
-        fixed: boolean;
     };
     // 默认主题
     defaultTheme: "system" | "light" | "dark";
