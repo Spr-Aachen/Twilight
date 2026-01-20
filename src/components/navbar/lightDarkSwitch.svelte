@@ -17,7 +17,7 @@ import DropdownPanel from "@/components/common/DropdownPanel.svelte";
 
 
 const seq: LIGHT_DARK_MODE[] = [LIGHT_MODE, DARK_MODE, SYSTEM_MODE];
-let mode: LIGHT_DARK_MODE = $state(siteConfig.themeColor.defaultMode || SYSTEM_MODE);
+let mode: LIGHT_DARK_MODE = $state(siteConfig.defaultTheme || SYSTEM_MODE);
 
 
 onMount(() => {
@@ -44,13 +44,13 @@ function toggleScheme() {
 
 function showPanel() {
     const panel = document.querySelector("#light-dark-panel");
-    panel.classList.remove("float-panel-closed");
+    panel?.classList.remove("float-panel-closed");
 }
 
 
 function hidePanel() {
     const panel = document.querySelector("#light-dark-panel");
-    panel.classList.add("float-panel-closed");
+    panel?.classList.add("float-panel-closed");
 }
 
 </script>
