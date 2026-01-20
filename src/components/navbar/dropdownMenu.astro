@@ -37,11 +37,15 @@ const { link, class: className } = Astro.props;
     /* 小屏幕时只显示图标 */
     @media (max-width: 1023px) {
         .nav-link-item {
-            @apply px-2;
+            @apply w-11 px-0 flex items-center justify-center;
         }
 
         .nav-link-text {
             @apply hidden;
+        }
+
+        .nav-link-icon {
+            @apply ml-0;
         }
     }
 

@@ -137,18 +137,18 @@
 
     #navbar .navbar-buttons {
         justify-self: end;
-        gap: clamp(0.12rem, 1vw, 0.24rem);
+        gap: clamp(0.12rem, 1vw, 0.36rem);
     }
 }
 
 /* 非大屏桌面端&平板端优化 */
 @media (min-width: 768px) and (max-width: 1280px) {
     #navbar .navbar-nav-links {
-        gap: 0.12rem;
+        gap: 0.2rem;
     }
 
     #navbar .navbar-buttons {
-        gap: 0.12rem;
+        gap: 0.2rem;
     }
 
     /* 搜索状态下的避让逻辑以防重叠 */
