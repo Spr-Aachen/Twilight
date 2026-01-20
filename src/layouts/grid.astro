@@ -12,9 +12,9 @@ import IconifyLoader from "@components/common/iconifyLoader.astro";
 import Navbar from "@components/navbar.astro";
 import FullscreenWallpaper from "@components/fullscreenWallpaper.astro";
 import Banner from "@components/banner.astro";
-import TableOfContents from "@components/sidebar/toc.astro";
 import SideBar from "@components/sidebar.astro";
 import Footer from "@components/footer.astro";
+import TocButton from "@components/tocButton.astro";
 import BackToTop from "@components/backToTop.astro";
 import BaseLayout from "./base.astro";
 import "@styles/grid.css";
@@ -232,7 +232,7 @@ const {
         </div>
     </div>
 
-    <TableOfContents isFloating={true} />
+    <TocButton />
 
     <BackToTop />
 

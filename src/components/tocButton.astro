@@ -1,0 +1,120 @@
+---
+import { Icon } from "astro-icon/components";
+import { NAVBAR_HEIGHT } from "@constants/constants";
+import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
+
+
+interface Props {
+    class?: string;
+    style?: string;
+}
+
+const { class: className, style } = Astro.props;
+---
+
+<table-of-contents data-is-floating="true" data-navbar-height={NAVBAR_HEIGHT} class={className} style={style}>
+    <div class="toc-floating-container">
+        <div class="toc-floating-btn-wrapper rounded-2xl overflow-hidden transition">
+            <button class="toc-floating-btn btn-card rounded-2xl p-0 flex items-center justify-center" aria-label="Table of Contents">
+                <Icon name="material-symbols:format-list-bulleted-rounded" size={24} />
+            </button>
+        </div>
+        <div class="toc-floating-panel hidden opacity-0 translate-y-4 pointer-events-none">
+            <div class="toc-panel-header">
+                <Icon name="material-symbols:format-list-bulleted-rounded" class="text-[var(--primary)]" size={20} />
+                <span class="text-sm font-bold text-75">{i18n(I18nKey.tableOfContents)}</span>
+            </div>
+            <div class="toc-inner-content relative"></div>
+        </div>
+    </div>
+</table-of-contents>
+
+<script>
+    import "./sidebar/toc";
+</script>
+
+<style lang="stylus">
+    .toc-floating-container
+        position: fixed
+        right: 1rem
+        bottom: 6.78rem
+        z-index: 90
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+        pointer-events: none
+
+    .toc-floating-btn-wrapper
+        width: 3rem
+        height: 3rem
+        pointer-events: auto
+        box-shadow: 0 0 0 1px var(--btn-regular-bg), 0 0 1em var(--btn-regular-bg)
+        color: var(--primary)
+
+    .toc-floating-btn
+        width: 100%
+        height: 100%
+        cursor: pointer
+        color: inherit
+        border: none
+        transition: transform 0.2s, background-color 0.2s
+
+        &:active
+            transform: scale(0.9)
+
+    .toc-floating-panel
+        position: absolute
+        bottom: 100%
+        right: 0
+        margin-bottom: 1rem
+        width: 16rem
+        max-height: 60vh
+        overflow-y: auto
+        background-color: var(--card-bg)
+        border-radius: 1rem
+        padding: 0.75rem
+        box-shadow: var(--shadow-lg)
+        border: 1px solid var(--btn-regular-bg)
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+        z-index: 91
+        pointer-events: auto
+        
+        /* Scrollbar styling */
+        scrollbar-width: thin
+        scrollbar-color: var(--toc-btn-hover) transparent
+
+    .toc-panel-header
+        display: flex
+        align-items: center
+        gap: 0.5rem
+        padding: 0.25rem 0.5rem 0.75rem 0.5rem
+        border-bottom: 1px solid var(--btn-regular-bg)
+        margin-bottom: 0.5rem
+
+    .toc-floating-panel::-webkit-scrollbar
+        width: 4px
+    .toc-floating-panel::-webkit-scrollbar-track
+        background: transparent
+    .toc-floating-panel::-webkit-scrollbar-thumb
+        background: var(--toc-btn-hover)
+        border-radius: 10px
+    
+    .toc-floating-container.move-up
+        transform: translateY(-4rem)
+    
+    .toc-floating-container.toc-hide
+        transform: translateY(2rem) scale(0.9)
+        opacity: 0
+        pointer-events: none
+
+    /* Mobile adjustments */
+    @media (max-width: 768px)
+        .toc-floating-container
+            bottom: 5.5rem
+            right: 0.5rem
+    
+    /* Highlighting for TOC items */
+    :global(.toc-floating-panel .toc-inner-content a.visible .text-50),
+    :global(.toc-floating-panel .toc-inner-content a.visible .text-30)
+        color: var(--primary)
+        font-weight: 500
+</style>
