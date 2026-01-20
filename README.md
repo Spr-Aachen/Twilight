@@ -76,7 +76,7 @@ English | [**中文**](docs/README_ZH.md)
    ```
 
 3. **Configure your blog:**
-   - [Customize blog settings](https://docs.twilight.spr-aachen.com/en/config/core) inside `src/config.ts`
+   - [Customize blog settings](https://docs.twilight.spr-aachen.com/en/config/core) inside `twilight.config.yaml`
    - [Support CMS functionality](https://docs.twilight.spr-aachen.com/en/config/cms) inside `.env`
    - [Support Umami analytics](https://docs.twilight.spr-aachen.com/en/config/analytics) inside `.env`
    - [Manage site content](https://docs.twilight.spr-aachen.com/en/config/content) inside `src/content`

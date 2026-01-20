@@ -76,7 +76,7 @@
    ```
 
 3. **配置博客**
-   - 在 `src/config.ts` 中 [自定义博客设置](https://docs.twilight.spr-aachen.com/config/core)
+   - 在 `twilight.config.yaml` 中 [自定义博客设置](https://docs.twilight.spr-aachen.com/config/core)
    - 在 `.env` 中 [配置 CMS 功能](https://docs.twilight.spr-aachen.com/config/cms)
    - 在 `.env` 中 [配置站点统计功能](https://docs.twilight.spr-aachen.com/config/analytics)
    - 在 `src/content` 中 [管理站点内容](https://docs.twilight.spr-aachen.com/config/content)
