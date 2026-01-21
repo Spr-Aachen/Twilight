@@ -142,7 +142,7 @@
 }
 
 /* 非大屏桌面端&平板端优化 */
-@media (min-width: 768px) and (max-width: 1280px) {
+@media (min-width: 768px) and (max-width: 1279px) {
     #navbar .navbar-nav-links {
         gap: 0.2rem;
     }

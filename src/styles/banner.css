@@ -92,7 +92,7 @@ html.is-wallpaper-transitioning body {
 }
 
 /* 桌面端 */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
     .banner-text-overlay {
         align-items: center !important; /* 垂直居中 */
         justify-content: center !important; /* 水平居中 */
@@ -141,7 +141,7 @@ html.is-wallpaper-transitioning body {
 
 
 /* 移动端轮播图片 */
-@media (max-width: 1023px) {
+@media (max-width: 1279px) {
     /* 确保轮播容器有正确的 overflow 设置 */
     #banner-carousel {
         overflow: hidden !important;
@@ -177,7 +177,7 @@ html.is-wallpaper-transitioning body {
 }
 
 /* 移动端 banner 性能 */
-@media (max-width: 1023px) {
+@media (max-width: 1279px) {
     .banner-container {
         /* 启用硬件加速 */
         transform: translateZ(0);
@@ -258,7 +258,7 @@ html.is-wallpaper-transitioning body {
 }
 
 /* 移动端暗色模式 */
-@media (max-width: 1023px) and (prefers-color-scheme: dark) {
+@media (max-width: 1279px) and (prefers-color-scheme: dark) {
     .banner-text-overlay {
         background: linear-gradient(
             to top,
@@ -270,7 +270,7 @@ html.is-wallpaper-transitioning body {
 }
 
 /* 移动端横屏 */
-@media (max-width: 1023px) and (orientation: landscape) {
+@media (max-width: 1279px) and (orientation: landscape) {
     .banner-text-overlay {
         padding: 1rem 1.5rem;
         align-items: center !important; /* 垂直居中 */
@@ -290,7 +290,7 @@ html.is-wallpaper-transitioning body {
 }
 
 /* 平板 */
-@media (min-width: 769px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1279px) {
     /* 横幅文本覆盖层 */
     .banner-text-overlay {
         align-items: center !important; /* 垂直居中 */
