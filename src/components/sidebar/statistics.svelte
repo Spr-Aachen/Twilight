@@ -2,6 +2,8 @@
     import { onMount } from 'svelte';
     import Icon from "@iconify/svelte";
     import dayjs from 'dayjs';
+
+    import { BREAKPOINT_LG } from "@constants/breakpoints";
     import { i18n } from "@i18n/translation";
     import I18nKey from "@i18n/i18nKey";
 
@@ -42,6 +44,13 @@
 
     let timeScale: 'year' | 'month' | 'day' = $state('year');
     let isDark = $state(false);
+    let isDesktop = $state(true);
+
+    const updateIsDesktop = () => {
+        if (typeof window !== 'undefined') {
+            isDesktop = window.innerWidth >= BREAKPOINT_LG;
+        }
+    };
 
     const getThemeColors = () => {
         const isDarkNow = document.documentElement.classList.contains('dark');
@@ -88,7 +97,7 @@
     const initCharts = () => {
         if (isInitialized) return;
         initActivityChart();
-        initRadarCharts();
+        if (isDesktop) initRadarCharts();
         isInitialized = true;
     };
 
@@ -296,6 +305,8 @@
     };
 
     onMount(async () => {
+        updateIsDesktop();
+
         await loadECharts();
 
         // 检查是否处于初始加载动画阶段
@@ -343,9 +354,22 @@
         }
 
         const handleResize = () => {
+            const wasDesktop = isDesktop;
+            updateIsDesktop();
+            
             heatmapChart?.resize();
-            categoriesChart?.resize();
-            tagsChart?.resize();
+            
+            if (isDesktop) {
+                if (wasDesktop) {
+                    categoriesChart?.resize();
+                    tagsChart?.resize();
+                } else {
+                    // 从移动端切换到桌面端，需要初始化雷达图，延迟一帧确保 DOM 已更新（{#if isDesktop} 生效）
+                    setTimeout(() => {
+                        initRadarCharts();
+                    }, 0);
+                }
+            }
         };
 
         const observer = new MutationObserver(() => {
@@ -354,7 +378,7 @@
                 isDark = newIsDark;
                 if (isInitialized) {
                     initActivityChart(true);
-                    initRadarCharts();
+                    if (isDesktop) initRadarCharts();
                 }
             }
         });
@@ -399,13 +423,15 @@
                 <div bind:this={heatmapContainer} class="heatmap-container"></div>
             </div>
 
-            <div class="chart-section radar-section">
-                <div bind:this={categoriesContainer} class="radar-container"></div>
-            </div>
+            {#if isDesktop}
+                <div class="chart-section radar-section">
+                    <div bind:this={categoriesContainer} class="radar-container"></div>
+                </div>
 
-            <div class="chart-section radar-section">
-                <div bind:this={tagsContainer} class="radar-container"></div>
-            </div>
+                <div class="chart-section radar-section">
+                    <div bind:this={tagsContainer} class="radar-container"></div>
+                </div>
+            {/if}
         </div>
     </div>
 </div>
