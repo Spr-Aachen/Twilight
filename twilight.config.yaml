@@ -198,94 +198,52 @@ navbar:
 sidebar:
     # 侧边栏组件配置列表 (侧栏组件预设位于 src/types/config.ts 的 WidgetComponentType)
     components:
-        - # 组件 - 资料 (预设)
-            # 类型
-            type: "profile"
-            # 是否启用
-            enable: true
-            # 所属侧边栏 ("left" 左侧 | "right" 右侧)
-            side: "left"
-            # 显示顺序 (数字越小越靠前)
-            order: 1
-            # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
-            position: "top"
-        - # 组件 - 公告 (预设)
-            # 类型
-            type: "announcement"
-            # 是否启用
-            enable: true
-            # 所属侧边栏 ("left" 左侧 | "right" 右侧)
-            side: "left"
-            # 显示顺序 (数字越小越靠前)
-            order: 2
-            # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
-            position: "top"
-        - # 组件 - 文章类别 (预设)
-            # 类型
-            type: "categories"
-            # 是否启用
-            enable: true
-            # 所属侧边栏 ("left" 左侧 | "right" 右侧)
-            side: "left"
-            # 显示顺序 (数字越小越靠前)
-            order: 3
-            # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
-            position: "sticky"
-            # 响应式配置
-            responsive:
-                # 折叠阈值
-                collapseThreshold: 5
-        - # 组件 - 文章标签 (预设)
-            # 类型
-            type: "tags"
-            # 是否启用
-            enable: true
-            # 所属侧边栏 ("left" 左侧 | "right" 右侧)
-            side: "left"
-            # 显示顺序 (数字越小越靠前)
-            order: 4
-            # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
-            position: "sticky"
-            # 响应式配置
-            responsive:
-                # 折叠阈值
-                collapseThreshold: 20
-        - # 组件 - 文章目录 (预设)
-            # 类型
-            type: "toc"
-            # 是否启用
-            enable: true
-            # 所属侧边栏 ("left" 左侧 | "right" 右侧)
-            side: "right"
-            # 显示顺序 (数字越小越靠前)
-            order: 1
-            # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
-            position: "sticky"
-            # 自定义属性
-            customProps:
-                # 目录深度 (1-6，1 表示只显示 h1 标题，2 表示显示 h1 和 h2 标题，依此类推)
-                depth: 3
-        - # 组件 - 文章统计 (预设)
-            # 类型
-            type: "statistics"
-            # 是否启用
-            enable: true
-            # 所属侧边栏 ("left" 左侧 | "right" 右侧)
-            side: "right"
-            # 显示顺序 (数字越小越靠前)
-            order: 2
-            # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
-            position: "sticky"
-    # 响应式布局配置
-    responsive:
-        # 不同设备的布局模式 ("hidden" 不显示侧边栏 | "drawer" 抽屉模式 | "sidebar" 显示侧边栏)
-        layout:
-            # 移动端
-            mobile: "sidebar"
-            # 平板端
-            tablet: "sidebar"
-            # 桌面端
-            desktop: "sidebar"
+        # 左侧侧边栏
+        left:
+            - # 组件 - 资料 (预设)
+                # 类型
+                type: "profile"
+                # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
+                position: "top"
+            - # 组件 - 公告 (预设)
+                # 类型
+                type: "announcement"
+                # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
+                position: "top"
+            - # 组件 - 文章类别 (预设)
+                # 类型
+                type: "categories"
+                # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
+                position: "sticky"
+                # 响应式配置
+                responsive:
+                    # 折叠阈值
+                    collapseThreshold: 5
+            - # 组件 - 文章标签 (预设)
+                # 类型
+                type: "tags"
+                # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
+                position: "sticky"
+                # 响应式配置
+                responsive:
+                    # 折叠阈值
+                    collapseThreshold: 20
+        # 右侧侧边栏
+        right:
+            - # 组件 - 文章目录 (预设)
+                # 类型
+                type: "toc"
+                # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
+                position: "sticky"
+                # 自定义属性
+                customProps:
+                    # 目录深度 (1-6，1 表示只显示 h1 标题，2 表示显示 h1 和 h2 标题，依此类推)
+                    depth: 3
+            - # 组件 - 文章统计 (预设)
+                # 类型
+                type: "statistics"
+                # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
+                position: "sticky"
 
 # 资料配置
 profile:

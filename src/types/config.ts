@@ -254,10 +254,6 @@ export type WidgetComponentConfig = {
     type: WidgetComponentType;
     // 启用该组件
     enable: boolean;
-    // 组件所属侧边栏
-    side: "left" | "right"; // 左侧栏或右侧栏
-    // 显示顺序，数字越小越靠前
-    order: number;
     // 组件位置
     position: "top" | "sticky"; // 顶部固定区域或粘性区域
     // 自定义内联样式
@@ -271,25 +267,6 @@ export type WidgetComponentConfig = {
     };
     // 自定义属性
     customProps?: Record<string, any>;
-};
-
-
-// 侧边栏配置
-export type SidebarConfig = {
-    // 侧边栏组件配置列表
-    components: WidgetComponentConfig[];
-    // 响应式布局配置
-    responsive: {
-        // 不同设备的布局模式
-        layout: {
-            // 移动端
-            mobile: "hidden" | "bottom" | "drawer" | "sidebar";
-            // 平板端
-            tablet: "sidebar" | "bottom" | "drawer";
-            // 桌面端
-            desktop: "sidebar";
-        };
-    };
 };
 
 
@@ -332,6 +309,16 @@ export type AnnouncementConfig = {
         url: string;
         // 是否外部链接
         external?: boolean;
+    };
+};
+
+
+// 侧边栏配置
+export type SidebarConfig = {
+    // 侧边栏组件配置列表
+    components: {
+        left: WidgetComponentConfig[];
+        right: WidgetComponentConfig[];
     };
 };
 

@@ -6,15 +6,16 @@ import WidgetLayout from "./widgetLayout.astro";
 
 
 interface Props {
+    id?: string;
     class?: string;
     style?: string;
     depth?: number;
 }
 
-const { class: className, style, depth = 3 } = Astro.props;
+const { id = "toc-wrapper", class: className, style, depth = 3 } = Astro.props;
 ---
 
-<WidgetLayout name={i18n(I18nKey.tableOfContents)} id="toc-wrapper" class:list={[className, "toc-hide"]} style={style}>
+<WidgetLayout name={i18n(I18nKey.tableOfContents)} id={id} class:list={[className, "toc-wrapper", "toc-hide", "hidden md:block"]} style={style}>
     <div class="toc-scroll-container">
         <table-of-contents class="group" data-depth={depth} data-navbar-height={NAVBAR_HEIGHT}>
             <div class="toc-inner-content relative"></div>
@@ -57,7 +58,7 @@ import "./toc";
     }
 
     /* 基础过渡样式 */
-    :global(widget-layout[data-id="toc-wrapper"]) {
+    :global(widget-layout.toc-wrapper) {
         transition:
             max-height 300ms cubic-bezier(0.4, 0, 0.2, 1),
             opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -66,15 +67,9 @@ import "./toc";
             visibility 300ms;
         max-height: 1200px; /* 足够容纳目录的高度，避免 100vh 可能带来的过长过渡延迟 */
         overflow: hidden;
-        display: none; /* 默认隐藏，由媒体查询控制在桌面端显示 */
-    }
-    @media (min-width: 768px) {
-        :global(widget-layout[data-id="toc-wrapper"]) {
-            display: block;
-        }
     }
     /* 隐藏状态 */
-    :global(widget-layout[data-id="toc-wrapper"].toc-hide) {
+    :global(widget-layout.toc-wrapper.toc-hide) {
         max-height: 0;
         opacity: 0;
         margin-bottom: -1rem; /* 抵消父级 flex 的 gap-4 */

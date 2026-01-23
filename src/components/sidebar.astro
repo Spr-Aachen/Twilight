@@ -14,7 +14,7 @@ interface Props {
     id?: string;
     class?: string;
     headings?: MarkdownHeading[];
-    side: "left" | "right";
+    side: "left" | "right" | "middle";
 }
 
 const { id, class: className, headings, side } = Astro.props;
@@ -34,32 +34,38 @@ const componentMap = {
 };
 
 // 渲染组件的辅助函数
-function renderComponent(component: any, index: number, components: any[]) {
+function renderComponent(component: any, index: number) {
     const ComponentToRender =
         componentMap[component.type as keyof typeof componentMap];
     if (!ComponentToRender) return null;
 
-    const componentClass = widgetManager.getComponentClass(component, index);
+    const componentClass = widgetManager.getComponentClass(component, index, side);
     const componentStyle = widgetManager.getComponentStyle(component, index);
+
+    const props: any = {
+        class: componentClass,
+        style: componentStyle,
+        ...component.customProps,
+    };
+
+    if (component.type === "toc") {
+        props.headings = headings;
+        props.id = `toc-wrapper-${side}`;
+    }
 
     return {
         Component: ComponentToRender,
-        props: {
-            class: componentClass,
-            style: componentStyle,
-            headings: component.type === "toc" ? headings : undefined,
-            ...component.customProps,
-        },
+        props,
     };
 }
 ---
 
-<div id={id || "sidebar"} data-side={side} class:list={[className, "w-full"]}>
+<div id={id || "sidebar"} data-side={side} class:list={[className, "w-full h-full"]}>
     <!-- 顶部固定组件区域 -->
     {topComponents.length > 0 && (
         <div class:list={["flex flex-col w-full gap-4", { "mb-4": stickyComponents.length > 0 }]}>
             {topComponents.map((component, index) => {
-                const renderData = renderComponent(component, index, topComponents);
+                const renderData = renderComponent(component, index);
                 if (!renderData) return null;
 
                 const { Component, props } = renderData;
@@ -72,7 +78,7 @@ function renderComponent(component: any, index: number, components: any[]) {
     {stickyComponents.length > 0 && (
         <div id="sidebar-sticky" class="flex flex-col w-full gap-4 sticky top-4">
             {stickyComponents.map((component, index) => {
-                const renderData = renderComponent(component, index, stickyComponents);
+                const renderData = renderComponent(component, index);
                 if (!renderData) return null;
 
                 const { Component, props } = renderData;

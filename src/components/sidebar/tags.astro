@@ -3,7 +3,7 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { getTagList } from "@utils/content";
 import { getTagUrl } from "@utils/url";
-import { widgetManager } from "@utils/widget";
+import { widgetManager, getComponentConfig } from "@utils/widget";
 import ButtonTag from "@/components/common/buttonTag.astro";
 import WidgetLayout from "./widgetLayout.astro";
 
@@ -13,7 +13,7 @@ const tags = await getTagList();
 const COLLAPSED_HEIGHT = "7.5rem";
 
 // 使用统一的组件管理器检查是否应该折叠
-const tagsComponent = widgetManager.getConfig().components.find(c => c.type === "tags");
+const tagsComponent = getComponentConfig("tags");
 const isCollapsed = tagsComponent ? widgetManager.isCollapsed(tagsComponent, tags.length) : false;
 
 interface Props {

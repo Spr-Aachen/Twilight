@@ -2,6 +2,7 @@ import yaml from "js-yaml";
 
 import type {
     SiteConfig,
+    NavbarLink,
     NavbarConfig,
     SidebarConfig,
     ProfileConfig,
@@ -11,7 +12,6 @@ import type {
     ParticleConfig,
     MusicPlayerConfig,
     PioConfig,
-    NavbarLink,
 } from "./types/config";
 import { LinkPreset } from "./types/config";
 import rawConfig from "../twilight.config.yaml?raw";

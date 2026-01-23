@@ -70,13 +70,13 @@ const transparentClass = shouldEnableTransparency ? "wallpaper-transparent" : ""
 const {
     hasLeftSidebar,
     hasRightSidebar,
-    mobileShowSidebar,
-    tabletShowSidebar,
-    desktopShowSidebar,
+    hasAnyComponents,
     gridCols,
     leftSidebarClass,
     rightSidebarClass,
     mainContentClass,
+    mobileFooterClass,
+    middleSidebarClass,
 } = widgetManager.getGridLayout(headings);
 ---
 
@@ -138,7 +138,7 @@ const {
         >
             <div
                     id="main-grid"
-                    class={`transition-all duration-600 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!mobileShowSidebar ? "mobile-no-sidebar" : ""} ${(hasLeftSidebar || hasRightSidebar) ? "mobile-both-sidebar" : ""}`}
+                    class={`transition-all duration-600 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!hasAnyComponents ? "mobile-no-sidebar" : ""} ${(hasLeftSidebar || hasRightSidebar) ? "mobile-both-sidebar" : ""}`}
                 >
                 <!-- Banner image credit -->
                 {
@@ -224,7 +224,16 @@ const {
                     </div>
                 </main>
 
-                <div class="footer col-span-2 onload-animation-up block lg:hidden transition-swup-fade">
+                <div class={middleSidebarClass}>
+                    <Sidebar
+                        id="mobile-sidebar"
+                        side="middle"
+                        class={`${transparentClass} onload-animation-up`}
+                        headings={headings}
+                    />
+                </div>
+
+                <div class={mobileFooterClass}>
                     <Footer />
                 </div>
 

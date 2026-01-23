@@ -25,11 +25,9 @@ export const WIDGET_COMPONENT_MAP = {
  */
 export class WidgetManager {
     private config: SidebarConfig;
-    private enabledComponents: WidgetComponentConfig[];
 
     constructor(config: SidebarConfig = sidebarConfig) {
         this.config = config;
-        this.enabledComponents = this.getEnabledComponents();
     }
 
     /**
@@ -40,20 +38,11 @@ export class WidgetManager {
     }
 
     /**
-     * 获取启用的组件列表
-     */
-    private getEnabledComponents(): WidgetComponentConfig[] {
-        return this.config.components
-            .filter((component) => component.enable)
-            .sort((a, b) => a.order - b.order);
-    }
-
-    /**
-     * 获取指定侧边栏上启用的组件列表
+     * 获取指定侧边栏上的组件列表
      * @param side 侧边栏位置：'left' | 'right'
      */
-    getEnabledComponentsBySide(side: "left" | "right"): WidgetComponentConfig[] {
-        return this.enabledComponents.filter((component) => component.side === side);
+    getComponentsBySide(side: "left" | "right"): WidgetComponentConfig[] {
+        return this.config.components[side] || [];
     }
 
     /**
@@ -61,48 +50,78 @@ export class WidgetManager {
      * @param position 组件位置：'top' | 'sticky'
      */
     getComponentsByPosition(position: "top" | "sticky"): WidgetComponentConfig[] {
-        return this.enabledComponents.filter(
-            (component) => component.position === position,
-        );
+        const left = this.getComponentsBySideAndPosition("left", position);
+        const right = this.getComponentsBySideAndPosition("right", position);
+        // Note: This might return duplicates if left/right logic overlaps, but used for enabled types check
+        return [...left, ...right];
     }
 
     /**
      * 根据侧边栏和位置获取组件列表
-     * @param side 侧边栏位置：'left' | 'right'
+     * @param side 侧边栏位置：'left' | 'right' | 'middle'
      * @param position 组件位置：'top' | 'sticky'
      */
     getComponentsBySideAndPosition(
-        side: "left" | "right",
+        side: "left" | "right" | "middle",
         position: "top" | "sticky",
     ): WidgetComponentConfig[] {
-        return this.enabledComponents.filter(
-            (component) => component.side === side && component.position === position,
-        );
+        const leftComponents = (this.config.components.left || []).filter(c => c.position === position);
+        const rightComponents = (this.config.components.right || []).filter(c => c.position === position);
+
+        if (side === "left") {
+            // Left sidebar includes Right components on Tablet (merged)
+            return [...leftComponents, ...rightComponents];
+        }
+        
+        if (side === "right") {
+            // Right sidebar only shows Right components (Desktop only)
+            return rightComponents;
+        }
+
+        if (side === "middle") {
+            // Middle sidebar includes all components
+            return [...leftComponents, ...rightComponents];
+        }
+
+        return [];
     }
 
     /**
      * 获取组件的CSS类名
      * @param component 组件配置
      * @param index 组件在列表中的索引
+     * @param side 当前渲染的侧边栏位置
      */
-    getComponentClass(component: WidgetComponentConfig, index: number): string {
+    getComponentClass(component: WidgetComponentConfig, index: number, side: "left" | "right" | "middle"): string {
         const classes: string[] = [];
 
-        // 添加响应式隐藏类名
+        // 基础响应式隐藏配置 (用户配置的)
         if (component.responsive?.hidden) {
             component.responsive.hidden.forEach((device) => {
                 switch (device) {
                     case "mobile":
-                        classes.push("hidden", "md:block");
+                        classes.push("hidden md:block");
                         break;
                     case "tablet":
-                        classes.push("md:hidden", "lg:block");
+                        classes.push("md:hidden lg:block");
                         break;
                     case "desktop":
                         classes.push("lg:hidden");
                         break;
                 }
             });
+        }
+
+        // 自动布局逻辑
+        const isFromLeft = (this.config.components.left || []).includes(component);
+        const isFromRight = (this.config.components.right || []).includes(component);
+
+        if (side === "left") {
+            if (isFromRight && !isFromLeft) {
+                // 如果是右侧组件在左侧栏渲染（平板模式），则仅在平板显示
+                classes.push("hidden md:block lg:hidden");
+            }
+            // 左侧组件默认显示
         }
 
         return classes.join(" ");
@@ -145,26 +164,12 @@ export class WidgetManager {
     }
 
     /**
-     * 检查当前设备是否应该显示侧边栏
-     * @param deviceType 设备类型
-     */
-    shouldShowSidebar(deviceType: "mobile" | "tablet" | "desktop"): boolean {
-        // 如果没有任何启用的组件，则不显示侧边栏
-        if (this.enabledComponents.length === 0) {
-            return false;
-        }
-
-        const layoutMode = this.config.responsive.layout[deviceType];
-        return layoutMode === "sidebar";
-    }
-
-    /**
      * 检查指定侧边栏是否具有实际可显示的内容
      * @param side 侧边栏位置：'left' | 'right'
      * @param headings 页面标题列表，用于判断特殊组件是否显示
      */
     hasContentOnSide(side: "left" | "right", headings: any[] = []): boolean {
-        const components = this.getEnabledComponentsBySide(side);
+        const components = this.getComponentsBySide(side);
         if (components.length === 0) return false;
 
         // 只要有一个组件能显示内容，侧边栏就不是空的
@@ -184,16 +189,18 @@ export class WidgetManager {
      */
     updateConfig(newConfig: Partial<SidebarConfig>): void {
         this.config = { ...this.config, ...newConfig };
-        this.enabledComponents = this.getEnabledComponents();
     }
 
     /**
      * 添加新组件
      * @param component 组件配置
+     * @param side 侧边栏位置
      */
-    addComponent(component: WidgetComponentConfig): void {
-        this.config.components.push(component);
-        this.enabledComponents = this.getEnabledComponents();
+    addComponent(component: WidgetComponentConfig, side: "left" | "right"): void {
+        if (!this.config.components[side]) {
+            this.config.components[side] = [];
+        }
+        this.config.components[side].push(component);
     }
 
     /**
@@ -201,39 +208,31 @@ export class WidgetManager {
      * @param componentType 组件类型
      */
     removeComponent(componentType: WidgetComponentType): void {
-        this.config.components = this.config.components.filter(
-            (component) => component.type !== componentType,
-        );
-        this.enabledComponents = this.getEnabledComponents();
-    }
-
-    /**
-     * 启用/禁用组件
-     * @param componentType 组件类型
-     * @param enable 是否启用
-     */
-    toggleComponent(componentType: WidgetComponentType, enable: boolean): void {
-        const component = this.config.components.find(
-            (c) => c.type === componentType,
-        );
-        if (component) {
-            component.enable = enable;
-            this.enabledComponents = this.getEnabledComponents();
+        if (this.config.components.left) {
+            this.config.components.left = this.config.components.left.filter(
+                (component) => component.type !== componentType,
+            );
+        }
+        if (this.config.components.right) {
+            this.config.components.right = this.config.components.right.filter(
+                (component) => component.type !== componentType,
+            );
         }
     }
 
     /**
      * 重新排序组件
-     * @param componentType 组件类型
-     * @param newOrder 新的排序值
+     * @param side 侧边栏
+     * @param oldIndex 旧索引
+     * @param newIndex 新索引
      */
-    reorderComponent(componentType: WidgetComponentType, newOrder: number): void {
-        const component = this.config.components.find(
-            (c) => c.type === componentType,
-        );
-        if (component) {
-            component.order = newOrder;
-            this.enabledComponents = this.getEnabledComponents();
+    reorderComponent(side: "left" | "right", oldIndex: number, newIndex: number): void {
+        const list = this.config.components[side];
+        if (!list) return;
+        
+        if (oldIndex >= 0 && oldIndex < list.length && newIndex >= 0 && newIndex < list.length) {
+            const [moved] = list.splice(oldIndex, 1);
+            list.splice(newIndex, 0, moved);
         }
     }
 
@@ -265,43 +264,48 @@ export class WidgetManager {
      * @param headings 页面标题列表
      */
     getGridLayout(headings: any[] = []) {
-        const hasLeftSidebar = this.hasContentOnSide("left", headings);
-        const hasRightSidebar = this.hasContentOnSide("right", headings);
+        const hasLeftComponents = this.hasContentOnSide("left", headings);
+        const hasRightComponents = this.hasContentOnSide("right", headings);
+        const hasAnyComponents = hasLeftComponents || hasRightComponents;
 
-        const mobileShowSidebar = (hasLeftSidebar || hasRightSidebar) && this.shouldShowSidebar("mobile");
-        const tabletShowSidebar = (hasLeftSidebar || hasRightSidebar) && this.shouldShowSidebar("tablet");
-        const desktopShowSidebar = (hasLeftSidebar || hasRightSidebar) && this.shouldShowSidebar("desktop");
+        // Desktop: Left if hasLeft, Right if hasRight
+        const hasLeftSidebar = hasLeftComponents;
+        const hasRightSidebar = hasRightComponents;
 
         // 动态网格布局类名
         const gridCols = `
             grid-cols-1
-            ${tabletShowSidebar ? "md:grid-cols-[17.5rem_1fr]" : "md:grid-cols-1"}
+            ${hasAnyComponents ? "md:grid-cols-[17.5rem_1fr]" : "md:grid-cols-1"}
             ${
-                desktopShowSidebar
-                    ? hasLeftSidebar && hasRightSidebar
-                        ? "lg:grid-cols-[17.5rem_1fr_17.5rem]"
-                        : hasLeftSidebar
-                            ? "lg:grid-cols-[17.5rem_1fr]"
-                            : "lg:grid-cols-[1fr_17.5rem]"
-                    : "lg:grid-cols-1"
+                hasLeftSidebar && hasRightSidebar
+                    ? "lg:grid-cols-[17.5rem_1fr_17.5rem]"
+                    : hasLeftSidebar
+                        ? "lg:grid-cols-[17.5rem_1fr]"
+                        : hasRightSidebar
+                            ? "lg:grid-cols-[1fr_17.5rem]"
+                            : "lg:grid-cols-1"
             }
         `.trim().replace(/\s+/g, " ");
 
         // 左侧侧边栏容器类名
+        // Mobile: Hidden
+        // Tablet: Visible if hasAnyComponents (merged)
+        // Desktop: Visible if hasLeftSidebar
         const leftSidebarClass = `
-            mb-0 col-span-1
-            ${mobileShowSidebar && hasLeftSidebar ? "block row-start-2 row-end-3" : "hidden"}
-            ${tabletShowSidebar && hasLeftSidebar ? "md:block md:max-w-[17.5rem]" : "md:hidden"}
-            ${desktopShowSidebar && hasLeftSidebar ? "lg:block lg:max-w-[17.5rem] lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2" : "lg:hidden"}
+            mb-0 col-span-1 hidden
+            ${hasAnyComponents ? "md:block md:max-w-[17.5rem]" : ""}
+            ${hasLeftSidebar ? "lg:block lg:max-w-[17.5rem] lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2" : "lg:hidden"}
         `.trim().replace(/\s+/g, " ");
 
         // 右侧侧边栏容器类名
+        // Mobile: Hidden
+        // Tablet: Hidden
+        // Desktop: Visible if hasRightSidebar
         const rightSidebarClass = `
-            mb-0 col-span-1
-            ${mobileShowSidebar && hasRightSidebar ? "block row-start-3 row-end-4" : "hidden"}
-            ${tabletShowSidebar && hasRightSidebar ? "md:block md:max-w-[17.5rem]" : "md:hidden"}
+            mb-0 col-span-1 hidden
+            md:hidden
             ${
-                desktopShowSidebar && hasRightSidebar
+                hasRightSidebar
                     ? hasLeftSidebar
                         ? "lg:block lg:max-w-[17.5rem] lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2"
                         : "lg:block lg:max-w-[17.5rem] lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
@@ -309,32 +313,46 @@ export class WidgetManager {
             }
         `.trim().replace(/\s+/g, " ");
 
+        // 移动端 Footer 类名
+        // Always 1 col on mobile
+        // 2 cols on tablet if sidebar is present
+        const mobileFooterClass = `
+            footer col-span-1 onload-animation-up block lg:hidden transition-swup-fade
+            ${hasAnyComponents ? "md:col-span-2" : "md:col-span-1"}
+        `.trim().replace(/\s+/g, " ");
+        
+        // 移动端侧边栏类名
+        const middleSidebarClass = `
+            col-span-1 block md:hidden
+            ${!hasAnyComponents ? "hidden" : ""}
+        `.trim().replace(/\s+/g, " ");
+
         // 主内容区域类名
         const mainContentClass = `
             overflow-hidden w-full
             col-span-1 row-start-1 row-end-2
-            ${tabletShowSidebar ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2" : "md:col-span-1"}
+            ${hasAnyComponents ? "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2" : "md:col-span-1"}
             ${
-                desktopShowSidebar
-                    ? hasLeftSidebar
+                hasLeftSidebar && hasRightSidebar
+                    ? "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
+                    : hasLeftSidebar
                         ? "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
                         : hasRightSidebar
                             ? "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2"
                             : "lg:col-span-1"
-                    : "lg:col-span-1"
             }
         `.trim().replace(/\s+/g, " ");
 
         return {
             hasLeftSidebar,
             hasRightSidebar,
-            mobileShowSidebar,
-            tabletShowSidebar,
-            desktopShowSidebar,
+            hasAnyComponents,
             gridCols,
             leftSidebarClass,
             rightSidebarClass,
             mainContentClass,
+            mobileFooterClass,
+            middleSidebarClass,
         };
     }
 }
@@ -351,7 +369,10 @@ export const widgetManager = new WidgetManager();
 export function getComponentConfig(
     componentType: WidgetComponentType,
 ): WidgetComponentConfig | undefined {
-    return widgetManager.getConfig().components.find((c) => c.type === componentType);
+    const left = widgetManager.getConfig().components.left || [];
+    const right = widgetManager.getConfig().components.right || [];
+    return left.find((c) => c.type === componentType) ||
+           right.find((c) => c.type === componentType);
 }
 
 /**
@@ -361,8 +382,8 @@ export function getComponentConfig(
 export function isComponentEnabled(
     componentType: WidgetComponentType,
 ): boolean {
-    const config = getComponentConfig(componentType);
-    return config?.enable ?? false;
+    // 默认所有配置中存在的组件都视为启用
+    return !!getComponentConfig(componentType);
 }
 
 /**
