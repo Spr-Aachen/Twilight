@@ -63,6 +63,14 @@
         };
     };
 
+    const getChartsFontFamily = () => {
+        const fallback = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
+        if (typeof window === 'undefined') return fallback;
+        const target = container ?? document.body ?? document.documentElement;
+        const fontFamily = window.getComputedStyle(target).fontFamily;
+        return fontFamily && fontFamily !== 'inherit' ? fontFamily : fallback;
+    };
+
     const loadECharts = async () => {
         if (typeof window === 'undefined') return;
         isDark = document.documentElement.classList.contains('dark');
@@ -114,6 +122,7 @@
         }
 
         const colors = getThemeColors();
+        const fontFamily = getChartsFontFamily();
 
         const now = dayjs();
         let data: any[] = [];
@@ -155,13 +164,14 @@
 
         const option = {
             backgroundColor: 'transparent',
+            textStyle: { fontFamily },
             animation: isNew || isUpdate,
             animationDuration: isNew ? 2000 : 500,
             animationEasing: 'cubicOut',
             title: {
                 text: labels.activities,
                 left: 'left',
-                textStyle: { fontSize: 14, color: colors.text, fontWeight: 'bold' }
+                textStyle: { fontFamily, fontSize: 14, color: colors.text, fontWeight: 'bold' }
             },
             tooltip: {
                 trigger: 'axis',
@@ -173,13 +183,13 @@
                 type: 'category',
                 data: xAxisData,
                 axisLine: { lineStyle: { color: colors.grid } },
-                axisLabel: { color: colors.text, fontSize: 10 }
+                axisLabel: { fontFamily, color: colors.text, fontSize: 10 }
             },
             yAxis: {
                 type: 'value',
                 minInterval: 1,
                 axisLine: { show: false },
-                axisLabel: { color: colors.text, fontSize: 10 },
+                axisLabel: { fontFamily, color: colors.text, fontSize: 10 },
                 splitLine: { lineStyle: { color: colors.grid, type: 'dashed' } }
             },
             series: [{
@@ -205,6 +215,7 @@
     const initRadarCharts = () => {
         if (!echarts) return;
         const colors = getThemeColors();
+        const fontFamily = getChartsFontFamily();
 
         // Categories Radar
         if (categoriesContainer) {
@@ -220,6 +231,7 @@
 
             categoriesChart.setOption({
                 backgroundColor: 'transparent',
+                textStyle: { fontFamily },
                 animation: true,
                 animationDuration: 2000,
                 animationEasing: 'exponentialOut',
@@ -231,13 +243,13 @@
                 title: {
                     text: labels.categories,
                     left: 'left',
-                    textStyle: { fontSize: 14, color: colors.text, fontWeight: 'bold' }
+                    textStyle: { fontFamily, fontSize: 14, color: colors.text, fontWeight: 'bold' }
                 },
                 radar: {
                     indicator: indicator,
                     radius: '60%',
                     center: ['50%', '60%'],
-                    axisName: { color: colors.text, fontSize: 10 },
+                    axisName: { fontFamily, color: colors.text, fontSize: 10 },
                     splitLine: { lineStyle: { color: colors.grid } },
                     splitArea: { show: false }
                 },
@@ -269,6 +281,7 @@
 
             tagsChart.setOption({
                 backgroundColor: 'transparent',
+                textStyle: { fontFamily },
                 animation: true,
                 animationDuration: 2000,
                 animationEasing: 'exponentialOut',
@@ -280,13 +293,13 @@
                 title: {
                     text: labels.tags,
                     left: 'left',
-                    textStyle: { fontSize: 14, color: colors.text, fontWeight: 'bold' }
+                    textStyle: { fontFamily, fontSize: 14, color: colors.text, fontWeight: 'bold' }
                 },
                 radar: {
                     indicator: indicator,
                     radius: '60%',
                     center: ['50%', '60%'],
-                    axisName: { color: colors.text, fontSize: 10 },
+                    axisName: { fontFamily, color: colors.text, fontSize: 10 },
                     splitLine: { lineStyle: { color: colors.grid } },
                     splitArea: { show: false }
                 },
