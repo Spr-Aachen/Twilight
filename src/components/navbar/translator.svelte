@@ -2,6 +2,7 @@
 import { onDestroy, onMount } from "svelte";
 import Icon from "@iconify/svelte";
 
+import { BREAKPOINT_LG } from "@constants/breakpoints";
 import { siteConfig } from "@/config";
 import { getTranslateLanguageFromConfig, getSiteLanguage, setStoredLanguage, getDefaultLanguage } from "@/utils/language";
 import { getSupportedTranslateLanguages } from "@/i18n/language";
@@ -23,6 +24,14 @@ const sourceLanguage = getTranslateLanguageFromConfig(
 
 function togglePanel() {
     isOpen = !isOpen;
+}
+
+function openPanel() {
+    isOpen = true;
+}
+
+function closePanel() {
+    isOpen = false;
 }
 
 async function changeLanguage(languageCode: string) {
@@ -89,42 +98,45 @@ onDestroy(() => {
 </script>
 
 {#if siteConfig.translate?.enable}
-<div class="relative">
+<div class="relative z-50" onmouseleave={closePanel}>
     <!-- 翻译按钮 -->
     <button
         aria-label="Language Translation"
         class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90"
         id="translate-switch"
-        onclick={togglePanel}
+        onclick={() => { if (window.innerWidth < BREAKPOINT_LG) { openPanel(); } else { togglePanel(); } }}
+        onmouseenter={openPanel}
     >
         <Icon icon="material-symbols:translate" class="text-[1.25rem] transition" />
     </button>
     <!-- 翻译面板 -->
-    <DropdownPanel
-        element={translatePanel}
-        id="translate-panel"
-        class="z-50 p-4 transition-all duration-200 fixed top-[4.5rem] right-4 w-[calc(100vw-2rem)] max-w-64 md:absolute md:top-[3.75rem] md:right-0 md:w-64 {isOpen ? '' : 'float-panel-closed'}"
-    >
-        <div class="text-sm font-medium text-[var(--primary)] mb-3 px-1">
-            选择语言 / Select Language
-        </div>
-        <div class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
-            {#each languages as lang}
-                <DropdownItem
-                    isActive={currentLanguage === lang.code}
-                    onclick={() => changeLanguage(lang.code)}
-                    class="gap-3 !p-2 !h-auto"
-                    isLast={false}
-                >
-                    <span class="text-lg transition">{lang.icon}</span>
-                    <span class="text-sm transition flex-grow text-left">{lang.name}</span>
-                    {#if currentLanguage === lang.code}
-                        <span class="ml-auto text-[var(--primary)]">✓</span>
-                    {/if}
-                </DropdownItem>
-            {/each}
-        </div>
-    </DropdownPanel>
+    <div id="translate-panel-wrapper" class="fixed top-[3.625rem] pt-5 right-4 w-[calc(100vw-2rem)] max-w-64 md:absolute md:top-11 md:right-0 md:w-64 md:pt-5 transition-all z-50" class:float-panel-closed={!isOpen}>
+        <DropdownPanel
+            bind:element={translatePanel}
+            id="translate-panel"
+            class="p-4 w-full"
+        >
+            <div class="text-sm font-medium text-[var(--primary)] mb-3 px-1">
+                选择语言 / Select Language
+            </div>
+            <div class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                {#each languages as lang}
+                    <DropdownItem
+                        isActive={currentLanguage === lang.code}
+                        onclick={() => changeLanguage(lang.code)}
+                        class="gap-3 !p-2 !h-auto"
+                        isLast={false}
+                    >
+                        <span class="text-lg transition">{lang.icon}</span>
+                        <span class="text-sm transition flex-grow text-left">{lang.name}</span>
+                        {#if currentLanguage === lang.code}
+                            <span class="ml-auto text-[var(--primary)]">✓</span>
+                        {/if}
+                    </DropdownItem>
+                {/each}
+            </div>
+        </DropdownPanel>
+    </div>
 </div>
 {/if}
 
