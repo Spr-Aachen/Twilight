@@ -63,7 +63,7 @@ function renderComponent(component: any, index: number) {
                 if (!renderData) return null;
 
                 const { Component, props } = renderData;
-                return <Component {...props} />;
+                return <Component {...props} side={side} />;
             })}
         </div>
     )}
@@ -76,7 +76,7 @@ function renderComponent(component: any, index: number) {
                 if (!renderData) return null;
 
                 const { Component, props } = renderData;
-                return <Component {...props} />;
+                return <Component {...props} side={side} />;
             })}
         </div>
     )}

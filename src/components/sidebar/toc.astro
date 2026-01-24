@@ -10,12 +10,14 @@ interface Props {
     class?: string;
     style?: string;
     depth?: number;
+    side?: string;
 }
 
-const { id = "toc-wrapper", class: className, style, depth = 3 } = Astro.props;
+const { id: propId, class: className, style, depth = 3, side = "default" } = Astro.props;
+const id = propId || `toc-wrapper-${side}`;
 ---
 
-<WidgetLayout name={i18n(I18nKey.tableOfContents)} id={id} class:list={[className, "toc-wrapper", "toc-hide", "hidden md:block"]} style={style}>
+<WidgetLayout name={i18n(I18nKey.tableOfContents)} id={id} class:list={[className, "toc-wrapper", "toc-hide"]} style={style}>
     <div class="toc-scroll-container">
         <table-of-contents class="group" data-depth={depth} data-navbar-height={NAVBAR_HEIGHT}>
             <div class="toc-inner-content relative"></div>

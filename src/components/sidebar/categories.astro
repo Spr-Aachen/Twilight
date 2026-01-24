@@ -18,14 +18,14 @@ const isCollapsed = categoriesComponent ? widgetManager.isCollapsed(categoriesCo
 interface Props {
     class?: string;
     style?: string;
+    side?: string;
 }
-const className = Astro.props.class;
-const style = Astro.props.style;
+const { class: className, style, side = "default" } = Astro.props;
 ---
 
 <WidgetLayout
     name={i18n(I18nKey.categories)}
-    id="categories"
+    id={`categories-${side}`}
     isCollapsed={isCollapsed}
     collapsedHeight={COLLAPSED_HEIGHT}
     class={className}

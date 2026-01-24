@@ -58,22 +58,22 @@ const style = Astro.props.style;
 
 <script>
     function closeAnnouncement() {
-        // 通过data-id属性找到整个widget-layout元素
-        const widgetLayout = document.querySelector('widget-layout[data-id="announcement"]');
-        if (widgetLayout) {
-            // 隐藏整个widget-layout元素
-            (widgetLayout as HTMLElement).style.display = 'none';
-            // 保存关闭状态到localStorage
-            localStorage.setItem('announcementClosed', 'true');
-        }
+        // Find all announcement widgets
+        const widgetLayouts = document.querySelectorAll('widget-layout[data-id^="announcement"]');
+        widgetLayouts.forEach(layout => {
+            (layout as HTMLElement).style.display = 'none';
+        });
+        localStorage.setItem('announcementClosed', 'true');
     }
-    // 页面加载时检查是否已关闭
+    // Check if closed on page load
     document.addEventListener('DOMContentLoaded', function() {
-        const widgetLayout = document.querySelector('widget-layout[data-id="announcement"]');
-        if (widgetLayout && localStorage.getItem('announcementClosed') === 'true') {
-            (widgetLayout as HTMLElement).style.display = 'none';
+        if (localStorage.getItem('announcementClosed') === 'true') {
+            const widgetLayouts = document.querySelectorAll('widget-layout[data-id^="announcement"]');
+            widgetLayouts.forEach(layout => {
+                (layout as HTMLElement).style.display = 'none';
+            });
         }
     });
-    // 使公告栏函数全局可用
+    // Make function global
     window.closeAnnouncement = closeAnnouncement;
 </script>
