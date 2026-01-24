@@ -2,6 +2,8 @@ import type { ParticleConfig } from "@/types/config";
 import { particleConfig } from "@/config";
 
 
+const BOUNDARY_OFFSET = 100;
+
 // 粒子对象类
 class Particle {
     x: number;
@@ -67,8 +69,8 @@ class Particle {
         if (
             this.x > window.innerWidth ||
             this.x < 0 ||
-            this.y > window.innerHeight + 100 ||
-            this.y < -100 || // 从顶部消失
+            this.y > window.innerHeight + BOUNDARY_OFFSET ||
+            this.y < -BOUNDARY_OFFSET || // 从顶部消失
             this.a <= 0
         ) {
             // 如果粒子不做限制
@@ -89,7 +91,7 @@ class Particle {
         this.r = getRandom("fnr", this.config);
         if (Math.random() > 0.4) {
             this.x = getRandom("x", this.config);
-            this.y = window.innerHeight + Math.random() * 100; // 从屏幕底部开始
+            this.y = window.innerHeight + Math.random() * BOUNDARY_OFFSET; // 从屏幕底部开始
             this.s = getRandom("s", this.config);
             this.r = getRandom("r", this.config);
             this.a = getRandom('a', this.config);
@@ -146,7 +148,7 @@ function getRandom(option: string, config: ParticleConfig): any {
             ret = Math.random() * window.innerWidth;
             break;
         case "y":
-            ret = window.innerHeight + Math.random() * 100; // 初始位置在屏幕底部
+            ret = window.innerHeight + Math.random() * BOUNDARY_OFFSET; // 初始位置在屏幕底部
             break;
         case "s":
             ret =
