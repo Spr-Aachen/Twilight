@@ -42,20 +42,14 @@ function renderComponent(component: any, index: number) {
     const componentClass = widgetManager.getComponentClass(component, index, side);
     const componentStyle = widgetManager.getComponentStyle(component, index);
 
-    const props: any = {
-        class: componentClass,
-        style: componentStyle,
-        ...component.customProps,
-    };
-
-    if (component.type === "toc") {
-        props.headings = headings;
-        props.id = `toc-wrapper-${side}`;
-    }
-
     return {
         Component: ComponentToRender,
-        props,
+        props: {
+            class: componentClass,
+            style: componentStyle,
+            headings: component.type === "toc" ? headings : undefined,
+            ...component.customProps,
+        },
     };
 }
 ---

@@ -198,7 +198,7 @@ export class TableOfContents extends HTMLElement {
         const isFloating = this.dataset.isFloating === "true";
         const tocWrapper = isFloating
             ? this.querySelector('.toc-floating-container') as HTMLElement
-            : document.querySelector('widget-layout[data-id="toc-wrapper"]') as HTMLElement;
+            : this.closest('widget-layout') as HTMLElement;
 
         if (!tocWrapper) return false;
 
@@ -355,7 +355,7 @@ export class TableOfContents extends HTMLElement {
                         const isFloating = this.dataset.isFloating === "true";
                         const tocWrapper = isFloating
                             ? this.querySelector('.toc-floating-container') as HTMLElement
-                            : document.querySelector('widget-layout[data-id="toc-wrapper"]') as HTMLElement;
+                            : this.closest('widget-layout') as HTMLElement;
                         if (tocWrapper && !tocWrapper.classList.contains('toc-hide')) {
                             if (!isFloating) {
                                 tocWrapper.style.maxHeight = tocWrapper.offsetHeight + 'px';
@@ -372,7 +372,7 @@ export class TableOfContents extends HTMLElement {
                     const isFloating = this.dataset.isFloating === "true";
                     const tocWrapper = isFloating
                         ? this.querySelector('.toc-floating-container') as HTMLElement
-                        : document.querySelector('widget-layout[data-id="toc-wrapper"]') as HTMLElement;
+                        : this.closest('widget-layout') as HTMLElement;
                     if (tocWrapper && !this.isPostPage()) {
                         tocWrapper.classList.add('toc-hide');
                         if (!isFloating) tocWrapper.style.maxHeight = '';
