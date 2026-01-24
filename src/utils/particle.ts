@@ -67,7 +67,7 @@ class Particle {
         if (
             this.x > window.innerWidth ||
             this.x < 0 ||
-            this.y > window.innerHeight ||
+            this.y > window.innerHeight + 100 ||
             this.y < -100 || // 从顶部消失
             this.a <= 0
         ) {
