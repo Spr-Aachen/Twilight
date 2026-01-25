@@ -3,8 +3,9 @@ import { onDestroy, onMount } from "svelte";
 import Icon from "@iconify/svelte";
 
 import { BREAKPOINT_LG } from "@constants/breakpoints";
-import { siteConfig } from "@/config";
 import { getTranslateLanguageFromConfig, getSiteLanguage, setStoredLanguage, getDefaultLanguage } from "@/utils/language";
+import { onClickOutside } from "@utils/widget";
+import { siteConfig } from "@/config";
 import { getSupportedTranslateLanguages } from "@/i18n/language";
 import DropdownItem from "@/components/common/DropdownItem.svelte";
 import DropdownPanel from "@/components/common/DropdownPanel.svelte";
@@ -68,19 +69,10 @@ async function changeLanguage(languageCode: string) {
 
 // 点击外部关闭面板
 function handleClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    // 只有在翻译面板打开时才处理点击外部事件
-    if (!isOpen || !translatePanel) {
-        return;
-    }
-    // 检查点击是否在翻译相关元素内部
-    if (
-        !translatePanel.contains(target) &&
-        !target.closest("#translate-switch")
-    ) {
+    if (!isOpen) return;
+    onClickOutside(event, "translate-panel", "translate-switch", () => {
         isOpen = false;
-        // 不阻止事件传播，让其他元素的点击事件正常执行
-    }
+    });
 }
 
 // 组件挂载时添加事件监听和初始化默认语言

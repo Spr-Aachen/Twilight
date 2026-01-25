@@ -4,6 +4,7 @@ import { onMount } from "svelte";
 
 import { BREAKPOINT_LG } from "@constants/breakpoints";
 import { getDefaultHue, getHue, setHue } from "@utils/hue";
+import { onClickOutside } from "@utils/widget";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 
@@ -30,15 +31,10 @@ function closePanel() {
 
 // 点击外部关闭面板
 function handleClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement;
     if (!isOpen) return;
-    
-    const panel = document.getElementById("display-setting");
-    const button = document.getElementById("display-settings-switch");
-    
-    if (panel && !panel.contains(target) && !target.closest("#display-settings-switch")) {
+    onClickOutside(event, "display-setting", "display-settings-switch", () => {
         isOpen = false;
-    }
+    });
 }
 
 onMount(() => {

@@ -4,6 +4,7 @@ import { onMount } from "svelte";
 
 import type { NavbarLink } from "@/types/config";
 import { url } from "@utils/url";
+import { onClickOutside } from "@utils/widget";
 
 
 interface Props {
@@ -19,15 +20,10 @@ function togglePanel() {
 
 // 点击外部关闭面板
 function handleClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement;
     if (!isOpen) return;
-    
-    const panel = document.getElementById("nav-menu-panel");
-    const button = document.getElementById("nav-menu-switch");
-    
-    if (panel && !panel.contains(target) && button && !button.contains(target)) {
+    onClickOutside(event, "nav-menu-panel", "nav-menu-switch", () => {
         isOpen = false;
-    }
+    });
 }
 
 onMount(() => {

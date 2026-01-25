@@ -2,9 +2,10 @@
 import { onMount, onDestroy } from "svelte";
 import Icon from "@iconify/svelte";
 
+import type { SearchResult } from "@/global";
 import { url } from "@utils/url";
 import { navigateToPage } from "@utils/navigation";
-import type { SearchResult } from "@/global";
+import { onClickOutside } from "@utils/widget";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import DropdownPanel from "@/components/common/DropdownPanel.svelte";
@@ -128,7 +129,20 @@ const search = async (keyword: string, isDesktop: boolean): Promise<void> => {
     }
 };
 
+const handleClickOutside = (event: MouseEvent) => {
+    const panel = document.getElementById("search-panel");
+    if (!panel || panel.classList.contains("float-panel-closed")) {
+        return;
+    }
+    onClickOutside(event, "search-panel", ["search-switch", "search-bar"], () => {
+        const panel = document.getElementById("search-panel");
+        panel?.classList.add("float-panel-closed");
+        isDesktopSearchExpanded = false;
+    });
+};
+
 onMount(() => {
+    document.addEventListener("click", handleClickOutside);
     const initializeSearch = () => {
         initialized = true;
         pagefindLoaded =
@@ -193,6 +207,7 @@ $effect(() => {
 
 onDestroy(() => {
     if (typeof document !== 'undefined') {
+        document.removeEventListener("click", handleClickOutside);
         const navbar = document.getElementById('navbar');
         navbar?.classList.remove('is-searching');
     }

@@ -395,3 +395,38 @@ export function getEnabledComponentTypes(): WidgetComponentType[] {
     );
     return enabledComponents.map((c) => c.type);
 }
+
+/**
+ * 通用的点击外部关闭处理函数
+ * @param event 鼠标事件
+ * @param panelId 面板ID
+ * @param ignoreIds 忽略的元素ID（按钮等），支持单个ID或ID数组
+ * @param action 关闭回调
+ */
+export function onClickOutside(
+    event: MouseEvent,
+    panelId: string,
+    ignoreIds: string | string[],
+    action: () => void
+) {
+    if (typeof document === "undefined") {
+        return;
+    }
+    const panel = document.getElementById(panelId);
+
+    const target = event.target as HTMLElement;
+
+    const ids = Array.isArray(ignoreIds) ? ignoreIds : [ignoreIds];
+    
+    // 如果点击的是忽略元素或其内部元素，则不执行关闭操作
+    for (const id of ids) {
+        if (target.closest(`#${id}`)) {
+            return;
+        }
+    }
+
+    // 如果面板存在且点击发生在面板外部，则执行关闭操作
+    if (panel && !panel.contains(target)) {
+        action();
+    }
+}

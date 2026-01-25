@@ -8,6 +8,7 @@ import {
     getStoredTheme,
     setTheme,
 } from "@utils/theme";
+import { onClickOutside } from "@utils/widget";
 import type { LIGHT_DARK_MODE } from "@/types/config";
 import { siteConfig } from "@/config";
 import { i18n } from "@i18n/translation";
@@ -45,13 +46,10 @@ function closePanel() {
 
 // 点击外部关闭面板
 function handleClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement;
     if (!isOpen) return;
-    
-    const panel = document.getElementById("light-dark-panel");
-    if (panel && !panel.contains(target) && !target.closest("#scheme-switch")) {
+    onClickOutside(event, "light-dark-panel", "scheme-switch", () => {
         isOpen = false;
-    }
+    });
 }
 
 onMount(() => {

@@ -8,10 +8,11 @@ import {
     getStoredWallpaperMode,
     setWallpaperMode,
 } from "@utils/wallpaper";
+import { onClickOutside } from "@utils/widget";
 import type { WALLPAPER_MODE } from "@/types/config";
+import { siteConfig } from "@/config";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
-import { siteConfig } from "@/config";
 import DropdownItem from "@/components/common/DropdownItem.svelte";
 import DropdownPanel from "@/components/common/DropdownPanel.svelte";
 
@@ -45,13 +46,10 @@ function closePanel() {
 
 // 点击外部关闭面板
 function handleClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement;
     if (!isOpen) return;
-    
-    const panel = document.getElementById("wallpaper-mode-panel");
-    if (panel && !panel.contains(target) && !target.closest("#wallpaper-mode-switch")) {
+    onClickOutside(event, "wallpaper-mode-panel", "wallpaper-mode-switch", () => {
         isOpen = false;
-    }
+    });
 }
 
 onMount(() => {
