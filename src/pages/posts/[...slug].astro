@@ -8,7 +8,7 @@ import utc from "dayjs/plugin/utc";
 import { siteConfig, profileConfig, postConfig } from "@/config";
 import { getSortedPosts } from "@utils/content";
 import { formatDateToYYYYMMDD } from "@utils/date";
-import { getFileDirFromPath, getPostUrlBySlug, removeFileExtension} from "@utils/url";
+import { getFileDirFromPath, getPostUrl, getPostUrlBySlug, removeFileExtension} from "@utils/url";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import License from "@components/post/license.astro";
@@ -173,7 +173,7 @@ const jsonLd = {
                     updated={entry.data.updated}
                     tags={entry.data.tags}
                     category={entry.data.category}
-                    slug={entry.id}
+                    postUrl={getPostUrl(entry)}
                 />
                 {
                     (!entry.data.cover || (entry.data.cover && !postConfig.showCoverInContent)) && (
@@ -213,6 +213,7 @@ const jsonLd = {
                             sourceLink={entry.data.sourceLink}
                             licenseName={entry.data.licenseName}
                             licenseUrl={entry.data.licenseUrl}
+                            postUrl={getPostUrl(entry)}
                             class="mb-6 rounded-xl license-container onload-animation-up"
                         />
                     )

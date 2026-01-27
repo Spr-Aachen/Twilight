@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 
+import { getPostUrlBySlug } from "@utils/url";
 import { postConfig, profileConfig } from "@/config";
 import { formatDateToYYYYMMDD } from "@utils/date";
 import { i18n } from "@i18n/translation";
@@ -16,14 +17,15 @@ interface Props {
     sourceLink: string;
     licenseName: string;
     licenseUrl: string;
+    postUrl?: string;
 }
 
-const { title, pubDate, author, sourceLink, licenseName, licenseUrl } =
+const { title, id, pubDate, author, sourceLink, licenseName, licenseUrl, postUrl: propPostUrl } =
     Astro.props;
 const className = Astro.props.class;
 const profileConf = profileConfig;
 const licenseConf = postConfig.license;
-const postUrl = sourceLink || decodeURIComponent(Astro.url.toString());
+const postUrl = sourceLink || propPostUrl || getPostUrlBySlug(id);
 ---
 
 <div class={`relative transition overflow-hidden bg-[var(--license-block-bg)] py-5 px-6 ${className}`}>

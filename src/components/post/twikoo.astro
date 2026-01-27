@@ -18,17 +18,10 @@ const config = {
     import "@/plugins/twikoo-scroll-protection";
 </script>
 <script is:inline define:vars={{ config }}>
-    // 获取当前页面路径
-    function getCurrentPath() {
-        const pathname = window.location.pathname;
-        return pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
-    }
-
     // 动态创建配置对象
     function createTwikooConfig() {
         return {
             ...config,
-            path: getCurrentPath(),
             el: '#tcomment'
         };
     }

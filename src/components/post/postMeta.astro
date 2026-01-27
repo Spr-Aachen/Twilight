@@ -2,17 +2,11 @@
 import { Icon } from "astro-icon/components";
 
 import { formatDateToYYYYMMDD } from "@utils/date";
-import { getCategoryUrl, getTagUrl } from "@utils/url";
+import { getCategoryUrl, getTagUrl, url } from "@utils/url";
 import { umamiConfig } from '@/config';
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 
-
-// 解析 umami
-const umamiEnabled = umamiConfig.enabled || false;
-const umamiWebsiteId = umamiConfig.scripts.match(/data-website-id="([^"]+)"/)?.[1] || "";
-const umamiApiKey = umamiConfig.apiKey || "";
-const umamiBaseUrl = umamiConfig.baseUrl || "";
 
 export interface Props {
     published: Date;
@@ -24,6 +18,7 @@ export interface Props {
     isHome?: boolean;
     className?: string;
     slug?: string;
+    postUrl?: string;
 }
 
 const {
@@ -35,11 +30,19 @@ const {
     hideTagsForMobile,
     isHome,
     className = "",
-    slug
+    slug,
+    postUrl
 } = Astro.props;
+const finalPostUrl = postUrl || (slug ? url(`/posts/${slug}/`) : "");
+
+// 解析 umami
+const umamiEnabled = umamiConfig.enabled || false;
+const umamiWebsiteId = umamiConfig.scripts.match(/data-website-id="([^"]+)"/)?.[1] || "";
+const umamiApiKey = umamiConfig.apiKey || "";
+const umamiBaseUrl = umamiConfig.baseUrl || "";
 ---
 
-<div class:list={["flex flex-wrap text-neutral-500 dark:text-neutral-400 items-center gap-4 gap-x-4 gap-y-2", className]}>
+<div class:list={["flex flex-wrap text-neutral-500 dark:text-neutral-400 items-center gap-x-4 gap-y-2", className]}>
     <!-- publish date -->
     <div class="flex items-center">
         <div class="meta-icon">
@@ -87,7 +90,7 @@ const {
         </div>
     </div>
     <!-- 访问量（首页不显示，且umami.enabled为true时显示） -->
-    {!isHome && umamiEnabled && slug && (
+    {!isHome && umamiEnabled && finalPostUrl && (
         <div class="flex items-center">
             <div class="meta-icon">
                 <Icon name="material-symbols:visibility-outline-rounded" class="text-xl"></Icon>
@@ -97,10 +100,10 @@ const {
     )}
 </div>
 
-<!-- 只有在非首页且启用umami且有slug时才加载脚本 -->
-{!isHome && umamiEnabled && slug && (
+<!-- 只有在非首页且启用umami且有finalPostUrl时才加载脚本 -->
+{!isHome && umamiEnabled && finalPostUrl && (
     <script define:vars={{
-        slug,
+        pageUrl: finalPostUrl,
         umamiBaseUrl,
         umamiApiKey,
         umamiWebsiteId,
@@ -114,13 +117,11 @@ const {
             return `${i18n_views} ${pageViews} · ${i18n_visitors} ${visitors}`;
         }
         // 获取访问量统计
-        async function fetchPageViews(isRetry = false) {
-            if (!umamiConfig.enabled) {
+        async function fetchPageViews() {
+            if (!umamiEnabled) {
                 return;
             }
             try {
-                // 构造文章页面的URL路径
-                const pageUrl = `/posts/${slug}/`;
                 // 动态加载 umami-share 插件
                 if (typeof getUmamiPageStats === 'undefined') {
                     await import("@/plugins/umami-share");

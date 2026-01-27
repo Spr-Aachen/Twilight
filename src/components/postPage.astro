@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
-import { getPostUrl } from "@utils/url";
 import PostCard from "@components/post/postCard.astro";
 
 
@@ -15,16 +14,6 @@ const interval = 30;
     {page.data.map((entry: CollectionEntry<"posts">) => (
         <PostCard
             entry={entry}
-            title={entry.data.title}
-            tags={entry.data.tags}
-            category={entry.data.category}
-            published={entry.data.published}
-            updated={entry.data.updated}
-            url={getPostUrl(entry)}
-            cover={entry.data.cover}
-            description={entry.data.description}
-            draft={entry.data.draft}
-            pinned={entry.data.pinned}
             class:list="onload-animation-up"
             style={`animation-delay: ${delay++ * interval}ms;`}
         ></PostCard>

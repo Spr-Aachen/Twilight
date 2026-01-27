@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
+import { getPostUrl } from "@utils/url";
 import { postConfig } from "@/config";
 import Twikoo from "./twikoo.astro";
 
@@ -9,9 +10,9 @@ interface Props {
     post: CollectionEntry<"posts">;
 }
 
-const { id } = Astro.props.post;
+const { post } = Astro.props;
 
-const path = `/posts/${id}/`;
+const path = getPostUrl(post);
 
 let commentService = "";
 if (postConfig.comment?.enable && postConfig.comment?.twikoo) {
