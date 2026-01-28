@@ -1,8 +1,8 @@
 ---
 import { Icon } from "astro-icon/components";
 
-import { formatDateToYYYYMMDD } from "@utils/date";
 import { getCategoryUrl, getTagUrl, url } from "@utils/url";
+import { formatDateToYYYYMMDD } from "@utils/date";
 import { umamiConfig } from '@/config';
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
@@ -66,7 +66,7 @@ const umamiBaseUrl = umamiConfig.baseUrl || "";
         </div>
         <div class="flex flex-row flex-nowrap items-center">
             <a href={getCategoryUrl(category || null)} aria-label={`View all posts in the ${category} category`}
-               class="link-lg transition text-50 text-sm font-medium
+                class="link-lg transition text-50 text-sm font-medium
                             hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap">
                 {category || i18n(I18nKey.uncategorized)}
             </a>
@@ -81,7 +81,7 @@ const umamiBaseUrl = umamiConfig.baseUrl || "";
             {(tags && tags.length > 0) && tags.map((tag, i) => (
                 <div class:list={[{"hidden": i == 0}, "mx-1.5 text-[var(--meta-divider)] text-sm"]}>/</div>
                 <a href={getTagUrl(tag)} aria-label={`View all posts with the ${tag.trim()} tag`}
-                   class="link-lg transition text-50 text-sm font-medium
+                    class="link-lg transition text-50 text-sm font-medium
                                 hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap">
                     {tag.trim()}
                 </a>
@@ -91,64 +91,73 @@ const umamiBaseUrl = umamiConfig.baseUrl || "";
     </div>
     <!-- 访问量（首页不显示，且umami.enabled为true时显示） -->
     {!isHome && umamiEnabled && finalPostUrl && (
-        <div class="flex items-center">
+        <div class="flex items-center page-views-container"
+            data-page-url={finalPostUrl}
+            data-umami-base-url={umamiBaseUrl}
+            data-umami-api-key={umamiApiKey}
+            data-umami-website-id={umamiWebsiteId}
+            data-i18n-views={i18n(I18nKey.pageViews)}
+            data-i18n-visitors={i18n(I18nKey.visitors)}
+            data-i18n-error={i18n(I18nKey.statsError)}
+        >
             <div class="meta-icon">
                 <Icon name="material-symbols:visibility-outline-rounded" class="text-xl"></Icon>
             </div>
-            <span class="text-50 text-sm font-medium" id="page-views-display">{i18n(I18nKey.statsLoading)}</span>
+            <span class="text-50 text-sm font-medium page-views-display">{i18n(I18nKey.statsLoading)}</span>
         </div>
     )}
 </div>
 
 <!-- 只有在非首页且启用umami且有finalPostUrl时才加载脚本 -->
 {!isHome && umamiEnabled && finalPostUrl && (
-    <script define:vars={{
-        pageUrl: finalPostUrl,
-        umamiBaseUrl,
-        umamiApiKey,
-        umamiWebsiteId,
-        umamiEnabled,
-        i18n_views: i18n(I18nKey.pageViews),
-        i18n_visitors: i18n(I18nKey.visitors),
-        i18n_error: i18n(I18nKey.statsError)
-    }}>
+    <script>
+        import "@/plugins/umami-share";
+
         // 客户端统计文案生成函数
-        function generateStatsText(pageViews, visitors) {
+        function generateStatsText(pageViews, visitors, i18n_views, i18n_visitors) {
             return `${i18n_views} ${pageViews} · ${i18n_visitors} ${visitors}`;
         }
         // 获取访问量统计
         async function fetchPageViews() {
-            if (!umamiEnabled) {
-                return;
-            }
-            try {
-                // 动态加载 umami-share 插件
-                if (typeof getUmamiPageStats === 'undefined') {
-                    await import("@/plugins/umami-share");
+            const containers = document.querySelectorAll('.page-views-container');
+            
+            containers.forEach(async (containerElement) => {
+                const container = containerElement;
+                if (container.hasAttribute('data-processed')) return;
+                container.setAttribute('data-processed', 'true');
+
+                const pageUrl = container.getAttribute('data-page-url');
+                const umamiBaseUrl = container.getAttribute('data-umami-base-url');
+                const umamiApiKey = container.getAttribute('data-umami-api-key');
+                const umamiWebsiteId = container.getAttribute('data-umami-website-id');
+                const i18n_views = container.getAttribute('data-i18n-views');
+                const i18n_visitors = container.getAttribute('data-i18n-visitors');
+                const i18n_error = container.getAttribute('data-i18n-error');
+
+                try {
+                    // 动态加载 umami-share 插件
+                    // 调用全局工具获取特定页面的 Umami 统计数据
+                    // @ts-ignore
+                    const stats = await window.getUmamiPageStats(umamiBaseUrl, umamiApiKey, umamiWebsiteId, pageUrl);
+                    // 从返回的数据中提取页面浏览量和访客数
+                    const pageViews = stats.pageviews || 0;
+                    const visitors = stats.visitors || 0;
+                    // 更新页面上的显示内容
+                    const displayElement = container.querySelector('.page-views-display');
+                    if (displayElement) {
+                        displayElement.textContent = generateStatsText(pageViews, visitors, i18n_views, i18n_visitors);
+                    }
+                } catch (error) {
+                    console.error('Error fetching page views:', error);
+                    const displayElement = container.querySelector('.page-views-display');
+                    if (displayElement) {
+                        displayElement.textContent = i18n_error || null;
+                    }
                 }
-                // 调用全局工具获取特定页面的 Umami 统计数据
-                const stats = await getUmamiPageStats(umamiBaseUrl, umamiApiKey, umamiWebsiteId, pageUrl);
-                // 从返回的数据中提取页面浏览量和访客数
-                const pageViews = stats.pageviews || 0;
-                const visitors = stats.visitors || 0;
-                // 更新页面上的显示内容
-                const displayElement = document.getElementById('page-views-display');
-                if (displayElement) {
-                    displayElement.textContent = generateStatsText(pageViews, visitors);
-                }
-            } catch (error) {
-                console.error('Error fetching page views:', error);
-                const displayElement = document.getElementById('page-views-display');
-                if (displayElement) {
-                    displayElement.textContent = i18n_error;
-                }
-            }
+            });
         }
         // 页面加载完成后获取统计数据
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', fetchPageViews);
-        } else {
-            fetchPageViews();
-        }
+        fetchPageViews();
+        document.addEventListener('astro:page-load', fetchPageViews);
     </script>
 )}

@@ -46,6 +46,8 @@ declare global {
         };
         mobileTOCInit?: () => void;
         loadTranslateScript?: () => Promise<void>;
+        getUmamiWebsiteStats?: (baseUrl: string, apiKey: string, websiteId: string) => Promise<any>;
+        getUmamiPageStats?: (baseUrl: string, apiKey: string, websiteId: string, urlPath: string, startAt?: number, endAt?: number) => Promise<any>;
     }
 }
 
