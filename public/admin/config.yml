@@ -23,12 +23,40 @@ collections:
         label: "Posts"
         # 内容存储目录
         folder: "src/content/posts"
+        # 目录嵌套配置
+        meta:
+            # 路径配置
+            path:
+                # 后台显示标签
+                label: "Path"
+                # 使用隐藏小部件记录路径
+                widget: hidden
+                # 索引文件名称（用于嵌套集合）
+                index_file: "_index"
+        nested:
+            # 最大嵌套深度
+            depth: 10
+            # 摘要模板，用于树状菜单中文件夹的显示名称
+            summary: '{{dirname}}'
+            # 是否支持子文件夹
+            subfolders: false # 由于文章是独立的 .md 文件，需要设为 false 以防止 CMS 寻找文件夹下的 _index.md
+        ## 列表页分组配置
+        #view_groups:
+        #    - # 按文件夹分组
+        #        # 分组标签
+        #        label: "Folder"
+        #        # 分组依据的字段
+        #        field: "path"
+        #        # 分组匹配模式
+        #        pattern: '^([^/]+)/' # 匹配第一个路径段（即文件夹名）
         # 允许创建新条目
         create: true
         # 文件命名规则
         slug: "{{slug}}"
         # 字段列表
         fields:
+            #- # 路径
+            #    {label: "Path", name: "path", widget: "string"}
             - # 标题
                 {label: "Title", name: "title", widget: "string"}
             - # 发布日期
