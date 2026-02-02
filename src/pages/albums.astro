@@ -6,6 +6,7 @@ import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import GridLayout from "@layouts/grid.astro";
 import BackwardButton from "@components/backwardButton.astro";
+import ImageWrapper from "@components/common/imageWrapper.astro";
 
 
 const pageTitle = LinkPresets[LinkPreset.Albums].name;
@@ -37,11 +38,11 @@ const albumsData = sortedAlbums.filter(album => album.visible);
                         <a href={`/albums/${album.id}/`} class="block">
                             <!-- 封面图片 -->
                             <div class="aspect-4/3 overflow-hidden bg-neutral-100 dark:bg-neutral-700">
-                                <img
+                                <ImageWrapper
                                     src={album.cover}
+                                    basePath={album.basePath}
                                     alt={album.title}
                                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                                    loading="lazy"
                                 />
                             </div>
                             <!-- 相册信息 -->

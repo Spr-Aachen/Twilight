@@ -7,6 +7,7 @@ import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import GridLayout from "@layouts/grid.astro";
 import BackwardButton from "@components/backwardButton.astro";
+import ImageWrapper from "@components/common/imageWrapper.astro";
 
 
 const pageTitle = LinkPresets[LinkPreset.Diary].name;
@@ -61,16 +62,19 @@ function formatTime(dateString: string): string {
                     {sortedMoments.map(moment => (
                         <div class="moment-item card-base p-4 md:p-6 lg:p-8 hover:shadow-lg transition-all">
                                 <div class="moment-content">
+                                    {moment.title && (
+                                        <h2 class="moment-title text-base md:text-lg lg:text-xl font-bold text-90 mb-2">{moment.title}</h2>
+                                    )}
                                     <p class="moment-text text-sm md:text-base lg:text-lg text-90 leading-relaxed mb-3 md:mb-4">{moment.content}</p>
                                     {moment.images && moment.images.length > 0 && (
-                                        <div class="moment-images grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4 mb-3 md:mb-4">
+                                        <div class="moment-images flex flex-wrap gap-2 md:gap-3 lg:gap-4 mb-3 md:mb-4">
                                             {moment.images.map((image, index) => (
-                                                <div class="image-item relative rounded-md overflow-hidden aspect-square cursor-pointer hover:scale-105 transition">
-                                                    <img
+                                                <div class="image-item relative rounded-md overflow-hidden cursor-pointer hover:scale-105 transition max-w-full">
+                                                    <ImageWrapper
                                                         src={image}
+                                                        basePath={moment.basePath}
                                                         alt={i18n(I18nKey.diaryImage)}
-                                                        class="w-full h-full object-cover"
-                                                        loading="lazy"
+                                                        class="w-auto h-auto max-h-[300px] md:max-h-[400px] object-contain rounded-md"
                                                     />
                                                 </div>
                                             ))}

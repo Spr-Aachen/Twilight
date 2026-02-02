@@ -9,7 +9,7 @@
     "columns": 3,
     "photos": [
         {
-            "src": "智子_ASK.jpg",
+            "src": "./智子_ASK.jpg",
             "alt": "智子",
             "title": "智子 by ASK",
             "description": "This is a beautiful image from local file",

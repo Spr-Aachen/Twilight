@@ -1,7 +1,7 @@
 {
     "title": "Twilight Blog Template",
     "description": "A CMS integrated blog theme built with Astro framework.",
-    "image": "",
+    "image": "./Twilight_Cover.jpg",
     "category": "website",
     "techStack": [
         "Astro",

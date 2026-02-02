@@ -5,6 +5,7 @@ import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import GridLayout from "@layouts/grid.astro";
 import BackwardButton from "@components/backwardButton.astro";
+import ImageWrapper from "@components/common/imageWrapper.astro";
 
 
 export const getStaticPaths = async () => {
@@ -72,20 +73,12 @@ if (!album) {
             >
                 {album.photos.map((photo, index) => (
                     <figure class="photo-item group relative overflow-hidden rounded-lg">
-                        <a
-                            href={photo.src}
-                            data-fancybox="gallery"
-                            data-caption={photo.alt}
-                            data-no-swup
-                            class="block"
-                        >
-                            <img
-                                src={photo.src}
-                                alt={photo.alt}
-                                class="photo-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
-                                loading="lazy"
-                            />
-                        </a>
+                        <ImageWrapper
+                            src={photo.src}
+                            basePath={album.basePath}
+                            alt={photo.alt}
+                            class="photo-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        />
                     </figure>
                 ))}
             </div>

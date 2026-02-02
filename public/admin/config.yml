@@ -29,8 +29,8 @@ collections:
             path:
                 # 后台显示标签
                 label: "Path"
-                # 使用隐藏小部件记录路径
-                widget: hidden
+                # 记录路径的部件
+                widget: hidden # 隐藏
                 # 索引文件名称（用于嵌套集合）
                 index_file: "_index"
         nested:
@@ -58,8 +58,6 @@ collections:
         slug: "{{slug}}"
         # 字段列表
         fields:
-            #- # 路径
-            #    {label: "Path", name: "path", widget: "string"}
             - # 标题
                 {label: "Title", name: "title", widget: "string"}
             - # 发布日期
@@ -79,6 +77,97 @@ collections:
             - # 正文
                 {label: "Body", name: "body", widget: "markdown"}
 
+    - # 日记集合
+        # 集合名称
+        name: "diary"
+        # 后台显示标签
+        label: "Diary"
+        # 内容存储目录
+        folder: "src/content/diary"
+        # 条目路径配置
+        path: "{{slug}}/{{slug}}" # {文件夹}/{文件名}
+        # 集合特定的媒体文件夹配置
+        media_folder: "" # 留空表示使用相对路径
+        public_folder: "" # 留空表示使用相对路径
+        # 允许创建新条目
+        create: true
+        # 文件命名规则
+        slug: "{{year}}-{{month}}-{{day}}-{{hour}}-{{minute}}"
+        # 文件存储格式
+        format: "json"
+        # 字段列表
+        fields:
+            - # 日记标题
+                { label: "Title", name: "title", widget: "string" }
+            - # 日记内容
+                { label: "Content", name: "content", widget: "text" }
+            - # 日记日期
+                { label: "Date", name: "date", widget: "datetime" }
+            - # 图片列表
+                label: "Images"
+                name: "images"
+                widget: "list"
+                required: false
+                default: []
+                field: { label: "Image", name: "image", widget: "image" }
+
+    - # 相册集合
+        # 集合名称
+        name: "albums"
+        # 后台显示标签
+        label: "Albums"
+        # 内容存储目录
+        folder: "src/content/albums"
+        # 条目路径配置
+        path: "{{slug}}/{{slug}}" # {文件夹}/{文件名}
+        # 集合特定的媒体文件夹配置
+        media_folder: "" # 留空表示使用相对路径
+        public_folder: "" # 留空表示使用相对路径
+        # 允许创建新条目
+        create: true
+        # 文件命名规则
+        slug: "{{slug}}"
+        # 文件存储格式
+        format: "json"
+        # 字段列表
+        fields:
+            - # 相册标题
+                { label: "Title", name: "title", widget: "string" }
+            - # 相册描述
+                { label: "Description", name: "description", widget: "text", required: false }
+            - # 相册封面
+                { label: "Cover", name: "cover", widget: "image" }
+            - # 日期
+                { label: "Date", name: "date", widget: "datetime" }
+            - # 地点
+                { label: "Location", name: "location", widget: "string", required: false }
+            - # 标签
+                { label: "Tags", name: "tags", widget: "list", required: false, default: [] }
+            - # 布局方式
+                { label: "Layout", name: "layout", widget: "select", options: ["grid", "masonry", "list"], default: "grid" }
+            - # 列数
+                { label: "Columns", name: "columns", widget: "number", default: 3, value_type: "int", min: 1, max: 6 }
+            - # 照片列表
+                label: "Photos"
+                name: "photos"
+                widget: "list"
+                required: false
+                fields:
+                    - # 图片路径
+                        { label: "Image", name: "src", widget: "image" }
+                    - # 图片描述
+                        { label: "Caption", name: "alt", widget: "string", required: false }
+                    - # 图片标题
+                        { label: "Title", name: "title", widget: "string", required: false }
+                    - # 图片说明
+                        { label: "Description", name: "description", widget: "text", required: false }
+                    - # 标签
+                        { label: "Tags", name: "tags", widget: "list", required: false, default: [] }
+                    - # 拍摄日期
+                        { label: "Date", name: "date", widget: "datetime", required: false }
+            - # 是否可见
+                { label: "Visible", name: "visible", widget: "boolean", default: true, required: false }
+
     - # 项目集合
         # 集合名称
         name: "projects"
@@ -86,6 +175,11 @@ collections:
         label: "Projects"
         # 内容存储目录
         folder: "src/content/projects"
+        # 条目路径配置
+        path: "{{slug}}/{{slug}}" # {文件夹}/{文件名}
+        # 集合特定的媒体文件夹配置
+        media_folder: "" # 留空表示使用相对路径
+        public_folder: "" # 留空表示使用相对路径
         # 允许创建新条目
         create: true
         # 文件命名规则
@@ -211,85 +305,6 @@ collections:
                 { label: "Icon", name: "icon", widget: "string", required: false }
             - # 主题颜色
                 { label: "Color", name: "color", widget: "string", required: false }
-
-    - # 日记集合
-        # 集合名称
-        name: "diary"
-        # 后台显示标签
-        label: "Diary"
-        # 内容存储目录
-        folder: "src/content/diary"
-        # 允许创建新条目
-        create: true
-        # 文件命名规则
-        slug: "{{year}}-{{month}}-{{day}}-{{hour}}-{{minute}}"
-        # 文件存储格式
-        format: "json"
-        # 字段列表
-        fields:
-            - # 日记内容
-                { label: "Content", name: "content", widget: "text" }
-            - # 日记日期
-                { label: "Date", name: "date", widget: "datetime" }
-            - # 图片列表
-                label: "Images"
-                name: "images"
-                widget: "list"
-                required: false
-                default: []
-                field: { label: "Image", name: "image", widget: "image" }
-
-    - # 相册集合
-        # 集合名称
-        name: "albums"
-        # 后台显示标签
-        label: "Albums"
-        # 内容存储目录
-        folder: "src/content/albums"
-        # 允许创建新条目
-        create: true
-        # 文件命名规则
-        slug: "{{slug}}"
-        # 文件存储格式
-        format: "json"
-        # 字段列表
-        fields:
-            - # 相册标题
-                { label: "Title", name: "title", widget: "string" }
-            - # 相册描述
-                { label: "Description", name: "description", widget: "text", required: false }
-            - # 相册封面
-                { label: "Cover", name: "cover", widget: "image" }
-            - # 日期
-                { label: "Date", name: "date", widget: "datetime" }
-            - # 地点
-                { label: "Location", name: "location", widget: "string", required: false }
-            - # 标签
-                { label: "Tags", name: "tags", widget: "list", required: false, default: [] }
-            - # 布局方式
-                { label: "Layout", name: "layout", widget: "select", options: ["grid", "masonry", "list"], default: "grid" }
-            - # 列数
-                { label: "Columns", name: "columns", widget: "number", default: 3, value_type: "int", min: 1, max: 6 }
-            - # 照片列表
-                label: "Photos"
-                name: "photos"
-                widget: "list"
-                required: false
-                fields:
-                    - # 图片路径
-                        { label: "Image", name: "src", widget: "image" }
-                    - # 图片描述
-                        { label: "Caption", name: "alt", widget: "string", required: false }
-                    - # 图片标题
-                        { label: "Title", name: "title", widget: "string", required: false }
-                    - # 图片说明
-                        { label: "Description", name: "description", widget: "text", required: false }
-                    - # 标签
-                        { label: "Tags", name: "tags", widget: "list", required: false, default: [] }
-                    - # 拍摄日期
-                        { label: "Date", name: "date", widget: "datetime", required: false }
-            - # 是否可见
-                { label: "Visible", name: "visible", widget: "boolean", default: true, required: false }
 
     - # 友链集合
         # 集合名称

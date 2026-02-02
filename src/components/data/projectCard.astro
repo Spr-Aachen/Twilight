@@ -1,6 +1,7 @@
 ---
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
+import ImageWrapper from "@components/common/imageWrapper.astro";
 
 
 export interface Props {
@@ -18,6 +19,7 @@ export interface Props {
         endDate?: string;
         featured?: boolean;
         tags?: string[];
+        basePath?: string;
     };
     size?: "small" | "medium" | "large";
     showImage?: boolean;
@@ -96,11 +98,11 @@ const sizeClasses = getSizeClasses(size);
     <!-- 项目图片 -->
     {showImage && project.image && (
         <div class={`overflow-hidden ${size === 'large' ? 'aspect-video' : 'aspect-4/3'}`}>
-            <img
+            <ImageWrapper
                 src={project.image}
+                basePath={project.basePath}
                 alt={project.title}
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
+                class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
             />
         </div>
     )}
