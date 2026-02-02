@@ -9,8 +9,8 @@ backend:
 
 
 # 媒体目录配置
-media_folder: "public/images" # 媒体文件存储路径
-public_folder: "/images" # 公共访问路径
+media_folder: "public/assets/images" # 媒体文件存储路径
+public_folder: "/assets/images" # 公共访问路径
 
 
 # 集合管理配置
