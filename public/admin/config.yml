@@ -49,6 +49,9 @@ collections:
         #        field: "path"
         #        # 分组匹配模式
         #        pattern: '^([^/]+)/' # 匹配第一个路径段（即文件夹名）
+        # 集合特定的媒体文件夹配置
+        media_folder: "" # 留空表示使用相对路径
+        public_folder: "" # 留空表示使用相对路径
         # 允许创建新条目
         create: true
         # 文件命名规则
