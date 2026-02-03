@@ -43,7 +43,7 @@ export default defineConfig({
     adapter: adapter,
     integrations: [
         decapCmsOauth({
-            decapCMSVersion: "3.3.3",
+            decapCMSVersion: "3.9.0",
             oauthDisabled: true, // Disable it to use oauth, requires .env configuration
         }),
         swup({
