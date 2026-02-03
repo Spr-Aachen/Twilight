@@ -8,6 +8,10 @@ backend:
     auth_endpoint: oauth # OAuth 路由由集成提供
 
 
+# 设置后台系统语言 (zh_Hans 简体中文 | en 英文 | ...)
+locale: en
+
+
 # 媒体目录配置
 media_folder: "public/assets/images" # 媒体文件存储路径
 public_folder: "/assets/images" # 公共访问路径
