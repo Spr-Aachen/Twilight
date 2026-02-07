@@ -176,14 +176,14 @@ const jsonLd = {
                     postUrl={getPostUrl(entry)}
                 />
                 {
-                    (!entry.data.cover || (entry.data.cover && !postConfig.showCoverInContent)) && (
+                    (!entry.data.cover || (entry.data.cover && !entry.data.coverInContent)) && (
                         <div class="mt-4 border-(--line-divider) border-dashed border-b mb-5" />
                     )
                 }
             </div>
             <!-- always show cover as long as it has one -->
             {
-                entry.data.cover && postConfig.showCoverInContent && (
+                entry.data.cover && entry.data.coverInContent && (
                     <>
                         <div class="mt-4" />
                         <ImageWrapper

@@ -347,8 +347,6 @@ export type BlogPostData = {
 export type PostConfig = {
     // 显示“上次编辑”卡片
     showLastModified: boolean;
-    // 在文章内容中显示封面
-    showCoverInContent: boolean;
     // 代码高亮配置
     expressiveCode: {
         // 主题

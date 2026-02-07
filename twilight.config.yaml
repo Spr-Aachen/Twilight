@@ -286,8 +286,6 @@ announcement:
 post:
     # 显示“上次编辑”卡片
     showLastModified: true
-    # 在文章内容中显示封面
-    showCoverInContent: false
     # 代码高亮配置
     expressiveCode:
         # 主题

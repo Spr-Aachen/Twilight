@@ -22,6 +22,7 @@ const postsCollection = defineCollection({
         draft: z.boolean().optional().default(false),
         description: z.string().optional().default(""),
         cover: z.string().optional().default(""),
+        coverInContent: z.boolean().optional().default(false),
         tags: z.array(z.string()).optional().default([]),
         category: z.string().optional().nullable().default(""),
         lang: z.string().optional().default(""),
@@ -50,6 +51,7 @@ const specCollection = defineCollection({
     loader: glob({ pattern: '[^_]*.{md,mdx}', base: "./src/content" }),
     schema: z.object({}),
 });
+
 export const collections = {
     posts: postsCollection,
     spec: specCollection,

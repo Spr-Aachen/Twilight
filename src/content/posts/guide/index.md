@@ -3,6 +3,7 @@ title: Guide for Blog Template
 published: 2001-10-02
 description: "How to use this blog template."
 cover: "./cover.jpg"
+coverInContent: false
 pinned: true
 tags: []
 category: Guides
@@ -21,6 +22,7 @@ title: My First Blog Post
 published: 2020-02-02
 description: This is the first post of my new Astro blog.
 cover: ./cover.jpg
+coverInContent: false
 tags: [Foo, Bar]
 category: Front-end
 draft: false
@@ -28,19 +30,20 @@ draft: false
 ```
 
 
-| Attribute     | Description   |
-|---------------|---------------|
-| `title`       | The title of the post. |
-| `published`   | The date the post was published. |
-| `pinned`      | Whether this post is pinned to the top of the post list. |
-| `description` | A short description of the post. Displayed on index page. |
-| `cover`       | The cover image path of the post. <br/>1. Start with `http://` or `https://`: For web image <br/>2. Start with `/`: For image in `public` dir <br/>3. With none of the prefixes: Relative to the markdown file |
-| `tags`        | The tags of the post. |
-| `category`    | The category of the post. |
-| `licenseName` | The license name for the post content. |
-| `author`      | The author of the post. |
-| `sourceLink`  | The source link or reference for the post content. |
-| `draft`       | If this post is still a draft, which won't be displayed. |
+| Attribute        | Description      |
+|------------------|------------------|
+| `title`          | The title of the post. |
+| `published`      | The date the post was published. |
+| `pinned`         | Whether this post is pinned to the top of the post list. |
+| `description`    | A short description of the post. Displayed on index page. |
+| `cover`          | The cover image path of the post. <br/>1. Start with `http://` or `https://`: For web image <br/>2. Start with `/`: For image in `public` dir <br/>3. With none of the prefixes: Relative to the markdown file |
+| `coverInContent` | Whether to show the cover image in the post content. |
+| `tags`           | The tags of the post. |
+| `category`       | The category of the post. |
+| `licenseName`    | The license name for the post content. |
+| `author`         | The author of the post. |
+| `sourceLink`     | The source link or reference for the post content. |
+| `draft`          | If this post is still a draft, which won't be displayed. |
 
 
 ## Where to Place the Post Files
