@@ -2,6 +2,7 @@
 import { Icon } from "astro-icon/components";
 
 import { getCategoryUrl, getTagUrl, url } from "@utils/url";
+import { getCategoryPathParts } from "@utils/category";
 import { formatDateToYYYYMMDD } from "@utils/date";
 import { umamiConfig } from '@/config';
 import { i18n } from "@i18n/translation";
@@ -11,7 +12,7 @@ import I18nKey from "@i18n/i18nKey";
 export interface Props {
     published: Date;
     updated?: Date;
-    category?: string | null;
+    category?: string | string[] | null;
     tags?: string[];
     hideUpdateDate?: boolean;
     hideTagsForMobile?: boolean;
@@ -34,6 +35,7 @@ const {
     postUrl
 } = Astro.props;
 const finalPostUrl = postUrl || (slug ? url(`/posts/${slug}/`) : "");
+const categoryParts = getCategoryPathParts(category ?? null);
 
 // 解析 umami
 const umamiEnabled = umamiConfig.enabled || false;
@@ -65,11 +67,29 @@ const umamiBaseUrl = umamiConfig.baseUrl || "";
             <Icon name="material-symbols:book-2-outline-rounded" class="text-xl"></Icon>
         </div>
         <div class="flex flex-row flex-nowrap items-center">
-            <a href={getCategoryUrl(category || null)} aria-label={`View all posts in the ${category} category`}
-                class="link-lg transition text-50 text-sm font-medium
-                            hover:text-(--primary) dark:hover:text-(--primary) whitespace-nowrap">
-                {category || i18n(I18nKey.uncategorized)}
-            </a>
+            {categoryParts && categoryParts.length > 0 ? (
+                categoryParts.map((categoryName, index) => (
+                    <>
+                        {index > 0 && (
+                            <div class="mx-1.5 text-(--meta-divider) text-sm">/</div>
+                        )}
+                        <a
+                            href={getCategoryUrl(categoryParts.slice(0, index + 1))}
+                            aria-label={`View all posts in the ${categoryName} category`}
+                            class="link-lg transition text-50 text-sm font-medium
+                                        hover:text-(--primary) dark:hover:text-(--primary) whitespace-nowrap"
+                        >
+                            {categoryName}
+                        </a>
+                    </>
+                ))
+            ) : (
+                <a href={getCategoryUrl(null)} aria-label={`View all posts in the ${i18n(I18nKey.uncategorized)} category`}
+                    class="link-lg transition text-50 text-sm font-medium
+                                hover:text-(--primary) dark:hover:text-(--primary) whitespace-nowrap">
+                    {i18n(I18nKey.uncategorized)}
+                </a>
+            )}
         </div>
     </div>
     <!-- tags -->

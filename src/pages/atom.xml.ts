@@ -6,6 +6,7 @@ import sanitizeHtml from "sanitize-html";
 
 import { siteConfig, profileConfig } from "@/config";
 import { getSortedPosts } from "@utils/content";
+import { getCategoryPathParts } from "@utils/category";
 import { getFileDirFromPath, getPostUrl } from "@utils/url";
 
 
@@ -112,9 +113,13 @@ export async function GET(context: APIContext) {
                 <name>${profileConfig.name}</name>
             </author>`;
         // 添加分类标签
-        if (post.data.category) {
-            atomFeed += `
-            <category term="${post.data.category}"></category>`;
+        const categoryParts = getCategoryPathParts(post.data.category);
+        if (categoryParts && categoryParts.length > 0) {
+            for (let i = 0; i < categoryParts.length; i++) {
+                const term = categoryParts.slice(0, i + 1).join(" / ");
+                atomFeed += `
+            <category term="${term}"></category>`;
+            }
         }
         // 添加标签
         atomFeed += `

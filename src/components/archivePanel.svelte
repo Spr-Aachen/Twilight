@@ -2,6 +2,7 @@
 import { onMount } from "svelte";
 
 import { getPostUrl } from "@utils/url";
+import { getCategoryPathLabel, getCategoryPathParts } from "@utils/category";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 
@@ -11,7 +12,7 @@ interface Post {
     data: {
         title: string;
         tags: string[];
-        category?: string | null;
+        category?: string | string[] | null;
         published: Date | string;
         routeName?: string;
     };
@@ -50,6 +51,20 @@ function formatTag(tagList: string[]) {
     return tagList.map((t) => `#${t}`).join(" ");
 }
 
+function isCategoryMatch(category: string | string[] | null | undefined, targets: string[]) {
+    const postParts = getCategoryPathParts(category);
+    if (!postParts || postParts.length === 0) return false;
+    return targets.some((target) => {
+        const targetParts = target
+            .split(" / ")
+            .map((part) => part.trim())
+            .filter((part) => part.length > 0);
+        if (targetParts.length === 0) return false;
+        if (targetParts.length > postParts.length) return false;
+        return targetParts.every((part, index) => part === postParts[index]);
+    });
+}
+
 let groups = $derived.by(() => {
     let filteredPosts = sortedPosts.map((post) => ({
         ...post,
@@ -69,12 +84,12 @@ let groups = $derived.by(() => {
 
     if (categories.length > 0) {
         filteredPosts = filteredPosts.filter(
-            (post) => post.data.category && categories.includes(post.data.category),
+            (post) => isCategoryMatch(post.data.category, categories),
         );
     }
 
     if (uncategorized !== null) {
-        filteredPosts = filteredPosts.filter((post) => !post.data.category);
+        filteredPosts = filteredPosts.filter((post) => !getCategoryPathLabel(post.data.category));
     }
 
     // 按发布时间倒序排序，确保不受置顶影响

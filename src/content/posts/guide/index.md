@@ -6,7 +6,9 @@ cover: "./cover.jpg"
 coverInContent: false
 pinned: true
 tags: []
-category: Guides
+category:
+    - Guides:
+        - Getting Started
 draft: false
 ---
 
@@ -23,8 +25,8 @@ published: 2020-02-02
 description: This is the first post of my new Astro blog.
 cover: ./cover.jpg
 coverInContent: false
-tags: [Foo, Bar]
-category: Front-end
+tags: []
+category: Guides
 draft: false
 ---
 ```
@@ -39,7 +41,7 @@ draft: false
 | `cover`          | The cover image path of the post. <br/>1. Start with `http://` or `https://`: For web image <br/>2. Start with `/`: For image in `public` dir <br/>3. With none of the prefixes: Relative to the markdown file |
 | `coverInContent` | Whether to show the cover image in the post content. |
 | `tags`           | The tags of the post. |
-| `category`       | The category of the post. |
+| `category`       | The category of the post <br/>1. Single category: `category: Guides` <br/>2. Multi-category: `category: [Guides, Getting Started]` |
 | `licenseName`    | The license name for the post content. |
 | `author`         | The author of the post. |
 | `sourceLink`     | The source link or reference for the post content. |

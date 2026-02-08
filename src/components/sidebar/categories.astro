@@ -1,19 +1,22 @@
 ---
-import { getCategoryList } from "@utils/content";
+import { getCategoryTree, type CategoryTreeItem } from "@utils/content";
 import { widgetManager, getComponentConfig } from "@utils/widget";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
-import ButtonLink from "@/components/common/buttonLink.astro";
 import WidgetLayout from "./widgetLayout.astro";
+import CategoryItem from "./categoryItem.astro";
 
 
-const categories = await getCategoryList();
+const categoriesTree = await getCategoryTree();
 
 const COLLAPSED_HEIGHT = "7.5rem";
 
 // 使用统一的组件管理器检查是否应该折叠
 const categoriesComponent = getComponentConfig("categories");
-const isCollapsed = categoriesComponent ? widgetManager.isCollapsed(categoriesComponent, categories.length) : false;
+const countNodes = (nodes: CategoryTreeItem[]): number =>
+    nodes.reduce((total, node) => total + 1 + countNodes(node.children), 0);
+const totalCategoriesCount = countNodes(categoriesTree);
+const isCollapsed = categoriesComponent ? widgetManager.isCollapsed(categoriesComponent, totalCategoriesCount) : false;
 
 interface Props {
     class?: string;
@@ -31,13 +34,5 @@ const { class: className, style, side = "default" } = Astro.props;
     class={className}
     style={style}
 >
-    {categories.map((c) =>
-        <ButtonLink
-            url={c.url}
-            badge={String(c.count)}
-            label={`View all posts in the ${c.name.trim()} category`}
-        >
-            {c.name.trim()}
-        </ButtonLink>
-    )}
+    <CategoryItem nodes={categoriesTree} />
 </WidgetLayout>
