@@ -43,11 +43,6 @@ export function getPostUrl(post: any): string {
     return getPostUrlBySlug(post.id);
 }
 
-export function getTagUrl(tag: string): string {
-    if (!tag) return url("/archive/");
-    return url(`/archive/?tag=${encodeURIComponent(tag.trim())}`);
-}
-
 export function getCategoryUrl(category: string | string[] | null): string {
     if (!category) return url("/archive/?uncategorized=true");
     const parts = Array.isArray(category)
@@ -58,6 +53,11 @@ export function getCategoryUrl(category: string | string[] | null): string {
         return url("/archive/?uncategorized=true");
     }
     return url(`/archive/?category=${encodeURIComponent(label)}`);
+}
+
+export function getTagUrl(tag: string): string {
+    if (!tag) return url("/archive/");
+    return url(`/archive/?tag=${encodeURIComponent(tag.trim())}`);
 }
 
 export function getDir(path: string): string {

@@ -8,6 +8,8 @@ import sanitizeHtml from "sanitize-html";
 
 import { siteConfig } from "@/config";
 import { getSortedPosts } from "@utils/content";
+import { getCategoryPathLabel } from "@utils/category";
+import { parseTags } from "@utils/tag";
 import { getFileDirFromPath, getPostUrl } from "@utils/url";
 
 
@@ -83,11 +85,19 @@ export async function GET(context: APIContext) {
             }
         }
 
+        const categories: string[] = [];
+        const categoryLabel = getCategoryPathLabel(post.data.category);
+        if (categoryLabel) categories.push(categoryLabel);
+        
+        const tags = parseTags(post.data.tags);
+        if (tags && tags.length > 0) categories.push(...tags);
+
         feed.push({
             title: post.data.title,
             description: post.data.description,
             pubDate: post.data.published,
             link: getPostUrl(post),
+            categories: categories,
             // sanitize the new html string with corrected image paths
             content: sanitizeHtml(html.toString(), {
                 allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),

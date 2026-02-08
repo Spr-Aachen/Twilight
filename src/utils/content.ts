@@ -1,6 +1,7 @@
 import { type CollectionEntry, getCollection } from "astro:content";
 
 import { CATEGORY_SEPARATOR, type CategoryPath, getCategoryPathParts } from "@utils/category";
+import { parseTags, type Tag } from "@utils/tag";
 import { getCategoryUrl } from "@utils/url";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
@@ -54,11 +55,6 @@ export async function getSortedPostsList(): Promise<PostForList[]> {
 
     return sortedPostsList;
 }
-export type Tag = {
-    name: string;
-    count: number;
-};
-
 export async function getTagList(): Promise<Tag[]> {
     const allBlogPosts = await getCollection<"posts">("posts", ({ data }) => {
         return import.meta.env.PROD ? data.draft !== true : true;
@@ -66,7 +62,8 @@ export async function getTagList(): Promise<Tag[]> {
 
     const countMap: { [key: string]: number } = {};
     allBlogPosts.forEach((post: { data: { tags: string[] } }) => {
-        post.data.tags.forEach((tag: string) => {
+        const tags = parseTags(post.data.tags);
+        tags.forEach((tag: string) => {
             if (!countMap[tag]) countMap[tag] = 0;
             countMap[tag]++;
         });

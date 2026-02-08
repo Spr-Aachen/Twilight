@@ -7,6 +7,7 @@ import sanitizeHtml from "sanitize-html";
 import { siteConfig, profileConfig } from "@/config";
 import { getSortedPosts } from "@utils/content";
 import { getCategoryPathParts } from "@utils/category";
+import { parseTags } from "@utils/tag";
 import { getFileDirFromPath, getPostUrl } from "@utils/url";
 
 
@@ -122,6 +123,13 @@ export async function GET(context: APIContext) {
             }
         }
         // 添加标签
+        const postTags = parseTags(post.data.tags);
+        if (postTags && postTags.length > 0) {
+            for (const tag of postTags) {
+                atomFeed += `
+            <category term="${tag}" label="${tag}"></category>`;
+            }
+        }
         atomFeed += `
             </entry>`;
     }

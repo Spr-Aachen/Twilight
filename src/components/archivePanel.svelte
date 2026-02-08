@@ -3,6 +3,7 @@ import { onMount } from "svelte";
 
 import { getPostUrl } from "@utils/url";
 import { getCategoryPathLabel, getCategoryPathParts } from "@utils/category";
+import { parseTags } from "@utils/tag";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 
@@ -77,8 +78,10 @@ let groups = $derived.by(() => {
     if (tags.length > 0) {
         filteredPosts = filteredPosts.filter(
             (post) =>
-                Array.isArray(post.data.tags) &&
-                post.data.tags.some((tag) => tags.includes(tag)),
+            {
+                const postTags = parseTags(post.data.tags);
+                return postTags.some((tag) => tags.includes(tag));
+            }
         );
     }
 
