@@ -31,7 +31,6 @@ const postsCollection = defineCollection({
         title: z.string(),
         published: dateSchema,
         updated: optionalDateSchema,
-        draft: z.boolean().optional().default(false),
         description: z.string().optional().default(""),
         cover: z.string().optional().default(""),
         coverInContent: z.boolean().optional().default(false),
@@ -43,6 +42,8 @@ const postsCollection = defineCollection({
         sourceLink: z.string().optional().default(""),
         licenseName: z.string().optional().default(""),
         licenseUrl: z.string().optional().default(""),
+        comment: z.boolean().optional().default(true),
+        draft: z.boolean().optional().default(false),
 
         /* Page encryption fields */
         encrypted: z.boolean().optional().default(false),

@@ -27,6 +27,7 @@ cover: ./cover.jpg
 coverInContent: false
 tags: []
 category: Guides
+comment: true
 draft: false
 ---
 ```
@@ -45,6 +46,7 @@ draft: false
 | `licenseName`    | The license name for the post content. |
 | `author`         | The author of the post. |
 | `sourceLink`     | The source link or reference for the post content. |
+| `comment`        | Whether to enable comment for this post. Default is `true`. |
 | `draft`          | If this post is still a draft, which won't be displayed. |
 
 

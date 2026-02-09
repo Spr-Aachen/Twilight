@@ -15,12 +15,12 @@ const { post } = Astro.props;
 const path = getPostUrl(post);
 
 let commentService = "";
-if (postConfig.comment?.enable && postConfig.comment?.twikoo) {
+if (postConfig.comment?.enable && post.data.comment && postConfig.comment?.twikoo) {
     commentService = "twikoo";
 }
 ---
 
-{postConfig.comment?.enable && (
+{postConfig.comment?.enable && post.data.comment && (
     <div class="card-base p-6 mb-4">
         {commentService === 'twikoo' && <Twikoo path={path} />}
         {commentService === '' && null}
