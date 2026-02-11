@@ -1,0 +1,44 @@
+name: Deploy to Pages Branch
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    name: Build and Deploy
+    steps:
+      - name: Checkout your repository using git
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.14.4
+          run_install: false
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build site
+        run: pnpm run build
+
+      - name: Create .nojekyll file
+        run: touch dist/.nojekyll
+      
+      - name: Deploy to pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: pages
+          folder: dist
+          clean: true
