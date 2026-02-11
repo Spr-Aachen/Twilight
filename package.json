@@ -37,7 +37,7 @@
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.18",
 		"@types/js-yaml": "^4.0.9",
-		"astro": "5.16.15",
+		"astro": "5.17.1",
 		"astro-decap-cms-oauth": "^0.5.1",
 		"astro-expressive-code": "^0.41.6",
 		"astro-icon": "^1.1.5",
