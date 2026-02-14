@@ -1,0 +1,18 @@
+services:
+  twilight:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: twilight-blog
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    volumes:
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - twilight-network
+
+networks:
+  twilight-network:
+    driver: bridge
