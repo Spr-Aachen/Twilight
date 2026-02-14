@@ -6,6 +6,8 @@
 @import './anime.css' layer(base);
 /* 导入动过渡样式 */
 @import './transition.css' layer(base);
+/* 导入 Markdown 文章样式（含 song-card） */
+@import './markdown.css' layer(base);
 
 @plugin '@tailwindcss/typography';
 
