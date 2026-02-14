@@ -7,7 +7,7 @@
 
 ## 📁 文件说明
 
-### 1. `dockerfile`
+### 1. `Dockerfile`
 
 多阶段构建的 Docker 镜像配置文件：
 - **构建阶段**：使用 `node:lts-alpine` 镜像安装依赖并构建项目
