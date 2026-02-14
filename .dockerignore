@@ -1,39 +1,11 @@
-# 依赖
 node_modules
-.pnpm-store
-
-# 构建产物
 dist
-.vercel
-.output
-
-# 开发文件
-.vscode
-.idea
-*.log
-*.swp
-*.swo
-*~
-
-# 系统文件
-.DS_Store
-Thumbs.db
-
-# Git
+.astro
 .git
 .gitignore
-
-# 环境变量
 .env
-.env.local
-.env.*.local
-
-# 测试
-coverage
-.nyc_output
-
-# 其他
+*.log
+*.bak
 README.md
 docs
-tutorial
-*.md
+terminals
