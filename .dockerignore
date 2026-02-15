@@ -1,11 +1,32 @@
-node_modules
-dist
-.astro
+# CI/CD
+.github
+
+# Git
 .git
 .gitignore
+
+# Environment
 .env
-*.log
-*.bak
+
+# Documentation
 README.md
 docs
+
+# Dependencies
+node_modules
+
+# Build
+.astro
+.vercel
+dist
+
+# IDE Config
+.vscode
+.idea
+*.swp
+*.swo
+
+# Others
 terminals
+*.log
+*.bak
