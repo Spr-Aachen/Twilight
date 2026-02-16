@@ -11,23 +11,17 @@ import { h } from "hastscript";
  * ::::
  */
 export function SongCardComponent(properties, children) {
-    const title = properties?.title || "Untitled";
-    const artist = properties?.artist || "Unknown Artist";
+    const title = properties?.title || "Music";
+    const artist = properties?.artist || "Artist";
     const cover = properties?.cover;
     const audio = properties?.audio;
     const cardId = `song-${Math.random().toString(36).slice(2, 10)}`;
 
-    if (!cover || !audio) {
-        return h(
-            "div",
-            { class: "hidden" },
-            'Invalid song directive. ("cover" and "audio" attributes are required)',
-        );
-    }
-
     const extractNodeText = (node) => {
         if (!node) return "";
         if (typeof node.value === "string") return node.value;
+        // Handle MDAST break and HAST br
+        if (node.type === 'break' || node.tagName === 'br') return "\n";
         if (Array.isArray(node.children)) {
             return node.children.map(extractNodeText).join("");
         }
@@ -39,72 +33,43 @@ export function SongCardComponent(properties, children) {
         .join("\n")
         .trim();
 
-    const stripTimestampPrefix = (line) =>
-        line.replace(/^\s*\[[^\]]+\]\s*/g, "").trim();
-
-    const parseTimestamp = (token) => {
-        if (!token) return null;
-        const normalized = token.trim().replaceAll("：", ":");
-        if (!normalized) return null;
-
-        // mm:ss(.xxx)
-        if (normalized.includes(":")) {
-            const [mRaw, secRaw] = normalized.split(":", 2);
-            const minute = Number(mRaw);
-            if (!Number.isFinite(minute)) return null;
-
-            let second = 0;
-            let fraction = 0;
-            if (secRaw.includes(".")) {
-                const [sRaw, fRaw] = secRaw.split(".", 2);
-                second = Number(sRaw);
-                if (!Number.isFinite(second)) return null;
-                const fracStr = (fRaw || "0").replace(/[^\d]/g, "");
-                fraction = fracStr ? Number(fracStr) / Math.pow(10, fracStr.length) : 0;
-            } else {
-                second = Number(secRaw);
-                if (!Number.isFinite(second)) return null;
-            }
-            return minute * 60 + second + fraction;
-        }
-
-        // ss(.xxx)
-        if (normalized.includes(".")) {
-            const [sRaw, fRaw] = normalized.split(".", 2);
-            const second = Number(sRaw);
-            if (!Number.isFinite(second)) return null;
-            const fracStr = (fRaw || "0").replace(/[^\d]/g, "");
-            const fraction = fracStr ? Number(fracStr) / Math.pow(10, fracStr.length) : 0;
-            return second + fraction;
-        }
-
-        return null;
-    };
-
-    const parseLrc = (input) => {
-        if (!input) return [];
+    const parseLrc = (lrc) => {
+        if (!lrc) return [];
+        // Regex to match [mm:ss.xx] or [mm:ss.xxx]
+        // Supports multiple timestamps per line: [00:00.00][00:01.00]Text
+        const timeRegex = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?\]/g;
         const output = [];
-        const lines = input.split(/\r?\n/);
+
+        const lines = lrc.split(/\r?\n/);
         for (const line of lines) {
-            const timestampMatches = [...line.matchAll(/\[([^\]]+)\]/g)];
-            const text = stripTimestampPrefix(line.replace(/\[([^\]]+)\]/g, "").trim());
-            if (timestampMatches.length === 0) continue;
-            for (const match of timestampMatches) {
-                const time = parseTimestamp(match[1]);
-                if (time === null || Number.isNaN(time)) continue;
-                output.push({ time, text: text || "..." });
+            const matches = [...line.matchAll(timeRegex)];
+            if (matches.length === 0) continue;
+
+            const text = line.replace(timeRegex, "").trim();
+
+            for (const match of matches) {
+                const min = parseInt(match[1], 10);
+                const sec = parseInt(match[2], 10);
+                const msStr = match[3] || "0";
+                // If 2 digits, it's 10ms units (x * 10). If 3 digits, it's 1ms units.
+                // Standard LRC .xx is usually 1/100s.
+                const ms = msStr.length === 3 ? parseInt(msStr, 10) / 1000 : parseInt(msStr, 10) / 100;
+
+                const time = min * 60 + sec + ms;
+                if (!Number.isFinite(time)) continue;
+
+                output.push({ time, text });
             }
         }
+
+        // Sort by time
         return output.sort((a, b) => a.time - b.time);
     };
 
     const lrcLines = parseLrc(rawLyrics);
-    const fallbackLines = rawLyrics
-        ? rawLyrics.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
-        : [];
     const safeCover = String(cover).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
-    const firstLine = lrcLines[0]?.text || stripTimestampPrefix(fallbackLines[0] || "") || "No lyrics provided.";
+    const firstLine = lrcLines[0]?.text || "No lyrics provided.";
 
     const lyricsSource =
         lrcLines.length > 0
@@ -215,222 +180,204 @@ export function SongCardComponent(properties, children) {
             { type: "text/javascript" },
             `
 (() => {
-  const SCRIPT_VERSION = "song-card-v4";
+    const SCRIPT_VERSION = "song-card-v5";
 
-  const initSongCards = () => {
-    const cards = document.querySelectorAll('[data-song-card="true"]');
-    cards.forEach((card) => {
-      if (card.dataset.songBoundVersion === SCRIPT_VERSION) return;
-      card.dataset.songBoundVersion = SCRIPT_VERSION;
+    const initSongCards = () => {
+        const cards = document.querySelectorAll('[data-song-card="true"]');
+        cards.forEach((card) => {
+            if (card.dataset.songBoundVersion === SCRIPT_VERSION) return;
+            card.dataset.songBoundVersion = SCRIPT_VERSION;
 
-      const audio = card.querySelector('[data-song-audio="true"]');
-      const toggle = card.querySelector('[data-player-toggle="true"]');
-      const progress = card.querySelector('[data-player-progress="true"]');
-      const currentTimeEl = card.querySelector('[data-player-current="true"]');
-      const durationEl = card.querySelector('[data-player-duration="true"]');
-      const currentLyricEl = card.querySelector('[data-lyrics-current="true"]');
-      const exitLyricEl = card.querySelector('[data-lyrics-exit="true"]');
-      const lines = Array.from(card.querySelectorAll('[data-lrc-source="true"] [data-lrc-time]'));
-      const coverImg = card.querySelector('.song-card__cover');
-      if (!audio || !toggle || !progress || !currentTimeEl || !durationEl) return;
-      let audioLoaded = false;
+            const audio = card.querySelector('[data-song-audio="true"]');
+            const toggle = card.querySelector('[data-player-toggle="true"]');
+            const progress = card.querySelector('[data-player-progress="true"]');
+            const currentTimeEl = card.querySelector('[data-player-current="true"]');
+            const durationEl = card.querySelector('[data-player-duration="true"]');
+            const currentLyricEl = card.querySelector('[data-lyrics-current="true"]');
+            const exitLyricEl = card.querySelector('[data-lyrics-exit="true"]');
+            const lines = Array.from(card.querySelectorAll('[data-lrc-source="true"] [data-lrc-time]'));
+            const coverImg = card.querySelector('.song-card__cover');
 
-      const ensureAudioLoaded = () => {
-        if (audioLoaded) return;
-        const sourceEl = audio.querySelector("source[data-src]");
-        if (sourceEl && !sourceEl.getAttribute("src")) {
-          const src = sourceEl.getAttribute("data-src");
-          if (src) sourceEl.setAttribute("src", src);
-        }
-        audio.preload = "metadata";
-        audio.load();
-        audioLoaded = true;
-      };
+            if (!audio || !toggle || !progress || !currentTimeEl || !durationEl) return;
 
-      const titlelineEl = card.querySelector('.song-card__titleline');
-      const rawTitle = (card.dataset.songTitle || "").trim();
-      const rawArtist = (card.dataset.songArtist || "").trim();
-      if (titlelineEl && rawTitle && rawArtist) {
-        titlelineEl.textContent = rawTitle + " - " + rawArtist;
-      }
+            let audioLoaded = false;
+            let currentIndex = -1;
 
-      const formatTime = (value) => {
-        if (!Number.isFinite(value) || value < 0) return "0:00";
-        const minute = Math.floor(value / 60);
-        const second = Math.floor(value % 60);
-        return minute + ":" + String(second).padStart(2, "0");
-      };
+            const ensureAudioLoaded = () => {
+                if (audioLoaded) return;
+                const sourceEl = audio.querySelector("source[data-src]");
+                if (sourceEl && !sourceEl.getAttribute("src")) {
+                    const src = sourceEl.getAttribute("data-src");
+                    if (src) sourceEl.setAttribute("src", src);
+                }
+                audio.preload = "metadata";
+                audio.load();
+                audioLoaded = true;
+            };
 
-      const findLineIndex = (time) => {
-        for (let i = lines.length - 1; i >= 0; i--) {
-          const t = Number(lines[i].dataset.lrcTime || 0);
-          if (time >= t) return i;
-        }
-        return -1;
-      };
+            const formatTime = (value) => {
+                if (!Number.isFinite(value) || value < 0) return "0:00";
+                const minute = Math.floor(value / 60);
+                const second = Math.floor(value % 60);
+                return minute + ":" + String(second).padStart(2, "0");
+            };
 
-      const renderLyric = (index) => {
-        if (!currentLyricEl) return;
-        if (lines.length === 0) return;
-        const current = index >= 0 ? lines[index] : lines[0];
-        const nextText = current ? (current.textContent || "...") : "...";
-        if (currentLyricEl.textContent !== nextText) {
-          const prevText = currentLyricEl.textContent || "";
-          if (exitLyricEl && prevText) {
-            exitLyricEl.textContent = prevText;
-            if (typeof exitLyricEl.animate === "function") {
-              exitLyricEl.getAnimations().forEach((a) => a.cancel());
-              exitLyricEl.animate([
-                { opacity: 1, transform: "translateY(0) scale(1)", filter: "blur(0px)" },
-                { opacity: 0, transform: "translateY(-12px) scale(0.992)", filter: "blur(2px)" },
-              ], {
-                duration: 460,
-                easing: "cubic-bezier(0.22,1,0.36,1)",
-                fill: "both",
-              });
-            } else {
-              exitLyricEl.classList.remove("is-leaving");
-              void exitLyricEl.offsetWidth;
-              exitLyricEl.classList.add("is-leaving");
-            }
-          }
-          currentLyricEl.textContent = nextText;
-          if (typeof currentLyricEl.animate === "function") {
-            currentLyricEl.getAnimations().forEach((a) => a.cancel());
-            currentLyricEl.animate([
-              { opacity: 0, transform: "translateY(12px) scale(0.992)", filter: "blur(2px)" },
-              { opacity: 0.92, transform: "translateY(-1px) scale(1.001)", filter: "blur(0.35px)" },
-              { opacity: 1, transform: "translateY(0) scale(1)", filter: "blur(0px)" },
-            ], {
-              duration: 460,
-              easing: "cubic-bezier(0.64,0,0.78,0)",
-              fill: "both",
+            const findLineIndex = (time) => {
+                // Find the last line where line.time <= time
+                let l = 0, r = lines.length - 1;
+                let idx = -1;
+                while (l <= r) {
+                        const mid = Math.floor((l + r) / 2);
+                        const t = Number(lines[mid].dataset.lrcTime || 0);
+                        if (t <= time) {
+                                idx = mid;
+                                l = mid + 1;
+                        } else {
+                                r = mid - 1;
+                        }
+                }
+                return idx;
+            };
+
+            const renderLyric = (index) => {
+                if (!currentLyricEl || lines.length === 0) return;
+
+                // Don't re-render if index hasn't changed
+                if (currentIndex === index) return;
+                currentIndex = index;
+
+                const currentLine = index >= 0 ? lines[index] : null;
+                const nextText = currentLine ? (currentLine.textContent || "") : (lines[0]?.textContent || "...");
+
+                // If text is same, just skip animation but ensure text is set
+                if (currentLyricEl.textContent === nextText) return;
+
+                const prevText = currentLyricEl.textContent || "";
+
+                // Exit animation
+                if (exitLyricEl && prevText) {
+                        exitLyricEl.textContent = prevText;
+                        exitLyricEl.classList.remove("is-leaving");
+                        void exitLyricEl.offsetWidth; // Trigger reflow
+                        exitLyricEl.classList.add("is-leaving");
+                }
+
+                // Enter animation
+                currentLyricEl.textContent = nextText;
+                currentLyricEl.classList.remove("is-entering");
+                void currentLyricEl.offsetWidth; // Trigger reflow
+                currentLyricEl.classList.add("is-entering");
+            };
+
+            const updateProgress = () => {
+                const duration = audio.duration || 0;
+                const current = audio.currentTime || 0;
+                const percent = duration > 0 ? (current / duration) * 100 : 0;
+
+                // Only update if not dragging (optional, but good UX)
+                // Here we just update always
+                progress.value = String(percent);
+                progress.style.setProperty("--song-progress", percent.toFixed(3) + "%");
+                currentTimeEl.textContent = formatTime(current);
+                durationEl.textContent = duration > 0 ? formatTime(duration) : "--:--";
+            };
+
+            const updateToggle = () => {
+                const playing = !audio.paused;
+                toggle.classList.toggle("is-playing", playing);
+                toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
+            };
+
+            const syncByTime = () => {
+                const time = audio.currentTime || 0;
+                const idx = findLineIndex(time);
+                renderLyric(idx);
+                updateProgress();
+            };
+
+            toggle.addEventListener("click", () => {
+                if (audio.paused) {
+                    ensureAudioLoaded();
+                    audio.play().catch(() => {});
+                } else {
+                    audio.pause();
+                }
             });
-          } else {
-            currentLyricEl.classList.remove("is-entering");
-            void currentLyricEl.offsetWidth;
-            currentLyricEl.classList.add("is-entering");
-          }
-        }
-      };
 
-      const updateProgress = () => {
-        const duration = audio.duration || 0;
-        const current = audio.currentTime || 0;
-        const percent = duration > 0 ? (current / duration) * 100 : 0;
-        progress.value = String(percent);
-        progress.style.setProperty("--song-progress", percent.toFixed(3) + "%");
-        currentTimeEl.textContent = formatTime(current);
-        durationEl.textContent = duration > 0 ? formatTime(duration) : "--:--";
-      };
+            progress.addEventListener("input", () => {
+                const duration = audio.duration || 0;
+                if (!duration) return;
+                const percent = Number(progress.value || 0) / 100;
+                audio.currentTime = duration * percent;
+                syncByTime();
+            });
 
-      const updateToggle = () => {
-        const playing = !audio.paused;
-        toggle.classList.toggle("is-playing", playing);
-        toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
-      };
+            audio.addEventListener("loadedmetadata", () => {
+                updateProgress();
+                syncByTime();
+            });
 
-      const syncByTime = () => {
-        const idx = findLineIndex(audio.currentTime || 0);
-        renderLyric(idx);
-        updateProgress();
-      };
+            audio.addEventListener('timeupdate', syncByTime);
+            audio.addEventListener('play', updateToggle);
+            audio.addEventListener('pause', updateToggle);
+            audio.addEventListener('ended', updateToggle);
 
-      toggle.addEventListener("click", () => {
-        if (audio.paused) {
-          ensureAudioLoaded();
-          audio.play().catch(() => {});
-        } else {
-          audio.pause();
-        }
-      });
+            // Color extraction logic (simplified)
+            const applyAccentFromCover = () => {
+                if (!coverImg || !coverImg.complete || coverImg.naturalWidth <= 0) return;
+                try {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = 24; canvas.height = 24;
+                    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+                    if (!ctx) return;
+                    ctx.drawImage(coverImg, 0, 0, 24, 24);
+                    const data = ctx.getImageData(0, 0, 24, 24).data;
+                    let r = 0, g = 0, b = 0, count = 0;
+                    for (let i = 0; i < data.length; i += 4) {
+                         if (data[i + 3] < 140) continue;
+                         r += data[i]; g += data[i + 1]; b += data[i + 2];
+                         count++;
+                    }
+                    if (!count) return;
+                    r = Math.round(r / count); g = Math.round(g / count); b = Math.round(b / count);
 
-      progress.addEventListener("input", () => {
-        const duration = audio.duration || 0;
-        if (!duration) return;
-        const percent = Number(progress.value || 0) / 100;
-        audio.currentTime = duration * percent;
-        syncByTime();
-      });
+                    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                    const l = (max + min) / 510;
+                    let h = 0, s = 0;
+                    if (max !== min) {
+                         const d = max - min;
+                         s = l > 0.5 ? d / (510 - max - min) : d / (max + min);
+                         switch (max) {
+                                 case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                                 case g: h = (b - r) / d + 2; break;
+                                 default: h = (r - g) / d + 4;
+                         }
+                         h /= 6;
+                    }
+                    const hue = Math.round(h * 360);
+                    const sat = Math.min(78, Math.max(45, Math.round(s * 100)));
+                    const light = Math.min(54, Math.max(36, Math.round(l * 100)));
 
-      audio.addEventListener("loadedmetadata", () => {
-        updateProgress();
-        syncByTime();
-      });
-      audio.addEventListener('timeupdate', syncByTime);
-      audio.addEventListener('seeked', syncByTime);
-      audio.addEventListener('play', syncByTime);
-      audio.addEventListener('play', updateToggle);
-      audio.addEventListener('pause', updateToggle);
-      audio.addEventListener('ended', updateToggle);
+                    card.style.setProperty("--song-accent", \`hsl(\${hue} \${sat}% \${light}%)\`);
+                    card.style.setProperty("--song-accent-soft", \`hsl(\${hue} \${Math.max(38, sat - 16)}% \${Math.min(68, light + 16)}% / 0.2)\`);
+                } catch (_) {}
+            };
 
-      const applyAccentFromCover = () => {
-        if (!coverImg || !coverImg.complete || coverImg.naturalWidth <= 0) return;
-        try {
-          const canvas = document.createElement("canvas");
-          canvas.width = 24;
-          canvas.height = 24;
-          const ctx = canvas.getContext("2d", { willReadFrequently: true });
-          if (!ctx) return;
-          ctx.drawImage(coverImg, 0, 0, 24, 24);
-          const data = ctx.getImageData(0, 0, 24, 24).data;
-          let r = 0, g = 0, b = 0, count = 0;
-          for (let i = 0; i < data.length; i += 4) {
-            const alpha = data[i + 3];
-            if (alpha < 140) continue;
-            r += data[i];
-            g += data[i + 1];
-            b += data[i + 2];
-            count++;
-          }
-          if (!count) return;
-          r = Math.round(r / count);
-          g = Math.round(g / count);
-          b = Math.round(b / count);
+            if (coverImg.complete) applyAccentFromCover();
+            else coverImg.addEventListener("load", applyAccentFromCover, { once: true });
 
-          const max = Math.max(r, g, b), min = Math.min(r, g, b);
-          const l = (max + min) / 510;
-          let h = 0, s = 0;
-          if (max !== min) {
-            const d = max - min;
-            s = l > 0.5 ? d / (510 - max - min) : d / (max + min);
-            switch (max) {
-              case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-              case g: h = (b - r) / d + 2; break;
-              default: h = (r - g) / d + 4;
-            }
-            h /= 6;
-          }
-          const hue = Math.round(h * 360);
-          const sat = Math.min(78, Math.max(45, Math.round(s * 100)));
-          // Keep accent mid-dark so white text remains readable under all covers.
-          const light = Math.min(54, Math.max(36, Math.round(l * 100)));
-          card.style.setProperty("--song-accent", "hsl(" + hue + " " + sat + "% " + light + "%)");
-          card.style.setProperty("--song-accent-soft", "hsl(" + hue + " " + Math.max(38, sat - 16) + "% " + Math.min(68, light + 16) + "% / 0.2)");
-        } catch (_e) {
-          // External images without CORS may block canvas reads. Keep fallback colors.
-        }
-      };
+            updateToggle();
+            updateProgress();
+        });
+    };
 
-      if (coverImg && coverImg.complete) {
-        applyAccentFromCover();
-      } else if (coverImg) {
-        coverImg.addEventListener("load", applyAccentFromCover, { once: true });
-      }
-
-      updateToggle();
-      updateProgress();
-      renderLyric(-1);
-    });
-  };
-
-  window.__songCardInit = initSongCards;
-  initSongCards();
-  if (!window.__songCardListenersBound) {
-    document.addEventListener('astro:page-load', () => window.__songCardInit?.());
-    document.addEventListener('swup:contentReplaced', () => window.__songCardInit?.());
-    window.__songCardListenersBound = true;
-  }
+    window.__songCardInit = initSongCards;
+    initSongCards();
+    if (!window.__songCardListenersBound) {
+        document.addEventListener('astro:page-load', () => window.__songCardInit?.());
+        document.addEventListener('swup:contentReplaced', () => window.__songCardInit?.());
+        window.__songCardListenersBound = true;
+    }
 })();
             `,
         ),
