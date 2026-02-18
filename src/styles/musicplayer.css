@@ -126,6 +126,29 @@ button.bg-\(--primary\) {
     background-color: rgba(155, 155, 155, 0.5);
 }
 
+/* Lyrics Scrollbar Styles */
+.lyrics-container {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+}
+.lyrics-container:hover, .lyrics-container.scrolling {
+    scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+}
+.lyrics-container::-webkit-scrollbar {
+    width: 4px;
+}
+.lyrics-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.lyrics-container::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+}
+.lyrics-container:hover::-webkit-scrollbar-thumb, .lyrics-container.scrolling::-webkit-scrollbar-thumb {
+    background-color: rgba(155, 155, 155, 0.5);
+}
+
 @media (hover: none) and (pointer: coarse) {
     .music-player button,
     .playlist-item {

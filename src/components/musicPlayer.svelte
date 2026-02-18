@@ -71,6 +71,129 @@ let showError = $state(false);
 // 音量过渡间隔
 let fadeInterval: number | null = null;
 
+// Lyrics State
+let lyrics: { time: number; text: string }[] = $state([]);
+let currentLrcIndex = $state(-1);
+let lrcContainer: HTMLElement | undefined = $state();
+let isUserScrolling = $state(false);
+let scrollTimeout: number | null = null;
+let noLyrics = $state(false); // Flag if no lyrics available
+
+// Parse LRC function
+function parseLRC(lrc: string) {
+    if (!lrc) return [];
+    const lines = lrc.split('\n');
+    const result: { time: number; text: string }[] = [];
+    const timeReg = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/g;
+    
+    lines.forEach(line => {
+        const matches = Array.from(line.matchAll(timeReg));
+        if (matches.length > 0) {
+            const text = line.replace(timeReg, '').trim();
+            if (text) {
+                matches.forEach(match => {
+                    const m = parseInt(match[1]);
+                    const s = parseInt(match[2]);
+                    const ms = parseInt(match[3]);
+                    const time = m * 60 + s + ms / (match[3].length === 3 ? 1000 : 100);
+                    result.push({ time, text });
+                });
+            }
+        }
+    });
+    return result.sort((a, b) => a.time - b.time);
+}
+
+// Load lyrics function
+async function loadLyrics(song: MusicPlayerTrack) {
+    lyrics = [];
+    currentLrcIndex = -1;
+    noLyrics = false;
+    
+    if (!song.lrc) {
+        noLyrics = true;
+        return;
+    }
+
+    let lrcText = "";
+    if (song.lrc.startsWith('http') || song.lrc.endsWith('.lrc') || song.lrc.startsWith('/')) {
+         try {
+             const res = await fetch(song.lrc);
+             if (res.ok) {
+                 lrcText = await res.text();
+             }
+         } catch (e) {
+             console.error("Failed to fetch lyrics", e);
+         }
+    } else {
+        lrcText = song.lrc;
+    }
+
+    if (lrcText) {
+        lyrics = parseLRC(lrcText);
+        if (lyrics.length === 0) noLyrics = true;
+    } else {
+        noLyrics = true;
+    }
+}
+
+// Seek to lyric time
+function seekToLyric(time: number) {
+    if (!audio) return;
+    audio.currentTime = time;
+    currentTime = time;
+    if (!isPlaying) {
+        togglePlay();
+    }
+}
+
+// Scroll logic
+function handleLrcScroll() {
+    isUserScrolling = true;
+    if (lrcContainer) {
+        lrcContainer.classList.add('scrolling');
+    }
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    scrollTimeout = window.setTimeout(() => {
+        isUserScrolling = false;
+        if (lrcContainer) {
+            lrcContainer.classList.remove('scrolling');
+        }
+    }, 2000);
+}
+
+// Update lyrics on timeupdate
+function updateLyrics(currentTime: number) {
+    if (lyrics.length === 0) return;
+    
+    let index = -1;
+    for (let i = 0; i < lyrics.length; i++) {
+        if (currentTime >= lyrics[i].time) {
+            index = i;
+        } else {
+            break;
+        }
+    }
+    
+    if (index !== currentLrcIndex) {
+            currentLrcIndex = index;
+            if (!isUserScrolling && lrcContainer && index !== -1) {
+                 const lines = lrcContainer.querySelectorAll('.lyric-line');
+                 const activeLine = lines[index] as HTMLElement;
+                 if (activeLine) {
+                     const containerHeight = lrcContainer.clientHeight;
+                     const lineOffset = activeLine.offsetTop;
+                     const lineHeight = activeLine.offsetHeight;
+                     const scrollTop = lineOffset - (containerHeight / 2) + (lineHeight / 2);
+                     lrcContainer.scrollTo({
+                         top: scrollTop,
+                         behavior: 'smooth'
+                     });
+                 }
+            }
+        }
+}
+
 function fadeInVolume(targetVolume: number, duration: number = 2000) {
     if (!audio) return;
     if (fadeInterval) clearInterval(fadeInterval);
@@ -168,6 +291,7 @@ async function fetchMetingPlaylist() {
                 artist,
                 cover: song.pic ?? "",
                 url: song.url ?? "",
+                lrc: song.lrc ?? "",
                 duration: dur,
             };
         });
@@ -321,6 +445,7 @@ function loadSong(song: MusicPlayerTrack) {
     }
     if (song.url) {
         isLoading = true;
+        loadLyrics(song);
         // 如果有待恢复的进度，先不要重置为 0，以免进度条跳变
         if (pendingProgress > 0) {
             currentTime = pendingProgress;
@@ -500,6 +625,7 @@ function handleAudioEvents() {
     audio.addEventListener("timeupdate", () => {
         if (!audio) return;
         currentTime = audio.currentTime;
+        updateLyrics(currentTime);
         // 每 2.1 秒保存一次进度，或者在歌曲接近结束时（虽然结束时可能不需要记忆，但为了保险）
         const now = Date.now();
         if (now - lastSaveTime > 2100) {
@@ -749,6 +875,36 @@ onDestroy(() => {
                 </button>
             </div>
         </div>
+        <div class="lyrics-section mb-2 px-1">
+            <div class="lyrics-container h-[88px] overflow-y-auto overflow-x-hidden relative text-center scroll-smooth"
+                 bind:this={lrcContainer}
+                 onscroll={handleLrcScroll}>
+                {#if noLyrics}
+                    <div class="h-full flex items-center justify-center text-sm text-30">
+                        暂无歌词
+                    </div>
+                {:else if lyrics.length === 0}
+                     <div class="h-full flex items-center justify-center text-sm text-30">
+                        加载歌词中...
+                    </div>
+                {:else}
+                    <div class="py-8">
+                        {#each lyrics as line, index}
+                            <button class="lyric-line w-fit max-w-[90%] mx-auto block text-sm py-1 transition-all duration-300 cursor-pointer hover:opacity-100 bg-transparent border-none p-0 focus:outline-none"
+                               onclick={() => seekToLyric(line.time)}
+                               class:text-(--primary)={index === currentLrcIndex}
+                               class:font-bold={index === currentLrcIndex}
+                               class:scale-105={index === currentLrcIndex}
+                               class:text-50={index !== currentLrcIndex}
+                               class:opacity-60={index !== currentLrcIndex}
+                               title="跳转至此句">
+                                {line.text}
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
+        </div>
         <div class="progress-section mb-4">
             <div class="progress-bar flex-1 h-2 bg-(--btn-regular-bg) rounded-full cursor-pointer"
                 bind:this={progressBar}
@@ -834,6 +990,34 @@ onDestroy(() => {
             <div class="flex-1 h-2 bg-(--btn-regular-bg) rounded-full cursor-pointer"
                 bind:this={volumeBar}
                 onmousedown={startVolumeDrag}
+                onkeydown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (e.key === 'Enter') toggleMute();
+                    }
+                }}
+                role="slider"
+                tabindex="0"
+                aria-label={i18n(Key.musicVolume)}
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow={volume * 100}>
+                <div class="h-full bg-(--primary) rounded-full transition-all"
+                    class:duration-100={!isVolumeDragging}
+                    class:duration-0={isVolumeDragging}
+                    style="width: {volume * 100}%">
+                </div>
+            </div>
+            <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
+                    onclick={toggleCollapse}
+                    title={i18n(Key.musicCollapse)}>
+                <Icon icon="material-symbols:expand-more" class="text-lg" />
+            </button>
+        </div>
+    </div>
+</div>
+
+{/if}down={startVolumeDrag}
                 onkeydown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();

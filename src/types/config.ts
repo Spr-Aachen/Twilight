@@ -455,6 +455,8 @@ export type MusicPlayerTrack = {
     cover: string;
     // 路径
     url: string;
+    // 歌词
+    lrc?: string;
     // 时长
     duration: number;
 };
