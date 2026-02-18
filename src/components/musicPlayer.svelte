@@ -628,9 +628,23 @@ onDestroy(() => {
              transition:slide={{ duration: 300, axis: 'y' }}>
             <div class="playlist-header flex items-center justify-between p-4 border-b border-(--line-divider)">
                 <h3 class="text-lg font-semibold text-90">{i18n(Key.playlist)}</h3>
-                <button class="btn-plain w-8 h-8 rounded-lg" onclick={togglePlaylist}>
-                    <Icon icon="material-symbols:close" class="text-lg" />
-                </button>
+                <div class="flex items-center gap-1">
+                    {#if mode === "meting"}
+                        <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
+                                onclick={fetchMetingPlaylist}
+                                disabled={isLoading}
+                                title={i18n(Key.musicRefresh)}>
+                            {#if isLoading}
+                                <Icon icon="eos-icons:loading" class="text-lg" />
+                            {:else}
+                                <Icon icon="material-symbols:refresh" class="text-lg" />
+                            {/if}
+                        </button>
+                    {/if}
+                    <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center" onclick={togglePlaylist}>
+                        <Icon icon="material-symbols:close" class="text-lg" />
+                    </button>
+                </div>
             </div>
             <div class="playlist-content overflow-y-auto max-h-80">
                 {#each playlist as song, index}
