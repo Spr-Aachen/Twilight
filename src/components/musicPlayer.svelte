@@ -371,25 +371,29 @@ function togglePlaylist() {
     showPlaylist = !showPlaylist;
 }
 
-function toggleShuffle() {
-    isShuffled = !isShuffled;
-    if (isShuffled) {
-        isRepeating = 0;
-    }
-    if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.SHUFFLE, String(isShuffled));
-        localStorage.setItem(STORAGE_KEYS.REPEAT, String(isRepeating));
-    }
+let showLyrics = $state(true);
+
+function toggleLyrics() {
+    showLyrics = !showLyrics;
 }
 
-function toggleRepeat() {
-    isRepeating = (isRepeating + 1) % 3;
-    if (isRepeating !== 0) {
+function togglePlaybackMode() {
+    if (isRepeating === 1) {
+        // Single -> Sequence
         isShuffled = false;
+        isRepeating = 2;
+    } else if (isShuffled) {
+        // Shuffle -> Single
+        isShuffled = false;
+        isRepeating = 1;
+    } else {
+        // Sequence -> Shuffle
+        isShuffled = true;
+        isRepeating = 2;
     }
     if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.REPEAT, String(isRepeating));
         localStorage.setItem(STORAGE_KEYS.SHUFFLE, String(isShuffled));
+        localStorage.setItem(STORAGE_KEYS.REPEAT, String(isRepeating));
     }
 }
 
@@ -875,6 +879,7 @@ onDestroy(() => {
                 </button>
             </div>
         </div>
+        {#if showLyrics}
         <div class="lyrics-section mb-2 px-1">
             <div class="lyrics-container h-[88px] overflow-y-auto overflow-x-hidden relative text-center scroll-smooth"
                  bind:this={lrcContainer}
@@ -890,7 +895,7 @@ onDestroy(() => {
                 {:else}
                     <div class="py-8">
                         {#each lyrics as line, index}
-                            <button class="lyric-line w-fit max-w-[90%] mx-auto block text-sm py-1 transition-all duration-300 cursor-pointer hover:opacity-100 bg-transparent border-none p-0 focus:outline-none"
+                            <button class="lyric-line w-full block text-sm py-1 transition-all duration-300 cursor-pointer hover:opacity-100 bg-transparent border-none p-0 focus:outline-none"
                                onclick={() => seekToLyric(line.time)}
                                class:text-(--primary)={index === currentLrcIndex}
                                class:font-bold={index === currentLrcIndex}
@@ -905,6 +910,7 @@ onDestroy(() => {
                 {/if}
             </div>
         </div>
+        {/if}
         <div class="progress-section mb-4">
             <div class="progress-bar flex-1 h-2 bg-(--btn-regular-bg) rounded-full cursor-pointer"
                 bind:this={progressBar}
@@ -935,13 +941,17 @@ onDestroy(() => {
             </div>
         </div>
         <div class="controls flex items-center justify-center gap-2 mb-4">
-            <!-- 随机按钮高亮 -->
-            <button class="w-10 h-10 rounded-lg"
-                    class:btn-regular={isShuffled}
-                    class:btn-plain={!isShuffled}
-                    onclick={toggleShuffle}
-                    disabled={playlist.length <= 1}>
-                <Icon icon="material-symbols:shuffle" class="text-lg" />
+            <!-- 播放模式切换按钮 -->
+            <button class="w-10 h-10 rounded-lg btn-plain"
+                    onclick={togglePlaybackMode}
+                    title={isRepeating === 1 ? i18n(Key.musicRepeatOne) : (isShuffled ? i18n(Key.musicShuffle) : i18n(Key.musicRepeatAll))}>
+                {#if isRepeating === 1}
+                    <Icon icon="material-symbols:repeat-one" class="text-lg" />
+                {:else if isShuffled}
+                    <Icon icon="material-symbols:shuffle" class="text-lg" />
+                {:else}
+                    <Icon icon="material-symbols:repeat" class="text-lg" />
+                {/if}
             </button>
             <button class="btn-plain w-10 h-10 rounded-lg" onclick={previousSong}
                     disabled={playlist.length <= 1}>
@@ -963,18 +973,11 @@ onDestroy(() => {
                     disabled={playlist.length <= 1}>
                 <Icon icon="material-symbols:skip-next" class="text-xl" />
             </button>
-            <!-- 循环按钮高亮 -->
-            <button class="w-10 h-10 rounded-lg"
-                    class:btn-regular={isRepeating > 0}
-                    class:btn-plain={isRepeating === 0}
-                    onclick={toggleRepeat}>
-                {#if isRepeating === 1}
-                    <Icon icon="material-symbols:repeat-one" class="text-lg" />
-                {:else if isRepeating === 2}
-                    <Icon icon="material-symbols:repeat" class="text-lg" />
-                {:else}
-                    <Icon icon="material-symbols:repeat" class="text-lg opacity-50" />
-                {/if}
+            <!-- 歌词显示切换按钮 -->
+            <button class="w-10 h-10 rounded-lg btn-plain"
+                    onclick={toggleLyrics}
+                    title="切换歌词显示">
+                <Icon icon="material-symbols:lyrics" class="text-lg {showLyrics ? 'text-(--primary)' : 'opacity-90'}" />
             </button>
         </div>
         <div class="bottom-controls flex items-center gap-2">
@@ -990,34 +993,6 @@ onDestroy(() => {
             <div class="flex-1 h-2 bg-(--btn-regular-bg) rounded-full cursor-pointer"
                 bind:this={volumeBar}
                 onmousedown={startVolumeDrag}
-                onkeydown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        if (e.key === 'Enter') toggleMute();
-                    }
-                }}
-                role="slider"
-                tabindex="0"
-                aria-label={i18n(Key.musicVolume)}
-                aria-valuemin="0"
-                aria-valuemax="100"
-                aria-valuenow={volume * 100}>
-                <div class="h-full bg-(--primary) rounded-full transition-all"
-                    class:duration-100={!isVolumeDragging}
-                    class:duration-0={isVolumeDragging}
-                    style="width: {volume * 100}%">
-                </div>
-            </div>
-            <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                    onclick={toggleCollapse}
-                    title={i18n(Key.musicCollapse)}>
-                <Icon icon="material-symbols:expand-more" class="text-lg" />
-            </button>
-        </div>
-    </div>
-</div>
-
-{/if}down={startVolumeDrag}
                 onkeydown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
