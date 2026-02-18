@@ -148,6 +148,7 @@ async function fetchMetingPlaylist() {
         server: meting_server,
         type: meting_type,
         id: meting_id,
+        r: Math.random().toString(), // Prevent caching
     });
     const separator = meting_api.includes("?") ? "&" : "?";
     const apiUrl = `${meting_api}${separator}${query.toString()}`;
