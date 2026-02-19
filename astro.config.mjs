@@ -153,20 +153,20 @@ export default defineConfig({
             rehypeKatex,
             rehypeSlug,
             rehypeMermaid,
-                [
-                    rehypeComponents,
-                    {
-                        components: {
-                            github: GithubCardComponent,
-                            song: SongCardComponent,
-                            note: (x, y) => AdmonitionComponent(x, y, "note"),
-                            tip: (x, y) => AdmonitionComponent(x, y, "tip"),
-                            important: (x, y) => AdmonitionComponent(x, y, "important"),
-                            caution: (x, y) => AdmonitionComponent(x, y, "caution"),
-                            warning: (x, y) => AdmonitionComponent(x, y, "warning"),
-                        },
+            [
+                rehypeComponents,
+                {
+                    components: {
+                        github: GithubCardComponent,
+                        song: SongCardComponent,
+                        note: (x, y) => AdmonitionComponent(x, y, "note"),
+                        tip: (x, y) => AdmonitionComponent(x, y, "tip"),
+                        important: (x, y) => AdmonitionComponent(x, y, "important"),
+                        caution: (x, y) => AdmonitionComponent(x, y, "caution"),
+                        warning: (x, y) => AdmonitionComponent(x, y, "warning"),
                     },
-                ],
+                },
+            ],
             [
                 rehypeAutolinkHeadings,
                 {
