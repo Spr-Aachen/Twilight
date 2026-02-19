@@ -5,6 +5,15 @@ import Icon from "@iconify/svelte";
 
 import type { MusicPlayerTrack } from "@/types/config";
 import { musicPlayerConfig } from "@/config";
+import { 
+    STORAGE_KEYS, 
+    formatTime, 
+    getAssetPath, 
+    parseLRC, 
+    fetchLyrics, 
+    fetchMetingPlaylist as fetchMetingPlaylistUtil,
+    fadeInAudio 
+} from "@/utils/music";
 import { i18n } from "@i18n/translation";
 import Key from "@i18n/i18nKey";
 import "@styles/musicplayer.css";
@@ -79,31 +88,6 @@ let isUserScrolling = $state(false);
 let scrollTimeout: number | null = null;
 let noLyrics = $state(false); // Flag if no lyrics available
 
-// Parse LRC function
-function parseLRC(lrc: string) {
-    if (!lrc) return [];
-    const lines = lrc.split('\n');
-    const result: { time: number; text: string }[] = [];
-    const timeReg = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/g;
-    
-    lines.forEach(line => {
-        const matches = Array.from(line.matchAll(timeReg));
-        if (matches.length > 0) {
-            const text = line.replace(timeReg, '').trim();
-            if (text) {
-                matches.forEach(match => {
-                    const m = parseInt(match[1]);
-                    const s = parseInt(match[2]);
-                    const ms = parseInt(match[3]);
-                    const time = m * 60 + s + ms / (match[3].length === 3 ? 1000 : 100);
-                    result.push({ time, text });
-                });
-            }
-        }
-    });
-    return result.sort((a, b) => a.time - b.time);
-}
-
 // Load lyrics function
 async function loadLyrics(song: MusicPlayerTrack) {
     lyrics = [];
@@ -115,19 +99,7 @@ async function loadLyrics(song: MusicPlayerTrack) {
         return;
     }
 
-    let lrcText = "";
-    if (song.lrc.startsWith('http') || song.lrc.endsWith('.lrc') || song.lrc.startsWith('/')) {
-         try {
-             const res = await fetch(song.lrc);
-             if (res.ok) {
-                 lrcText = await res.text();
-             }
-         } catch (e) {
-             console.error("Failed to fetch lyrics", e);
-         }
-    } else {
-        lrcText = song.lrc;
-    }
+    const lrcText = await fetchLyrics(song.lrc);
 
     if (lrcText) {
         lyrics = parseLRC(lrcText);
@@ -176,60 +148,32 @@ function updateLyrics(currentTime: number) {
     }
     
     if (index !== currentLrcIndex) {
-            currentLrcIndex = index;
-            if (!isUserScrolling && lrcContainer && index !== -1) {
-                 const lines = lrcContainer.querySelectorAll('.lyric-line');
-                 const activeLine = lines[index] as HTMLElement;
-                 if (activeLine) {
-                     const containerHeight = lrcContainer.clientHeight;
-                     const lineOffset = activeLine.offsetTop;
-                     const lineHeight = activeLine.offsetHeight;
-                     const scrollTop = lineOffset - (containerHeight / 2) + (lineHeight / 2);
-                     lrcContainer.scrollTo({
-                         top: scrollTop,
-                         behavior: 'smooth'
-                     });
-                 }
-            }
+        currentLrcIndex = index;
+        if (!isUserScrolling && lrcContainer && index !== -1) {
+             const lines = lrcContainer.querySelectorAll('.lyric-line');
+             const activeLine = lines[index] as HTMLElement;
+             if (activeLine) {
+                 const containerHeight = lrcContainer.clientHeight;
+                 const lineOffset = activeLine.offsetTop;
+                 const lineHeight = activeLine.offsetHeight;
+                 const scrollTop = lineOffset - (containerHeight / 2) + (lineHeight / 2);
+                 lrcContainer.scrollTo({
+                     top: scrollTop,
+                     behavior: 'smooth'
+                 });
+             }
         }
+    }
 }
 
 function fadeInVolume(targetVolume: number, duration: number = 2000) {
     if (!audio) return;
     if (fadeInterval) clearInterval(fadeInterval);
-    const startVolume = 0;
-    const startTime = Date.now();
-    audio.volume = startVolume;
-    fadeInterval = window.setInterval(() => {
-        if (!audio || isMuted) {
-            if (fadeInterval) {
-                clearInterval(fadeInterval);
-                fadeInterval = null;
-            }
-            return;
-        }
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const currentVolume = startVolume + (targetVolume - startVolume) * progress;
-        audio.volume = currentVolume;
-        if (progress >= 1) {
-            if (fadeInterval) {
-                clearInterval(fadeInterval);
-                fadeInterval = null;
-            }
-        }
-    }, 50);
+    
+    fadeInterval = fadeInAudio(audio, targetVolume, duration, () => {
+        fadeInterval = null;
+    });
 }
-
-// 存储键名常量
-const STORAGE_KEYS = {
-    USER_PAUSED: "player_user_paused",
-    VOLUME: "player_volume",
-    SHUFFLE: "player_shuffle",
-    REPEAT: "player_repeat",
-    LAST_SONG_ID: "player_last_song_id",
-    LAST_SONG_PROGRESS: "player_last_song_progress",
-};
 
 function restoreLastSong() {
     if (playlist.length === 0) return;
@@ -267,34 +211,13 @@ function showErrorMessage(message: string) {
 async function fetchMetingPlaylist() {
     if (!meting_api || !meting_id) return;
     isLoading = true;
-    const query = new URLSearchParams({
-        server: meting_server,
-        type: meting_type,
-        id: meting_id,
-        r: Math.random().toString(), // Prevent caching
-    });
-    const separator = meting_api.includes("?") ? "&" : "?";
-    const apiUrl = `${meting_api}${separator}${query.toString()}`;
     try {
-        const res = await fetch(apiUrl);
-        if (!res.ok) throw new Error("meting api error");
-        const list = await res.json();
-        playlist = list.map((song: any, index: number) => {
-            let title = song.name ?? song.title ?? i18n(Key.musicUnknownTrack);
-            let artist = song.artist ?? song.author ?? i18n(Key.musicUnknownArtist);
-            let dur = song.duration ?? 0;
-            if (dur > 10000) dur = Math.floor(dur / 1000);
-            if (!Number.isFinite(dur) || dur <= 0) dur = 0;
-            return {
-                id: song.id ?? `meting-${index}`, // 确保每个歌曲都有 ID
-                title,
-                artist,
-                cover: song.pic ?? "",
-                url: song.url ?? "",
-                lrc: song.lrc ?? "",
-                duration: dur,
-            };
-        });
+        playlist = await fetchMetingPlaylistUtil(
+            meting_api,
+            meting_server,
+            meting_type,
+            meting_id
+        );
         if (playlist.length > 0) {
             // 使用 setTimeout 确保 Svelte 响应式变量已更新
             setTimeout(() => {
@@ -423,17 +346,11 @@ function playSong(index: number) {
     shouldPlay = true;
     // 用户手动选择歌曲，清除暂停偏好和待恢复进度
      if (typeof localStorage !== 'undefined') {
-         localStorage.setItem(STORAGE_KEYS.USER_PAUSED, "false");
-     }
+        localStorage.setItem(STORAGE_KEYS.USER_PAUSED, "false");
+    }
     pendingProgress = 0;
     // 加载歌曲
     loadSong(playlist[currentIndex]);
-}
-
-function getAssetPath(path: string): string {
-    if (path.startsWith("http://") || path.startsWith("https://")) return path;
-    if (path.startsWith("/")) return path;
-    return `/${path}`;
 }
 
 function loadSong(song: MusicPlayerTrack) {
@@ -603,13 +520,6 @@ function toggleMute() {
     }
     isMuted = !isMuted;
     audio.muted = isMuted;
-}
-
-function formatTime(seconds: number): string {
-    if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 function handleAudioEvents() {
