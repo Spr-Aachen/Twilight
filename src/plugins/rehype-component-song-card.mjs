@@ -22,12 +22,13 @@ export function SongCardComponent(properties, children) {
         return "/" + path;
     };
 
-    const title = properties.title || "Unknown Title";
-    const artist = properties.artist || "Unknown Artist";
+    const title = properties.title || (properties.meting ? "Loading..." : "Unknown Title");
+    const artist = properties.artist || (properties.meting ? "Loading..." : "Unknown Artist");
     const audioSrc = resolvePath(properties.audio);
     const coverSrc = resolvePath(properties.cover);
     const lrcSrc = resolvePath(properties.lrc);
-    
+    const metingUrl = properties.meting || "";
+
     // Extract inline lyrics if present in children
     let inlineLyrics = "";
     if (children && children.length > 0) {
@@ -42,9 +43,9 @@ export function SongCardComponent(properties, children) {
     const cardUuid = `SC${Math.random().toString(36).slice(-6)}`;
 
     // Create the HTML structure
-    const nCover = h("div", { 
-        class: "song-cover", 
-        style: `background-image: url('${coverSrc}');` 
+    const nCover = h("div", {
+        class: "song-cover",
+        style: `background-image: url('${coverSrc}');`
     });
 
     const nTitle = h("div", { class: "song-title" }, title);
@@ -68,7 +69,7 @@ export function SongCardComponent(properties, children) {
 
     const nProgressBar = h("div", { class: "progress-bar", id: `${cardUuid}-progress-bar` });
     const nProgressContainer = h("div", { class: "progress-container", id: `${cardUuid}-progress-container` }, [nProgressBar]);
-    
+
     const nTimeDisplay = h("div", { class: "time-display", id: `${cardUuid}-time` }, "0:00 / 0:00");
 
     const nControls = h("div", { class: "song-controls" }, [
@@ -83,7 +84,7 @@ export function SongCardComponent(properties, children) {
         nControls
     ]);
 
-    const nAudio = h("audio", { 
+    const nAudio = h("audio", {
         id: `${cardUuid}-audio`,
         src: audioSrc,
         preload: "metadata"
@@ -91,7 +92,7 @@ export function SongCardComponent(properties, children) {
 
     // Client-side script logic
     const scriptContent = `
-    (function() {
+    (async function() {
         const cardId = '${cardUuid}';
         const audio = document.getElementById(cardId + '-audio');
         const playBtn = document.getElementById(cardId + '-play');
@@ -105,7 +106,31 @@ export function SongCardComponent(properties, children) {
         let isPlaying = false;
         let lyrics = [];
         const inlineLyrics = ${JSON.stringify(inlineLyrics)};
-        const lrcSrc = '${lrcSrc}';
+        let lrcSrc = '${lrcSrc}';
+        const metingUrl = '${metingUrl}';
+
+        if (metingUrl) {
+            try {
+                const res = await fetch(metingUrl);
+                const data = await res.json();
+                const song = Array.isArray(data) ? data[0] : data;
+                
+                if (song) {
+                    const titleEl = document.querySelector('#' + cardId + '-card .song-title');
+                    const artistEl = document.querySelector('#' + cardId + '-card .song-artist');
+                    const coverEl = document.querySelector('#' + cardId + '-card .song-cover');
+                    
+                    if (titleEl) titleEl.innerText = song.title;
+                    if (artistEl) artistEl.innerText = song.author;
+                    if (coverEl) coverEl.style.backgroundImage = 'url("' + song.pic + '")';
+                    
+                    audio.src = song.url;
+                    lrcSrc = song.lrc;
+                }
+            } catch (e) {
+                console.error('Meting fetch error:', e);
+            }
+        }
 
         function formatTime(seconds) {
             if (!seconds || isNaN(seconds)) return "0:00";
