@@ -2,19 +2,19 @@
 import { h } from "hastscript";
 
 /**
- * Creates a Song Card component.
+ * Creates a Music Card component.
  *
  * @param {Object} properties - The properties of the component.
- * @param {string} properties.title - The title of the song.
- * @param {string} properties.artist - The artist of the song.
+ * @param {string} properties.title - The title of the music.
+ * @param {string} properties.artist - The artist of the music.
  * @param {string} properties.audio - The audio source URL.
  * @param {string} properties.cover - The cover image URL.
  * @param {string} properties.lrc - The lyrics URL.
  * @param {string} properties.meting - The Meting API URL (optional).
  * @param {import('mdast').RootContent[]} children - The children elements (lyrics text).
- * @returns {import('mdast').Parent} The created Song Card component.
+ * @returns {import('mdast').Parent} The created Music Card component.
  */
-export function SongCardComponent(properties, children) {
+export function MusicCardComponent(properties, children) {
     // Helper to resolve paths
     const resolvePath = (path) => {
         if (!path) return "";
@@ -49,16 +49,16 @@ export function SongCardComponent(properties, children) {
 
     // Create the HTML structure
     const nCover = h("div", {
-        class: "song-cover",
+        class: "music-cover",
         style: `background-image: url('${coverSrc}');`
     });
 
-    const nTitle = h("div", { class: "song-title" }, title);
-    const nArtist = h("div", { class: "song-artist" }, artist);
-    const nHeader = h("div", { class: "song-header" }, [nTitle, nArtist]);
+    const nTitle = h("div", { class: "music-title" }, title);
+    const nArtist = h("div", { class: "music-artist" }, artist);
+    const nHeader = h("div", { class: "music-header" }, [nTitle, nArtist]);
 
     // Use grid layout for overlapping lyrics to support the transition effect
-    const nLyric = h("div", { class: "song-lyric", id: `${cardUuid}-lyric`, style: "display: grid; place-items: center;" }, [
+    const nLyric = h("div", { class: "music-lyric", id: `${cardUuid}-lyric`, style: "display: grid; place-items: center;" }, [
         h("div", { class: "lyric-exit", style: "grid-area: 1/1; opacity: 0; pointer-events: none;" }, ""),
         h("div", { class: "lyric-current", style: "grid-area: 1/1;" }, "Loading lyrics...")
     ]);
@@ -79,13 +79,13 @@ export function SongCardComponent(properties, children) {
 
     const nTimeDisplay = h("div", { class: "time-display", id: `${cardUuid}-time` }, "0:00 / 0:00");
 
-    const nControls = h("div", { class: "song-controls" }, [
+    const nControls = h("div", { class: "music-controls" }, [
         nPlayBtn,
         nProgressContainer,
         nTimeDisplay
     ]);
 
-    const nInfo = h("div", { class: "song-info" }, [
+    const nInfo = h("div", { class: "music-info" }, [
         nHeader,
         nLyric,
         nControls
@@ -263,28 +263,28 @@ export function SongCardComponent(properties, children) {
             try {
                 const res = await fetch(metingUrl);
                 const data = await res.json();
-                const song = Array.isArray(data) ? data[0] : data;
+                const music = Array.isArray(data) ? data[0] : data;
                 
-                if (song) {
-                    const titleEl = document.querySelector('#' + cardId + '-card .song-title');
-                    const artistEl = document.querySelector('#' + cardId + '-card .song-artist');
-                    const coverEl = document.querySelector('#' + cardId + '-card .song-cover');
+                if (music) {
+                    const titleEl = document.querySelector('#' + cardId + '-card .music-title');
+                    const artistEl = document.querySelector('#' + cardId + '-card .music-artist');
+                    const coverEl = document.querySelector('#' + cardId + '-card .music-cover');
                     
-                    if (titleEl) titleEl.innerText = song.title;
-                    if (artistEl) artistEl.innerText = song.author;
-                    if (coverEl) coverEl.style.backgroundImage = 'url("' + song.pic + '")';
+                    if (titleEl) titleEl.innerText = music.title;
+                    if (artistEl) artistEl.innerText = music.author;
+                    if (coverEl) coverEl.style.backgroundImage = 'url("' + music.pic + '")';
                     
-                    audio.src = song.url;
+                    audio.src = music.url;
                     
-                    if (song.lrc) {
-                        lrcSrc = song.lrc;
+                    if (music.lrc) {
+                        lrcSrc = music.lrc;
                         inlineLyrics = ""; // Clear inline lyrics to force load from new src
                         await loadLyrics(); // Reload lyrics
                     }
                 }
             } catch (e) {
                 console.error('Meting fetch error:', e);
-                currentLyricEl.innerText = "Error loading song data";
+                currentLyricEl.innerText = "Error loading music data";
             }
         } else {
             // Load initial lyrics if not using Meting (or Meting url empty)
@@ -360,7 +360,7 @@ export function SongCardComponent(properties, children) {
 
     const nScript = h("script", { type: "text/javascript" }, scriptContent);
 
-    return h("div", { class: "card-song", id: `${cardUuid}-card` }, [
+    return h("div", { class: "card-music", id: `${cardUuid}-card` }, [
         nCover,
         nInfo,
         nAudio,
