@@ -57,6 +57,22 @@ Create a GitHub repository card with the code `::github{repo="Spr-Aachen/Twiligh
 ::github{repo="Spr-Aachen/Twilight"}
 ```
 
+### Song Cards
+
+- Online
+::song{meting="https://api.i-meto.com/meting/api?server=netease&type=song&id=1390882521"}
+
+```markdown
+::song{meting="https://api.i-meto.com/meting/api?server=netease&type=song&id=1390882521"}
+```
+
+- Local
+::song{title="深海之息" artist="Youzee Music" cover="https://p1.music.126.net/PhKOqFtljgHDDpKYM2ADUA==/109951169858309716.jpg" audio="assets/music/深海之息.m4a" lrc="assets/music/深海之息.lrc"}
+
+```markdown
+::song{title="深海之息" artist="Youzee Music" cover="https://p1.music.126.net/PhKOqFtljgHDDpKYM2ADUA==/109951169858309716.jpg" audio="assets/music/深海之息.m4a" lrc="assets/music/深海之息.lrc"}
+```
+
 ### Admonitions
 
 Following types of admonitions are supported: `note` `tip` `important` `warning` `caution`
