@@ -244,6 +244,12 @@ sidebar:
                 type: "statistics"
                 # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
                 position: "sticky"
+                # 页面可见性配置
+                visibility:
+                    # 匹配模式：'include' (包含), 'exclude' (排除)
+                    mode: "include"
+                    # 页面路径匹配规则列表 (支持正则字符串)
+                    paths: ["^/$", "^/archive$"]
 
 # 资料配置
 profile:

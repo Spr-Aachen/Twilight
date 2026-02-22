@@ -38,20 +38,61 @@ export class WidgetManager {
     }
 
     /**
+     * 检查组件在当前页面是否可见
+     * @param component 组件配置
+     * @param currentPath 当前页面路径
+     */
+    shouldShowComponent(component: WidgetComponentConfig, currentPath?: string): boolean {
+        if (!component.visibility || !currentPath) {
+            return true;
+        }
+        const { mode, paths } = component.visibility;
+        // 确保路径以 / 开头，以便于匹配
+        let normalizedPath = currentPath.startsWith('/') ? currentPath : '/' + currentPath;
+        // 移除末尾的斜杠（如果是根路径 / 则保留）
+        if (normalizedPath.length > 1 && normalizedPath.endsWith('/')) {
+            normalizedPath = normalizedPath.slice(0, -1);
+        }
+        
+        const matches = paths.some((pattern) => {
+            try {
+                return new RegExp(pattern).test(normalizedPath);
+            } catch (e) {
+                console.warn(`Invalid regex pattern in component visibility config: ${pattern}`, e);
+                return false;
+            }
+        });
+
+        if (mode === "include") {
+            return matches;
+        }
+        if (mode === "exclude") {
+            return !matches;
+        }
+        return true;
+    }
+
+    /**
      * 获取指定侧边栏上的组件列表
      * @param side 侧边栏位置：'left' | 'right'
+     * @param currentPath 当前页面路径 (可选，用于过滤)
      */
-    getComponentsBySide(side: "left" | "right"): WidgetComponentConfig[] {
-        return this.config.components[side] || [];
+    getComponentsBySide(side: "left" | "right", currentPath?: string): WidgetComponentConfig[] {
+        const components = this.config.components[side] || [];
+        if (currentPath) {
+            return components.filter(c => this.shouldShowComponent(c, currentPath));
+        }
+        return components;
     }
 
     /**
      * 根据位置获取组件列表
      * @param position 组件位置：'top' | 'sticky'
+     * @param currentPath 当前页面路径 (可选，用于过滤)
      */
-    getComponentsByPosition(position: "top" | "sticky"): WidgetComponentConfig[] {
-        const left = this.getComponentsBySideAndPosition("left", position);
-        const right = this.getComponentsBySideAndPosition("right", position);
+    getComponentsByPosition(position: "top" | "sticky", currentPath?: string): WidgetComponentConfig[] {
+        const left = this.getComponentsBySideAndPosition("left", position, currentPath);
+        const right = this.getComponentsBySideAndPosition("right", position, currentPath);
         // Note: This might return duplicates if left/right logic overlaps, but used for enabled types check
         return [...left, ...right];
     }
@@ -60,13 +101,19 @@ export class WidgetManager {
      * 根据侧边栏和位置获取组件列表
      * @param side 侧边栏位置：'left' | 'right' | 'middle'
      * @param position 组件位置：'top' | 'sticky'
+     * @param currentPath 当前页面路径 (可选，用于过滤)
      */
     getComponentsBySideAndPosition(
         side: "left" | "right" | "middle",
         position: "top" | "sticky",
+        currentPath?: string,
     ): WidgetComponentConfig[] {
-        const leftComponents = (this.config.components.left || []).filter(c => c.position === position);
-        const rightComponents = (this.config.components.right || []).filter(c => c.position === position);
+        const leftComponents = (this.config.components.left || [])
+            .filter(c => c.position === position)
+            .filter(c => this.shouldShowComponent(c, currentPath));
+        const rightComponents = (this.config.components.right || [])
+            .filter(c => c.position === position)
+            .filter(c => this.shouldShowComponent(c, currentPath));
 
         if (side === "left") {
             // Left sidebar includes Right components on Tablet (merged)
@@ -167,9 +214,10 @@ export class WidgetManager {
      * 检查指定侧边栏是否具有实际可显示的内容
      * @param side 侧边栏位置：'left' | 'right'
      * @param headings 页面标题列表，用于判断特殊组件是否显示
+     * @param currentPath 当前页面路径 (可选，用于过滤)
      */
-    hasContentOnSide(side: "left" | "right", headings: any[] = []): boolean {
-        const components = this.getComponentsBySide(side);
+    hasContentOnSide(side: "left" | "right", headings: any[] = [], currentPath?: string): boolean {
+        const components = this.getComponentsBySide(side, currentPath);
         if (components.length === 0) return false;
 
         // 只要有一个组件能显示内容，侧边栏就不是空的
@@ -262,10 +310,11 @@ export class WidgetManager {
     /**
      * 获取网格布局相关的类名
      * @param headings 页面标题列表
+     * @param currentPath 当前页面路径 (可选，用于过滤)
      */
-    getGridLayout(headings: any[] = []) {
-        const hasLeftComponents = this.hasContentOnSide("left", headings);
-        const hasRightComponents = this.hasContentOnSide("right", headings);
+    getGridLayout(headings: any[] = [], currentPath?: string) {
+        const hasLeftComponents = this.hasContentOnSide("left", headings, currentPath);
+        const hasRightComponents = this.hasContentOnSide("right", headings, currentPath);
         const hasAnyComponents = hasLeftComponents || hasRightComponents;
 
         // Desktop: Left if hasLeft, Right if hasRight

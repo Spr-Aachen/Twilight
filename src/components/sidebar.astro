@@ -18,10 +18,11 @@ interface Props {
 }
 
 const { id, class: className, headings, side } = Astro.props;
+const currentPath = Astro.url.pathname;
 
 // 获取配置的组件列表（按侧边栏和位置划分）
-const topComponents = widgetManager.getComponentsBySideAndPosition(side, "top");
-const stickyComponents = widgetManager.getComponentsBySideAndPosition(side, "sticky");
+const topComponents = widgetManager.getComponentsBySideAndPosition(side, "top", currentPath);
+const stickyComponents = widgetManager.getComponentsBySideAndPosition(side, "sticky", currentPath);
 
 // 组件映射表
 const componentMap = {

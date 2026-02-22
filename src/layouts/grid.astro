@@ -76,9 +76,9 @@ const {
     leftSidebarClass,
     rightSidebarClass,
     mainContentClass,
-    mobileFooterClass,
     middleSidebarClass,
-} = widgetManager.getGridLayout(headings);
+    mobileFooterClass,
+} = widgetManager.getGridLayout(headings, Astro.url.pathname);
 ---
 
 <BaseLayout
@@ -227,7 +227,7 @@ const {
 
                 <div class={middleSidebarClass}>
                     <Sidebar
-                        id="mobile-sidebar"
+                        id="middle-sidebar"
                         side="middle"
                         class={`${transparentClass} onload-animation-up`}
                         headings={headings}

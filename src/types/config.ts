@@ -258,6 +258,13 @@ export type WidgetComponentConfig = {
     position: "top" | "sticky"; // 顶部固定区域或粘性区域
     // 自定义内联样式
     style?: string;
+    // 页面可见性配置
+    visibility?: {
+        // 匹配模式：'include' (包含), 'exclude' (排除)
+        mode: "include" | "exclude";
+        // 页面路径匹配规则列表 (支持正则字符串)
+        paths: string[];
+    };
     // 响应式配置
     responsive?: {
         // 在指定设备上隐藏
