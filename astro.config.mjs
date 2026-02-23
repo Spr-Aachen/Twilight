@@ -61,6 +61,7 @@ export default defineConfig({
                 "#swup-container",
                 "#left-sidebar",
                 "#right-sidebar",
+                "#middle-sidebar",
             ],
             cache: true,
             preload: true,

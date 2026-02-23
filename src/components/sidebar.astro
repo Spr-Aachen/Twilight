@@ -20,9 +20,32 @@ interface Props {
 const { id, class: className, headings, side } = Astro.props;
 const currentPath = Astro.url.pathname;
 
-// 获取配置的组件列表（按侧边栏和位置划分）
-const topComponents = widgetManager.getComponentsBySideAndPosition(side, "top", currentPath);
-const stickyComponents = widgetManager.getComponentsBySideAndPosition(side, "sticky", currentPath);
+// 获取所有组件（包括不可见的，用于计算动画状态）
+const allTopComponents = widgetManager.getComponentsBySideAndPosition(side, "top");
+const allStickyComponents = widgetManager.getComponentsBySideAndPosition(side, "sticky");
+
+// 过滤并添加动画标记
+let hasVolatile = false;
+const topComponents = allTopComponents.reduce((acc: any[], component) => {
+    const isVisible = widgetManager.shouldShowComponent(component, currentPath);
+    const isVolatile = !!component.visibility;
+    if (isVolatile) hasVolatile = true;
+
+    if (isVisible) {
+        acc.push({ ...component, shouldAnimate: hasVolatile, _original: component });
+    }
+    return acc;
+}, []);
+const stickyComponents = allStickyComponents.reduce((acc: any[], component) => {
+    const isVisible = widgetManager.shouldShowComponent(component, currentPath);
+    const isVolatile = !!component.visibility;
+    if (isVolatile) hasVolatile = true;
+
+    if (isVisible) {
+        acc.push({ ...component, shouldAnimate: hasVolatile, _original: component });
+    }
+    return acc;
+}, []);
 
 // 组件映射表
 const componentMap = {
@@ -40,8 +63,15 @@ function renderComponent(component: any, index: number) {
         componentMap[component.type as keyof typeof componentMap];
     if (!ComponentToRender) return null;
 
-    const componentClass = widgetManager.getComponentClass(component, index, side);
+    // 使用原始组件引用获取类名（因为 getComponentClass 依赖对象引用判断来源）
+    const originalComponent = component._original || component;
+    let componentClass = widgetManager.getComponentClass(originalComponent, index, side);
     const componentStyle = widgetManager.getComponentStyle(component, index);
+
+    // 如果组件需要动画，添加 transition-swup-fade 类
+    if (component.shouldAnimate) {
+        componentClass += " transition-swup-fade";
+    }
 
     return {
         Component: ComponentToRender,
