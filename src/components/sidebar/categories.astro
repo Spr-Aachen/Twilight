@@ -22,8 +22,9 @@ interface Props {
     class?: string;
     style?: string;
     side?: string;
+    depth?: number;
 }
-const { class: className, style, side = "default" } = Astro.props;
+const { class: className, style, side = "default", depth } = Astro.props;
 ---
 
 <WidgetLayout
@@ -34,5 +35,5 @@ const { class: className, style, side = "default" } = Astro.props;
     class={className}
     style={style}
 >
-    <CategoryItem nodes={categoriesTree} />
+    <CategoryItem nodes={categoriesTree} maxDepth={depth} />
 </WidgetLayout>

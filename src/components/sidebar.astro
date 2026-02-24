@@ -79,7 +79,7 @@ function renderComponent(component: any, index: number) {
             class: componentClass,
             style: componentStyle,
             headings: component.type === "toc" ? headings : undefined,
-            ...component.customProps,
+            depth: component.depth,
         },
     };
 }

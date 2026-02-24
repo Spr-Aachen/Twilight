@@ -6,9 +6,10 @@ import ButtonLink from "@components/common/buttonLink.astro";
 interface Props {
     nodes: CategoryTreeItem[];
     depth?: number;
+    maxDepth?: number;
 }
 
-const { nodes, depth = 0 } = Astro.props;
+const { nodes, depth = 0, maxDepth = 3 } = Astro.props;
 ---
 
 {nodes.map((node) => (
@@ -22,8 +23,8 @@ const { nodes, depth = 0 } = Astro.props;
                 {node.name.trim()}
             </ButtonLink>
         </div>
-        {node.children.length > 0 && (
-            <Astro.self nodes={node.children} depth={depth + 1} />
+        {node.children.length > 0 && depth < maxDepth - 1 && (
+            <Astro.self nodes={node.children} depth={depth + 1} maxDepth={maxDepth} />
         )}
     </div>
 ))}

@@ -272,8 +272,8 @@ export type WidgetComponentConfig = {
         // 折叠阈值
         collapseThreshold?: number;
     };
-    // 自定义属性
-    customProps?: Record<string, any>;
+    // 目录深度 (仅用于 toc 和 categories 组件)
+    depth?: number;
 };
 
 

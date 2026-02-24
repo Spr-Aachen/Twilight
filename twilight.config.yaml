@@ -219,6 +219,8 @@ sidebar:
                 responsive:
                     # 折叠阈值
                     collapseThreshold: 5
+                # 目录深度
+                depth: 3
             - # 组件 - 文章标签 (预设)
                 # 类型
                 type: "tags"
@@ -235,10 +237,8 @@ sidebar:
                 type: "toc"
                 # 位置策略 ("top" 顶部固定 | "sticky" 粘性)
                 position: "sticky"
-                # 自定义属性
-                customProps:
-                    # 目录深度 (1-6，1 表示只显示 h1 标题，2 表示显示 h1 和 h2 标题，依此类推)
-                    depth: 3
+                # 目录深度 (1-6，1 表示只显示 h1 标题，2 表示显示 h1 和 h2 标题，依此类推)
+                depth: 3
             - # 组件 - 文章统计 (预设)
                 # 类型
                 type: "statistics"
