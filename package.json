@@ -10,7 +10,7 @@
 		"format": "biome format --write ./src",
 		"check": "astro check",
 		"dev": "astro dev",
-		"build": "node scripts/build-with-pagefind.cjs",
+		"build": "node scripts/build-with-pagefind.cjs && node scripts/generate-icons.js",
 		"preview": "astro preview",
 		"astro": "astro",
 		"new-post": "node scripts/new-post.js"
