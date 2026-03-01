@@ -1,6 +1,5 @@
 <script lang="ts">
 import { onDestroy, onMount } from "svelte";
-import Icon from "@iconify/svelte";
 
 import { BREAKPOINT_LG } from "@constants/breakpoints";
 import { getTranslateLanguageFromConfig, getSiteLanguage, setStoredLanguage, getDefaultLanguage } from "@/utils/language";
@@ -9,6 +8,7 @@ import { siteConfig } from "@/config";
 import { getSupportedTranslateLanguages } from "@/i18n/language";
 import DropdownItem from "@/components/common/DropdownItem.svelte";
 import DropdownPanel from "@/components/common/DropdownPanel.svelte";
+import Icon from "@components/common/icon.svelte";
 
 
 let isOpen = $state(false);

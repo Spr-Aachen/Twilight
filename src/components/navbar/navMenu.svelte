@@ -1,10 +1,10 @@
 <script lang="ts">
-import Icon from "@iconify/svelte";
 import { onMount } from "svelte";
 
 import type { NavbarLink } from "@/types/config";
 import { url } from "@utils/url";
 import { onClickOutside } from "@utils/widget";
+import Icon from "@components/common/icon.svelte";
 
 
 interface Props {

@@ -1,5 +1,4 @@
 <script lang="ts">
-import Icon from "@iconify/svelte";
 import { onMount } from "svelte";
 
 import { BREAKPOINT_LG } from "@constants/breakpoints";
@@ -7,6 +6,7 @@ import { getDefaultHue, getHue, setHue } from "@utils/hue";
 import { onClickOutside } from "@utils/widget";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
+import Icon from "@components/common/icon.svelte";
 
 
 let hue = $state(getDefaultHue());

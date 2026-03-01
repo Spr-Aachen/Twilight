@@ -1,11 +1,11 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import Icon from "@iconify/svelte";
     import dayjs from 'dayjs';
 
     import { BREAKPOINT_LG } from "@constants/breakpoints";
     import { i18n } from "@i18n/translation";
     import I18nKey from "@i18n/i18nKey";
+    import Icon from "@components/common/icon.svelte";
 
 
     let {
