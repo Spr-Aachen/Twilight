@@ -92,7 +92,7 @@ onDestroy(() => {
     <!-- 翻译按钮 -->
     <button
         aria-label="Language Translation"
-        class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90"
+        class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90 flex items-center justify-center"
         id="translate-switch"
         onclick={() => { if (window.innerWidth < BREAKPOINT_LG) { openPanel(); } else { togglePanel(); } }}
         onmouseenter={openPanel}
