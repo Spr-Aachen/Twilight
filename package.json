@@ -29,6 +29,7 @@
 		"@fancyapps/ui": "^6.1.10",
 		"@fontsource-variable/jetbrains-mono": "^5.2.8",
 		"@fontsource/roboto": "^5.2.9",
+		"@iconify-json/eos-icons": "^1.2.4",
 		"@iconify-json/fa6-brands": "^1.2.6",
 		"@iconify-json/fa6-regular": "^1.2.4",
 		"@iconify-json/fa6-solid": "^1.2.4",
