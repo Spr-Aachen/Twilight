@@ -53,7 +53,7 @@
 		"markdown-it": "^14.1.1",
 		"marked": "^17.0.3",
 		"mdast-util-to-string": "^4.0.0",
-		"node-html-parser": "^7.0.2",
+		"node-html-parser": "^7.1.0",
 		"overlayscrollbars": "^2.14.0",
 		"pagefind": "^1.4.0",
 		"photoswipe": "^5.4.4",
