@@ -12,9 +12,9 @@ import decapCmsOauth from "astro-decap-cms-oauth";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeComponents from "rehype-components"; /* Render the custom directive content */
-import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
+import rehypeKatex from "rehype-katex";
+import rehypeComponents from "rehype-components"; /* Render the custom directive content */
 import remarkDirective from "remark-directive"; /* Handle directives */
 import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
 import remarkMath from "remark-math";
@@ -28,6 +28,7 @@ import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.m
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
 import { MusicCardComponent } from "./src/plugins/rehype-component-music-card.mjs";
 import { rehypeMermaid } from "./src/plugins/rehype-mermaid.mjs";
+import { rehypeLazyLoadMedia } from "./src/plugins/rehype-lazy-load-media.mjs";
 import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
 import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
@@ -154,23 +155,6 @@ export default defineConfig({
             remarkMermaid,
         ],
         rehypePlugins: [
-            rehypeKatex,
-            rehypeSlug,
-            rehypeMermaid,
-            [
-                rehypeComponents,
-                {
-                    components: {
-                        github: GithubCardComponent,
-                        music: MusicCardComponent,
-                        note: (x, y) => AdmonitionComponent(x, y, "note"),
-                        tip: (x, y) => AdmonitionComponent(x, y, "tip"),
-                        important: (x, y) => AdmonitionComponent(x, y, "important"),
-                        caution: (x, y) => AdmonitionComponent(x, y, "caution"),
-                        warning: (x, y) => AdmonitionComponent(x, y, "warning"),
-                    },
-                },
-            ],
             [
                 rehypeAutolinkHeadings,
                 {
@@ -194,6 +178,24 @@ export default defineConfig({
                     },
                 },
             ],
+            rehypeSlug,
+            rehypeKatex,
+            [
+                rehypeComponents,
+                {
+                    components: {
+                        github: GithubCardComponent,
+                        music: MusicCardComponent,
+                        note: (x, y) => AdmonitionComponent(x, y, "note"),
+                        tip: (x, y) => AdmonitionComponent(x, y, "tip"),
+                        important: (x, y) => AdmonitionComponent(x, y, "important"),
+                        caution: (x, y) => AdmonitionComponent(x, y, "caution"),
+                        warning: (x, y) => AdmonitionComponent(x, y, "warning"),
+                    },
+                },
+            ],
+            rehypeMermaid,
+            rehypeLazyLoadMedia,
         ],
     },
     vite: {
