@@ -94,13 +94,14 @@ export function MusicCardComponent(properties, children) {
     const nAudio = h("audio", {
         id: `${cardUuid}-audio`,
         src: audioSrc,
-        preload: "metadata"
+        preload: "none"
     });
 
     // Client-side script logic
     const scriptContent = `
     (async function() {
         const cardId = '${cardUuid}';
+        const cardEl = document.getElementById(cardId + '-card');
         const audio = document.getElementById(cardId + '-audio');
         const playBtn = document.getElementById(cardId + '-play');
         const playIcon = playBtn.querySelector('.play-icon');
@@ -258,38 +259,51 @@ export function MusicCardComponent(properties, children) {
             }
         }
 
-        // Meting Logic
-        if (metingUrl) {
-            try {
-                const res = await fetch(metingUrl);
-                const data = await res.json();
-                const music = Array.isArray(data) ? data[0] : data;
-                
-                if (music) {
-                    const titleEl = document.querySelector('#' + cardId + '-card .music-title');
-                    const artistEl = document.querySelector('#' + cardId + '-card .music-artist');
-                    const coverEl = document.querySelector('#' + cardId + '-card .music-cover');
+        const init = async () => {
+            // Meting Logic
+            if (metingUrl) {
+                try {
+                    const res = await fetch(metingUrl);
+                    const data = await res.json();
+                    const music = Array.isArray(data) ? data[0] : data;
                     
-                    if (titleEl) titleEl.innerText = music.title;
-                    if (artistEl) artistEl.innerText = music.author;
-                    if (coverEl) coverEl.style.backgroundImage = 'url("' + music.pic + '")';
-                    
-                    audio.src = music.url;
-                    
-                    if (music.lrc) {
-                        lrcSrc = music.lrc;
-                        inlineLyrics = ""; // Clear inline lyrics to force load from new src
-                        await loadLyrics(); // Reload lyrics
+                    if (music) {
+                        const titleEl = cardEl.querySelector('.music-title');
+                        const artistEl = cardEl.querySelector('.music-artist');
+                        const coverEl = cardEl.querySelector('.music-cover');
+                        
+                        if (titleEl) titleEl.innerText = music.title;
+                        if (artistEl) artistEl.innerText = music.author;
+                        if (coverEl) coverEl.style.backgroundImage = 'url("' + music.pic + '")';
+                        
+                        audio.src = music.url;
+                        
+                        if (music.lrc) {
+                            lrcSrc = music.lrc;
+                            inlineLyrics = ""; // Clear inline lyrics to force load from new src
+                            await loadLyrics(); // Reload lyrics
+                        }
                     }
+                } catch (e) {
+                    console.error('Meting fetch error:', e);
+                    currentLyricEl.innerText = "Error loading music data";
                 }
-            } catch (e) {
-                console.error('Meting fetch error:', e);
-                currentLyricEl.innerText = "Error loading music data";
+            } else {
+                // Load initial lyrics if not using Meting (or Meting url empty)
+                await loadLyrics();
             }
-        } else {
-            // Load initial lyrics if not using Meting (or Meting url empty)
-            loadLyrics();
-        }
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    init();
+                    observer.disconnect();
+                }
+            });
+        }, { rootMargin: '100px' });
+
+        observer.observe(cardEl);
 
         function updatePlayState() {
             if (isPlaying) {
