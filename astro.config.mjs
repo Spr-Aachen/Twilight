@@ -8,7 +8,7 @@ import sitemap from "@astrojs/sitemap";
 import cloudflarePages from "@astrojs/cloudflare";
 import edgeone from "@edgeone/astro";
 import vercel from "@astrojs/vercel";
-import decapCmsOauth from "astro-decap-cms-oauth";
+import decapCmsOauth from "decap-cms-oauth-astro";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -52,8 +52,9 @@ export default defineConfig({
     adapter: adapter,
     integrations: [
         decapCmsOauth({
+            configPath: "./public/admin/config.yml", // Path to the Decap CMS configuration file
             decapCMSVersion: "3.9.0",
-            oauthDisabled: true, // Disable it to use oauth, requires .env configuration
+            enable: false, // Set to true to use oauth (Requires .env configuration)
         }),
         swup({
             theme: false,
