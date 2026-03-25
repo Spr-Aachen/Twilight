@@ -52,7 +52,7 @@ export default defineConfig({
     adapter: adapter,
     integrations: [
         decapCmsOauth({
-            configPath: "./public/admin/config.yml", // Path to the Decap CMS configuration file
+            configPath: "./.decap.yml", // Path to the Decap CMS configuration file
             decapCMSVersion: "3.9.0",
             enable: false, // Set to true to use oauth (Requires .env configuration)
         }),
