@@ -28,8 +28,8 @@ content:
       - { name: updated, label: Updated Date, type: date, required: false }
       - { name: description, label: Description, type: text, required: false }
       - { name: cover, label: Cover, type: image, required: false }
-      - { name: category, label: Category, type: string, required: false }
-      - { name: tags, label: Tags, type: list, required: false }
+      - { name: category, label: Category, type: string, list: true, required: false }
+      - { name: tags, label: Tags, type: string, list: true, required: false }
       - { name: draft, label: Draft, type: boolean, required: false }
       - { name: body, label: Body, type: rich-text, required: true }
 
@@ -67,19 +67,20 @@ content:
       - { name: cover, label: Cover, type: image }
       - { name: date, label: Date, type: date }
       - { name: location, label: Location, type: string, required: false }
-      - { name: tags, label: Tags, type: list, required: false }
+      - { name: tags, label: Tags, type: string, list: true, required: false }
       - { name: layout, label: Layout, type: select, options: {values: [grid, masonry, list]}, default: grid }
       - { name: columns, label: Columns, type: number, default: 3, min: 1, max: 6 }
-      - name: photos
+      - type: object
+        name: photos
         label: Photos
-        type: list
+        list: true
         required: false
         fields:
           - { name: src, label: Image, type: image }
           - { name: alt, label: Caption, type: string, required: false }
           - { name: title, label: Title, type: string, required: false }
           - { name: description, label: Description, type: text, required: false }
-          - { name: tags, label: Tags, type: list, required: false }
+          - { name: tags, label: Tags, type: string, list: true, required: false }
           - { name: date, label: Date, type: date, required: false }
       - { name: visible, label: Visible, type: boolean, required: false }
 
@@ -99,14 +100,14 @@ content:
       - { name: description, label: Description, type: text }
       - { name: image, label: Image, type: image, required: false }
       - { name: category, label: Category, type: select, options: {values: [library, ai, software, website, game]} }
-      - { name: techStack, label: Tech Stack, type: list }
+      - { name: techStack, label: Tech Stack, type: string, list: true }
       - { name: status, label: Status, type: select, options: {values: [completed, in-progress, planned]} }
       - { name: liveDemo, label: Live Demo, type: string, required: false }
       - { name: sourceCode, label: Source Code, type: string, required: false }
       - { name: startDate, label: Start Date, type: date }
       - { name: endDate, label: End Date, type: date, required: false }
       - { name: featured, label: Featured, type: boolean, required: false }
-      - { name: tags, label: Tags, type: list, required: false }
+      - { name: tags, label: Tags, type: string, list: true, required: false }
 
   # 技能
   - type: collection
@@ -125,14 +126,14 @@ content:
       - { name: icon, label: Icon, type: string }
       - { name: category, label: Category, type: select, options: {values: [ai, backend, client, frontend, database, engines, tools, others]} }
       - { name: level, label: Level, type: select, options: {values: [beginner, intermediate, advanced, expert]} }
-      - name: experience
+      - type: object
+        name: experience
         label: Experience
-        type: object
         fields:
           - { name: years, label: Years, type: number }
           - { name: months, label: Months, type: number }
-      - { name: projects, label: Projects, type: list, required: false }
-      - { name: certifications, label: Certifications, type: list, required: false }
+      - { name: projects, label: Projects, type: string, list: true, required: false }
+      - { name: certifications, label: Certifications, type: string, list: true, required: false }
       - { name: color, label: Color, type: string, required: false }
 
   # 时间线
@@ -155,11 +156,12 @@ content:
       - { name: location, label: Location, type: string, required: false }
       - { name: organization, label: Organization, type: string, required: false }
       - { name: position, label: Position, type: string, required: false }
-      - { name: skills, label: Skills, type: list, required: false }
-      - { name: achievements, label: Achievements, type: list, required: false }
-      - name: links
+      - { name: skills, label: Skills, type: string, list: true, required: false }
+      - { name: achievements, label: Achievements, type: string, list: true, required: false }
+      - type: object
+        name: links
         label: Links
-        type: list
+        list: true
         required: false
         fields:
           - { name: name, label: Name, type: string }
@@ -184,4 +186,4 @@ content:
       - { name: imgurl, label: Avatar URL, type: string }
       - { name: desc, label: Description, type: text }
       - { name: siteurl, label: Site URL, type: string }
-      - { name: tags, label: Tags, type: list, required: false }
+      - { name: tags, label: Tags, type: string, list: true, required: false }
