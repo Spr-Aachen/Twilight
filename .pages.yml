@@ -1,9 +1,30 @@
 # 媒体目录配置
 media:
-  - name: images
-    label: Images
+  - name: public
+    label: Public Images
     input: public/assets/images
     output: /assets/images
+    categories: [image]
+  - name: posts
+    label: Posts Images
+    input: src/content/posts
+    output: /src/content/posts
+    categories: [image]
+  - name: diary
+    label: Diary Images
+    input: src/content/diary
+    output: /src/content/diary
+    categories: [image]
+  - name: albums
+    label: Albums Images
+    input: src/content/albums
+    output: /src/content/albums
+    categories: [image]
+  - name: projects
+    label: Projects Images
+    input: src/content/projects
+    output: /src/content/projects
+    categories: [image]
 
 
 # 内容管理配置
@@ -27,7 +48,7 @@ content:
       - { name: published, label: Published Date, type: date }
       - { name: updated, label: Updated Date, type: date, required: false }
       - { name: description, label: Description, type: text, required: false }
-      - { name: cover, label: Cover, type: image, required: false }
+      - { name: cover, label: Cover, type: image, options: {media: posts}, required: false }
       - { name: category, label: Category, type: string, list: true, required: false }
       - { name: tags, label: Tags, type: string, list: true, required: false }
       - { name: draft, label: Draft, type: boolean, required: false }
@@ -48,7 +69,7 @@ content:
       - { name: title, label: Title, type: string }
       - { name: content, label: Content, type: text }
       - { name: date, label: Date, type: date }
-      - { name: images, label: Images, type: image, options: { multiple: true }, required: false }
+      - { name: images, label: Images, type: image, options: { media: diary, multiple: true }, required: false }
 
   # 相册
   - type: collection
@@ -76,7 +97,7 @@ content:
         list: true
         required: false
         fields:
-          - { name: src, label: Image, type: image }
+          - { name: src, label: Image, type: image, options: {media: albums} }
           - { name: alt, label: Caption, type: string, required: false }
           - { name: title, label: Title, type: string, required: false }
           - { name: description, label: Description, type: text, required: false }
@@ -98,7 +119,7 @@ content:
     fields:
       - { name: title, label: Title, type: string }
       - { name: description, label: Description, type: text }
-      - { name: image, label: Image, type: image, required: false }
+      - { name: image, label: Image, type: image, options: {media: projects}, required: false }
       - { name: category, label: Category, type: select, options: {values: [library, ai, software, website, game]} }
       - { name: techStack, label: Tech Stack, type: string, list: true }
       - { name: status, label: Status, type: select, options: {values: [completed, in-progress, planned]} }
