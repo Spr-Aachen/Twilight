@@ -37,7 +37,7 @@ English | [**中文**](docs/README_ZH.md)
 ## ✨ Features
 
 ### Content
-- **CMS Functionality**: Easy content management with Decap CMS integration
+- **CMS Functionality**: Easy content management with headless CMS integration
 - **Data Visualization**: Visualized personal data like projects, skills etc.
 - **Automatic Navigation**: Automatic generation of post navigation
 
@@ -77,8 +77,6 @@ English | [**中文**](docs/README_ZH.md)
 
 3. **Configure your blog:**
    - [Customize blog settings](https://docs.twilight.spr-aachen.com/en/config/core) inside `twilight.config.yaml`
-   - [Support CMS functionality](https://docs.twilight.spr-aachen.com/en/config/cms) inside `.env`
-   - [Support Umami analytics](https://docs.twilight.spr-aachen.com/en/config/analytics) inside `.env`
    - [Manage site content](https://docs.twilight.spr-aachen.com/en/config/content) inside `src/content`
 
 4. **Start the development server:**
@@ -110,5 +108,4 @@ Deploy your blog to any static hosting platform
 
 - Prototype   - [Fuwari](https://github.com/saicaca/fuwari)
 - Inspiration - [Yukina](https://github.com/WhitePaper233/yukina) & [Mizuki](https://github.com/matsuzaka-yuki/Mizuki)
-- CMS         - [astro-decap-cms-oauth](https://github.com/dorukgezici/astro-decap-cms-oauth)
 - Translation - [translate](https://gitee.com/mail_osc/translate)
