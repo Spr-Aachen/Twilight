@@ -1,0 +1,206 @@
+:root {
+    --tk-text: black;
+    --code-block-text: #333;
+}
+html.dark {
+    --tk-text: #d1d5db;
+    --code-block-text: #d1d5db;
+}
+.tk-comments {
+    color: var(--tk-text);
+}
+.tk-submit .tk-avatar {
+    display: none;
+}
+
+/* Text Area */
+.tk-row .tk-col {
+    flex-direction: column-reverse;
+}
+.tk-row .tk-col .tk-input textarea {
+    border-radius: var(--radius-large);
+    padding: 1rem 1.5rem;
+    min-height: 150px !important;
+}
+.tk-row .tk-col .tk-input textarea:focus {
+    border-color: var(--primary);
+}
+
+/* Input */
+.tk-meta-input {
+    position: relative;
+    margin-top: 0.75rem;
+}
+.tk-meta-input div {
+    min-height: 2.5rem;
+}
+.tk-meta-input div .el-input-group__prepend {
+    background: inherit !important;
+    border-radius: 0.5rem 0 0 0.5rem;
+    min-height: inherit;
+}
+.tk-meta-input div input {
+    padding: 0.25rem 1rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+    min-height: inherit;
+}
+.tk-meta-input div input:focus {
+    border-color: var(--primary) !important;
+}
+
+/* Button */
+.tk-row.actions {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+}
+.tk-row.actions .__markdown {
+    display: none !important;
+}
+.tk-row.actions .tk-preview,
+.tk-row.actions .tk-send,
+.tk-row.actions .tk-cancel {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0 0.75rem;
+    height: 2rem;
+    background: var(--btn-regular-bg-active) !important;
+}
+.tk-row.actions .tk-preview:disabled,
+.tk-row.actions .tk-send:disabled,
+.tk-row.actions .tk-cancel:disabled {
+    background: var(--btn-regular-bg) !important;
+}
+.tk-row.actions .tk-preview,
+.tk-row.actions .tk-send,
+.tk-row.actions .tk-cancel {
+    color: var(--btn-content);
+}
+.tk-row.actions .tk-preview:disabled,
+.tk-row.actions .tk-send:disabled,
+.tk-row.actions .tk-cancel:disabled {
+    color: #ffffffa1 !important;
+}
+
+/* Comment */
+.tk-comments-title .__comments svg {
+    fill: var(--primary);
+}
+.tk-comment {
+    border: 1px solid rgba(144, 147, 153, 0.31);
+    padding: 1rem;
+    border-radius: 1.5rem;
+    transition: all 0.2s ease;
+}
+.tk-comment:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.tk-comment .tk-action-icon svg {
+    fill: var(--primary);
+}
+.tk-action .tk-action-count {
+    color: var(--btn-content);
+}
+.tk-meta .tk-tag {
+    border: none;
+    border-radius: 0.5rem;
+    color: var(--btn-content);
+}
+.tk-meta .tk-tag-green {
+    background: var(--btn-regular-bg);
+}
+html.dark .tk-meta .tk-tag-green {
+    background: var(--primary);
+    color: var(--deep-text);
+}
+
+/* Content & Preview */
+.tk-content img,
+.tk-preview-container img {
+    display: inline !important;
+    vertical-align: bottom !important;
+}
+.tk-content a,
+.tk-preview-container a {
+    text-decoration: underline;
+    color: var(--primary);
+    font-weight: 500;
+}
+.tk-content .tk-ruser,
+.tk-preview-container .tk-ruser {
+    text-decoration: none;
+}
+.tk-content :not(pre) > code,
+.tk-preview-container :not(pre) > code {
+    background: var(--inline-code-bg);
+    border-radius: 0.375rem;
+    color: var(--inline-code-color);
+    padding: 0.125rem 0.25rem;
+    font-weight: 600;
+}
+.tk-content li,
+.tk-preview-container li {
+    list-style: none;
+}
+.tk-content li::before,
+.tk-preview-container li::before {
+    content: "\2022";
+    color: var(--primary);
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+/* Replies */
+.tk-replies .tk-comment {
+    background: var(--page-bg);
+}
+.tk-replies .tk-comment .tk-content > span:first-of-type {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+.twikoo .code-block pre {
+    border-radius: 1.25rem !important;
+}
+.twikoo .code-block pre:not([class]) {
+    background: var(--codeblock-bg);
+    overflow: auto;
+    padding: 0.5rem;
+    color: var(--code-block-text);
+}
+.twikoo .code-block .copy-btn-icon {
+    width: inherit !important;
+    height: inherit !important;
+}
+.tk-expand-wrap .tk-expand:hover,
+.tk-collapse-wrap .tk-expand:hover {
+    border-radius: 0.5rem;
+    margin-top: 0.25rem;
+    background: var(--btn-plain-bg-hover);
+}
+.card-base {
+    overflow: visible;
+}
+.tk-action-icon,
+.tk-owo,
+.tk-submit,
+.tk-cancel,
+.tk-preview,
+.tk-admin,
+.tk-delete,
+.tk-edit {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.tk-action {
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+}
+.tk-submit-wrapper {
+    position: relative;
+}
+.tk-admin-panel {
+    position: relative;
+    z-index: 100;
+}

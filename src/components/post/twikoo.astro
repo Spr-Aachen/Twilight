@@ -1,4 +1,5 @@
 ---
+import { url } from "@utils/url";
 import { postConfig } from "@/config";
 
 
@@ -14,85 +15,66 @@ const config = {
 ---
 
 <div id="tcomment"></div>
-<script>
-    import "@/plugins/twikoo-scroll-protection";
-</script>
+<script is:inline src={url("/assets/js/twikoo.all.min.js")}></script>
+<link rel="stylesheet" href={url("/assets/css/twikoo.css")} />
 <script is:inline define:vars={{ config }}>
-    // 动态创建配置对象
+    function getCurrentPath() {
+        const pathname = window.location.pathname;
+        return pathname.endsWith("/") && pathname.length > 1
+            ? pathname.slice(0, -1)
+            : pathname;
+    }
+
     function createTwikooConfig() {
         return {
             ...config,
-            el: '#tcomment'
+            path: getCurrentPath(),
+            el: "#tcomment",
         };
     }
 
-    // 加载 Twikoo 脚本
-    function loadTwikooScript() {
-        return new Promise((resolve, reject) => {
-            if (typeof twikoo !== 'undefined') {
-                resolve();
-                return;
-            }
-            const script = document.createElement('script');
-            script.src = '/assets/js/twikoo.all.min.js';
-            script.async = true;
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    }
-
-    // 初始化 Twikoo
-    async function initTwikoo() {
-        const commentEl = document.getElementById('tcomment');
-        if (!commentEl) return;
-        try {
-            await loadTwikooScript();
-            if (typeof twikoo !== 'undefined') {
-                commentEl.innerHTML = '';
+    function initTwikoo() {
+        if (typeof twikoo !== "undefined") {
+            const commentEl = document.getElementById("tcomment");
+            if (commentEl) {
+                commentEl.innerHTML = "";
                 const dynamicConfig = createTwikooConfig();
-                console.log('[Twikoo] 初始化配置:', dynamicConfig);
-                await twikoo.init(dynamicConfig);
-                console.log('[Twikoo] 初始化完成');
+                console.log("[Twikoo] 初始化配置:", dynamicConfig);
+                twikoo
+                    .init(dynamicConfig)
+                    .then(() => {
+                        console.log("[Twikoo] 初始化完成");
+                    })
+                    .catch((error) => {
+                        console.error("[Twikoo] 初始化失败:", error);
+                    });
             }
-        } catch (error) {
-            console.error('[Twikoo] 加载或初始化失败:', error);
+        } else {
+            setTimeout(initTwikoo, 500);
         }
     }
 
-    // 使用 Intersection Observer 延迟加载
-    function setupLazyLoad() {
-        const commentEl = document.getElementById('tcomment');
-        if (!commentEl) return;
+    document.addEventListener("DOMContentLoaded", initTwikoo);
 
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                initTwikoo();
-                observer.disconnect();
-            }
-        }, { rootMargin: '200px' }); // 提前 200px 开始加载
-
-        observer.observe(commentEl);
-    }
-
-    // 页面加载或切换时设置延迟加载
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupLazyLoad);
-    } else {
-        setupLazyLoad();
-    }
-
-    // Swup 页面切换后重新设置
     if (window.swup && window.swup.hooks) {
-        window.swup.hooks.on('content:replace', setupLazyLoad);
+        window.swup.hooks.on("content:replace", function () {
+            setTimeout(initTwikoo, 200);
+        });
     } else {
-        document.addEventListener('swup:enable', function() {
+        document.addEventListener("swup:enable", function () {
             if (window.swup && window.swup.hooks) {
-                window.swup.hooks.on('content:replace', setupLazyLoad);
+                window.swup.hooks.on("content:replace", function () {
+                    setTimeout(initTwikoo, 200);
+                });
             }
         });
     }
 
-    // 自定义事件监听
-    document.addEventListener('twilight:page:loaded', setupLazyLoad);
+    document.addEventListener("twilight:page:loaded", function () {
+        const commentEl = document.getElementById("tcomment");
+        if (commentEl) {
+            console.log("[Twikoo] 通过自定义事件重新初始化");
+            initTwikoo();
+        }
+    });
 </script>
