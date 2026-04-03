@@ -21,7 +21,7 @@ if (postConfig.comment?.enable && post.data.comment && postConfig.comment?.twiko
 ---
 
 {postConfig.comment?.enable && post.data.comment && (
-    <div class="card-base p-6 mb-4">
+    <div class="card-base p-6 mb-4 transition-swup-fade">
         {commentService === 'twikoo' && <Twikoo path={path} />}
         {commentService === '' && null}
     </div>
