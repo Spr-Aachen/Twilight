@@ -204,3 +204,28 @@ html.dark .tk-meta .tk-tag-green {
     position: relative;
     z-index: 100;
 }
+
+.tk-login,
+.tk-regist {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tk-password,
+.tk-login-msg {
+    color: #ffffff;
+    width: 80%;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.tk-login-msg a {
+    color: #ffffff;
+    margin-left: 1em;
+    text-decoration: underline;
+}
+
+.tk-regist-button {
+    margin-top: 1rem;
+}
