@@ -22,12 +22,14 @@ export interface TimelineItem {
     icon?: string; // Iconify icon name
     color?: string;
     featured?: boolean;
+    basePath?: string;
 }
 
 export const timelineData: TimelineItem[] = Object.entries(timelineModules).map(([path, mod]: [string, any]) => {
     const id = path.split('/').pop()?.replace('.json', '') || '';
     const data = mod.default;
-    return { id, ...data } as TimelineItem;
+    const basePath = path.replace('../', '').replace(/\/[^/]+$/, '');
+    return { id, ...data, basePath } as TimelineItem;
 });
 
 // Get timeline statistics

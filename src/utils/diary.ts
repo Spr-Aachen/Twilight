@@ -14,9 +14,7 @@ export interface Moment {
 export const moments: Moment[] = Object.entries(diaryModules).map(([path, mod]: [string, any]) => {
     const id = path.split('/').pop()?.replace('.json', '') || '';
     const data = mod.default as any;
-    // Get directory path relative to src/
     const basePath = path.replace('../', '').replace(/\/[^/]+$/, '');
-
     const moment: Moment = {
         id,
         ...data,

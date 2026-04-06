@@ -22,9 +22,7 @@ export interface Project {
 export const projectsData: Project[] = Object.entries(projectModules).map(([path, mod]: [string, any]) => {
     const id = path.split('/').pop()?.replace('.json', '') || '';
     const data = mod.default as any;
-    // Get directory path relative to src/
     const basePath = path.replace('../', '').replace(/\/[^/]+$/, '');
-
     const project: Project = {
         id,
         ...data,

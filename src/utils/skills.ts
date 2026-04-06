@@ -16,12 +16,14 @@ export interface Skill {
     projects?: string[]; // Related project IDs
     certifications?: string[];
     color?: string; // Skill card theme color
+    basePath?: string;
 }
 
 export const skillsData: Skill[] = Object.entries(skillModules).map(([path, mod]: [string, any]) => {
   const id = path.split('/').pop()?.replace('.json', '') || '';
   const data = mod.default;
-  return { id, ...data } as Skill;
+  const basePath = path.replace('../', '').replace(/\/[^/]+$/, '');
+  return { id, ...data, basePath } as Skill;
 });
 
 // Get skill statistics
