@@ -149,16 +149,16 @@ site:
     # OpenGraph 配置
     generateOgImages: false
 
-# Umami统计配置
+# Umami 统计配置
 umami:
-    # 是否显示Umami统计
+    # 是否显示 Umami 统计
     enabled: false
-    # UmamiCloudAPI地址
+    # UmamiCloudAPI 地址
     baseUrl: "https://api.umami.is"
-    # API密钥 (可用环境变量覆盖)
-    apiKey: ""
-    # 要插入的Script (可用环境变量覆盖)
-    scripts: ""
+    # API 密钥
+    apiKey: ''
+    # Tracking code
+    code: ''
 
 # 导航栏配置
 navbar:

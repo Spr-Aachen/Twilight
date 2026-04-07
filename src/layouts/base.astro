@@ -116,7 +116,7 @@ const bannerOffset =
     bannerOffsetByPosition[siteConfig.wallpaper.position || "center"];
 
 const umamiEnabled = umamiConfig.enabled || false;
-const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
+const umamiCode = umamiConfig.code || ""; // 获取 Umami Code 配置
 ---
 
 <!DOCTYPE html>
@@ -217,7 +217,7 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
         <!-- rss feed -->
         <link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
         <!-- Umami Analytics -->
-        {umamiEnabled && umamiScripts && <Fragment set:html={umamiScripts} />}
+        {umamiEnabled && umamiCode && <Fragment set:html={umamiCode} />}
     </head>
 
     <body class=" min-h-screen " class:list={[{"is-home": isHomePage, "enable-banner": enableBanner}]}

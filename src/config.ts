@@ -23,7 +23,7 @@ type ConfigFile = {
         enabled: boolean;
         apiKey?: string;
         baseUrl: string;
-        scripts?: string;
+        code?: string;
     };
     navbar: {
         links: Array<NavbarLink | LinkPreset | string>;
@@ -92,9 +92,9 @@ export const siteConfig: SiteConfig = config.site;
 // Umami统计配置
 export const umamiConfig = {
     enabled: config.umami.enabled,
-    apiKey: import.meta.env.UMAMI_API_KEY ?? config.umami.apiKey,
+    apiKey: config.umami.apiKey ?? import.meta.env.UMAMI_API_KEY,
     baseUrl: config.umami.baseUrl,
-    scripts: import.meta.env.UMAMI_TRACKING_CODE ?? config.umami.scripts,
+    code: config.umami.code ?? import.meta.env.UMAMI_TRACKING_CODE,
 } as const;
 
 // 导航栏配置
