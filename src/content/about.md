@@ -21,3 +21,4 @@ Twilight is a CMS integrated static blog template built with [Astro](https://ast
 - Comprehensive music card plugin in [#81](https://github.com/Spr-Aachen/Twilight/pull/81)
 - Refactored DecapCMS OAuth integration in [#107](https://github.com/Spr-Aachen/Twilight/pull/107)
 - Non-breaking PagesCMS support in [#114](https://github.com/Spr-Aachen/Twilight/pull/114)
+- Tree view directory component in [#117](https://github.com/Spr-Aachen/Twilight/pull/117)
