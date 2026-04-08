@@ -343,8 +343,8 @@ export class WidgetManager {
         // Desktop: Visible if hasLeftSidebar
         const leftSidebarClass = `
             mb-0 col-span-1 hidden
-            ${hasAnyComponents ? "md:block md:max-w-70" : ""}
-            ${hasLeftSidebar ? "lg:block lg:max-w-70 lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2" : "lg:hidden"}
+            ${hasAnyComponents ? "md:flex md:flex-col md:max-w-70" : ""}
+            ${hasLeftSidebar ? "lg:flex lg:flex-col lg:max-w-70 lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2" : "lg:hidden"}
         `.trim().replace(/\s+/g, " ");
 
         // 右侧侧边栏容器类名
@@ -357,8 +357,8 @@ export class WidgetManager {
             ${
                 hasRightSidebar
                     ? hasLeftSidebar
-                        ? "lg:block lg:max-w-70 lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2"
-                        : "lg:block lg:max-w-70 lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
+                        ? "lg:flex lg:flex-col lg:max-w-70 lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2"
+                        : "lg:flex lg:flex-col lg:max-w-70 lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2"
                     : "lg:hidden"
             }
         `.trim().replace(/\s+/g, " ");
@@ -373,7 +373,7 @@ export class WidgetManager {
         
         // 移动端侧边栏类名
         const middleSidebarClass = `
-            col-span-1 block md:hidden
+            col-span-1 flex flex-col md:hidden
             ${!hasAnyComponents ? "hidden" : ""}
         `.trim().replace(/\s+/g, " ");
 

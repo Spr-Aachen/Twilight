@@ -88,19 +88,15 @@ function renderComponent(component: any, index: number) {
 }
 ---
 
-<div id={id || "sidebar"} data-side={side} class:list={[className, "w-full h-full"]}>
+<div id={id || "sidebar"} data-side={side} class:list={[className, "flex flex-col w-full h-full gap-4"]}>
     <!-- 顶部固定组件区域 -->
-    {topComponents.length > 0 && (
-        <div class:list={["flex flex-col w-full gap-4", { "mb-4": stickyComponents.length > 0 }]}>
-            {topComponents.map((component, index) => {
-                const renderData = renderComponent(component, index);
-                if (!renderData) return null;
+    {topComponents.map((component, index) => {
+        const renderData = renderComponent(component, index);
+        if (!renderData) return null;
 
-                const { Component, props } = renderData;
-                return <Component {...props} side={side} />;
-            })}
-        </div>
-    )}
+        const { Component, props } = renderData;
+        return <Component {...props} side={side} />;
+    })}
 
     <!-- 粘性组件区域 -->
     {stickyComponents.length > 0 && (
