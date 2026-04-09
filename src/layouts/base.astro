@@ -2,6 +2,7 @@
 import "katex/dist/katex.css";
 
 import { siteConfig, profileConfig, umamiConfig, musicPlayerConfig, pioConfig } from "@/config";
+import { getUmamiConfig } from "@utils/umami";
 import type { Favicon } from "@/types/config";
 import { defaultFavicons } from "@constants/icon";
 import {
@@ -115,8 +116,8 @@ const bannerOffsetByPosition = {
 const bannerOffset =
     bannerOffsetByPosition[siteConfig.wallpaper.position || "center"];
 
-const umamiEnabled = umamiConfig.enabled || false;
-const umamiCode = umamiConfig.code || ""; // 获取 Umami Code 配置
+const { enabled: umamiEnabled, websiteId: _umamiWebsiteId, apiKey: _umamiApiKey, baseUrl: _umamiBaseUrl } = getUmamiConfig();
+const umamiCode = umamiConfig.code || "";
 ---
 
 <!DOCTYPE html>
