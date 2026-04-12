@@ -216,8 +216,6 @@ const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
         {pioConfig.enable && <link rel="stylesheet" href="/pio/static/pio.css" />}
         <!-- rss feed -->
         <link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
-        <!-- Analytics -->
-        {analyticsEnabled && analyticsCode && <Fragment set:html={analyticsCode} />}
     </head>
 
     <body class=" min-h-screen " class:list={[{"is-home": isHomePage, "enable-banner": enableBanner}]}
@@ -230,6 +228,8 @@ const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
         {shouldShowTopHighlight && <div class="top-gradient-highlight"></div>}
         <!-- 页面内容 -->
         <slot />
+        <!-- Analytics -->
+        {analyticsEnabled && analyticsCode && <Fragment set:html={analyticsCode} />}
         <!-- Music Player - 仅在启用时加载 -->
         {musicPlayerConfig.enable && <MusicPlayer client:idle />}
         <!-- Pio 看板娘组件 - 如果启用了侧边栏，可能需要调整 z-index -->
