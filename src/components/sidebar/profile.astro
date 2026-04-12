@@ -2,14 +2,14 @@
 import { Icon } from "astro-icon/components";
 
 import { profileConfig } from "@/config";
-import { getUmamiConfig } from "@utils/umami";
+import { getAnalyticsConfig } from "@utils/analytics";
 import { url } from "@utils/url";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 import ImageWrapper from "@/components/common/imageWrapper.astro";
 
 
-const { enabled: umamiEnabled, websiteId: umamiWebsiteId, apiKey: umamiApiKey, baseUrl: umamiBaseUrl } = getUmamiConfig();
+const { enabled: analyticsEnabled, platform, baseUrl, apiKey, websiteId } = getAnalyticsConfig();
 
 interface Props {
     class?: string;
@@ -48,12 +48,12 @@ const id = `profile-${side}`;
                 {profileConfig.links[0].name}
             </a>}
         </div>
-        {umamiEnabled && (
+        {analyticsEnabled && (
             <hr class="my-2 border-t border-dashed border-gray-300 dark:border-gray-700" />
             <div class="text-sm text-gray-500 mt-2 text-center site-stats-container"
-                 data-umami-base-url={umamiBaseUrl}
-                 data-umami-api-key={umamiApiKey}
-                 data-umami-website-id={umamiWebsiteId}
+                 data-analytics-base-url={baseUrl}
+                 data-analytics-api-key={apiKey}
+                 data-analytics-website-id={websiteId}
                  data-i18n-views={i18n(I18nKey.pageViews)}
                  data-i18n-visitors={i18n(I18nKey.visitors)}
                  data-i18n-error={i18n(I18nKey.statsError)}
@@ -65,14 +65,14 @@ const id = `profile-${side}`;
     </div>
 </div>
 
-{umamiEnabled && (
+{analyticsEnabled && (
     <script>
-        import { initUmamiStats } from "@utils/umami";
+        import { initAnalyticsStats } from "@utils/analytics";
         import "@/plugins/umami-share";
 
-        initUmamiStats(".site-stats-container", ".site-stats-display", false);
+        initAnalyticsStats(".site-stats-container", ".site-stats-display", "umami", false);
         document.addEventListener('astro:page-load', () => {
-            initUmamiStats(".site-stats-container", ".site-stats-display", false);
+            initAnalyticsStats(".site-stats-container", ".site-stats-display", "umami", false);
         });
     </script>
 )}

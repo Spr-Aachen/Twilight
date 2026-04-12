@@ -12,6 +12,21 @@ import type {
  * 
  */
 
+// Analytics 配置
+export type AnalyticsConfig = {
+    enabled: boolean;
+    platform: "umami";
+    umami: {
+        apiKey: string;
+        baseUrl: string;
+        code: string;
+    };
+};
+
+/**
+ * 
+ */
+
 // Favicon 配置
 export type Favicon = {
     src: string;

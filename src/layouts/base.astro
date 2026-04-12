@@ -1,8 +1,8 @@
 ---
 import "katex/dist/katex.css";
 
-import { siteConfig, profileConfig, umamiConfig, musicPlayerConfig, pioConfig } from "@/config";
-import { getUmamiConfig } from "@utils/umami";
+import { siteConfig, profileConfig, musicPlayerConfig, pioConfig } from "@/config";
+import { getAnalyticsConfig } from "@utils/analytics";
 import type { Favicon } from "@/types/config";
 import { defaultFavicons } from "@constants/icon";
 import {
@@ -116,8 +116,7 @@ const bannerOffsetByPosition = {
 const bannerOffset =
     bannerOffsetByPosition[siteConfig.wallpaper.position || "center"];
 
-const { enabled: umamiEnabled, websiteId: _umamiWebsiteId, apiKey: _umamiApiKey, baseUrl: _umamiBaseUrl } = getUmamiConfig();
-const umamiCode = umamiConfig.code || "";
+const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
 ---
 
 <!DOCTYPE html>
@@ -217,8 +216,8 @@ const umamiCode = umamiConfig.code || "";
         {pioConfig.enable && <link rel="stylesheet" href="/pio/static/pio.css" />}
         <!-- rss feed -->
         <link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
-        <!-- Umami Analytics -->
-        {umamiEnabled && umamiCode && <Fragment set:html={umamiCode} />}
+        <!-- Analytics -->
+        {analyticsEnabled && analyticsCode && <Fragment set:html={analyticsCode} />}
     </head>
 
     <body class=" min-h-screen " class:list={[{"is-home": isHomePage, "enable-banner": enableBanner}]}

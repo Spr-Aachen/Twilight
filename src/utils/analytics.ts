@@ -1,10 +1,10 @@
-import { umamiConfig } from "@/config";
+import { analyticsConfig } from "@/config";
 
 
-export const UMAMI_ATTRS = {
-    baseUrl: "data-umami-base-url",
-    apiKey: "data-umami-api-key",
-    websiteId: "data-umami-website-id",
+export const ANALYTICS_ATTRS = {
+    baseUrl: "data-analytics-base-url",
+    apiKey: "data-analytics-api-key",
+    websiteId: "data-analytics-website-id",
     pageUrl: "data-page-url",
     i18nViews: "data-i18n-views",
     i18nVisitors: "data-i18n-visitors",
@@ -12,13 +12,32 @@ export const UMAMI_ATTRS = {
     processed: "data-processed",
 } as const;
 
-export const getUmamiConfig = () => {
-    return {
-        enabled: umamiConfig.enabled || false,
-        websiteId: umamiConfig.code.match(/data-website-id="([^"]+)"/)?.[1] || "",
-        apiKey: umamiConfig.apiKey || "",
-        baseUrl: umamiConfig.baseUrl || "",
-    };
+export type AnalyticsConfig = {
+    enabled: boolean;
+    platform: string;
+    code?: string;
+    websiteId?: string;
+    apiKey?: string;
+    baseUrl?: string;
+};
+
+export const getWebsiteId = (code: string): string => {
+    return code.match(/data-website-id="([^"]+)"/)?.[1] || "";
+};
+
+export const getAnalyticsConfig = (): AnalyticsConfig => {
+    const { enabled, platform } = analyticsConfig;
+    if (platform === "umami") {
+        return {
+            enabled,
+            platform,
+            code: analyticsConfig.umami.code,
+            websiteId: getWebsiteId(analyticsConfig.umami.code),
+            apiKey: analyticsConfig.umami.apiKey,
+            baseUrl: analyticsConfig.umami.baseUrl,
+        };
+    }
+    return { enabled, platform };
 };
 
 export const generateStatsText = (
@@ -33,7 +52,7 @@ export const generateStatsText = (
 export const STATS_LOADING_KEY = "statsLoading";
 export const STATS_ERROR_KEY = "statsError";
 
-export interface UmamiStats {
+export interface AnalyticsStats {
     pageviews: number;
     visitors: number;
     visits?: number;
@@ -41,12 +60,12 @@ export interface UmamiStats {
     totaltime?: number;
 }
 
-export const fetchUmamiStats = async (
+const fetchUmamiStats = async (
     baseUrl: string,
     apiKey: string,
     websiteId: string,
     urlPath?: string
-): Promise<UmamiStats> => {
+): Promise<AnalyticsStats> => {
     const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
     const currentTimestamp = Date.now();
     
@@ -64,7 +83,7 @@ export const fetchUmamiStats = async (
     });
 
     if (!res.ok) {
-        throw new Error("Failed to fetch Umami stats");
+        throw new Error("Failed to fetch analytics stats");
     }
 
     const stats = await res.json();
@@ -78,30 +97,38 @@ export const fetchUmamiStats = async (
     };
 };
 
-export const initUmamiStats = (
+export const initAnalyticsStats = (
     containerSelector: string,
     displaySelector: string,
+    platform: string,
     isPageStats: boolean = false
 ) => {
     const containers = document.querySelectorAll(containerSelector);
 
     containers.forEach(async (containerElement) => {
         const container = containerElement as HTMLElement;
-        if (container.getAttribute(UMAMI_ATTRS.processed)) return;
-        container.setAttribute(UMAMI_ATTRS.processed, "true");
+        if (container.getAttribute(ANALYTICS_ATTRS.processed)) return;
+        container.setAttribute(ANALYTICS_ATTRS.processed, "true");
 
-        const baseUrl = container.getAttribute(UMAMI_ATTRS.baseUrl);
-        const apiKey = container.getAttribute(UMAMI_ATTRS.apiKey);
-        const websiteId = container.getAttribute(UMAMI_ATTRS.websiteId);
-        const i18nViews = container.getAttribute(UMAMI_ATTRS.i18nViews);
-        const i18nVisitors = container.getAttribute(UMAMI_ATTRS.i18nVisitors);
-        const i18nError = container.getAttribute(UMAMI_ATTRS.i18nError);
-        const pageUrl = isPageStats ? container.getAttribute(UMAMI_ATTRS.pageUrl) : undefined;
+        const baseUrl = container.getAttribute(ANALYTICS_ATTRS.baseUrl);
+        const apiKey = container.getAttribute(ANALYTICS_ATTRS.apiKey);
+        const websiteId = container.getAttribute(ANALYTICS_ATTRS.websiteId);
+        const i18nViews = container.getAttribute(ANALYTICS_ATTRS.i18nViews);
+        const i18nVisitors = container.getAttribute(ANALYTICS_ATTRS.i18nVisitors);
+        const i18nError = container.getAttribute(ANALYTICS_ATTRS.i18nError);
+        const pageUrl = isPageStats ? container.getAttribute(ANALYTICS_ATTRS.pageUrl) : undefined;
 
         if (!baseUrl || !apiKey || !websiteId) return;
 
         try {
-            const stats = await fetchUmamiStats(baseUrl, apiKey, websiteId, pageUrl || undefined);
+            let stats: AnalyticsStats;
+            
+            if (platform === "umami") {
+                stats = await fetchUmamiStats(baseUrl, apiKey, websiteId, pageUrl || undefined);
+            } else {
+                throw new Error(`Unsupported analytics platform: ${platform}`);
+            }
+            
             const displayElement = container.querySelector(displaySelector);
             if (displayElement) {
                 displayElement.textContent = generateStatsText(
@@ -112,7 +139,7 @@ export const initUmamiStats = (
                 );
             }
         } catch (error) {
-            console.error("Error fetching Umami stats:", error);
+            console.error("Error fetching analytics stats:", error);
             const displayElement = container.querySelector(displaySelector);
             if (displayElement) {
                 displayElement.textContent = i18nError || "";
