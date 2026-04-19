@@ -378,6 +378,10 @@ const setup = () => {
         if (heightExtend) {
             heightExtend.classList.remove('hidden')
         }
+        // Check sidebar components visibility on the current page
+        const configCarrier = widgetManager.getConfig();
+        const leftSidebarComponents = configCarrier.components.left || [];
+        const rightSidebarComponents = configCarrier.components.right || [];
         // Handle animation logic for persistent sidebar components: if the component is visible on both the current and next pages, it should remain stationary
         const currentPath = window.location.pathname;
         const nextPath = visit.to.url;
@@ -388,20 +392,35 @@ const setup = () => {
             const allComponents = [...allTopComponents, ...allStickyComponents];
             let layoutShifted = false;
             allComponents.forEach(config => {
+                const isDesktop = window.innerWidth >= 1280;
+                const isTablet = window.innerWidth >= 768 && window.innerWidth < 1280;
+                const isMobile = window.innerWidth < 768;
+                if (isDesktop) {
+                    if (side === 'left' && !leftSidebarComponents.includes(config)) return;
+                    if (side === 'right' && !rightSidebarComponents.includes(config)) return;
+                }
+                if (config.responsive && config.responsive.hidden) {
+                    const hidden = config.responsive.hidden;
+                    if (isDesktop && hidden.includes('desktop')) return;
+                    if (isTablet && hidden.includes('tablet')) return;
+                    if (isMobile && hidden.includes('mobile')) return;
+                }
                 const isVisibleNow = widgetManager.shouldShowComponent(config, currentPath);
                 const isVisibleNext = widgetManager.shouldShowComponent(config, nextPath);
-                if (isVisibleNow !== isVisibleNext) {
-                    layoutShifted = true;
-                }
                 const elementId = config.type === "toc" ? `toc-wrapper-${side}` : `${config.type}-${side}`;
                 const el = document.getElementById(elementId);
                 if (el && el.hasAttribute('data-swup-persist')) {
-                    if (isVisibleNow && isVisibleNext && !layoutShifted) {
+                    if (config.type === "toc") {
+                        el.classList.remove('pause-swup-transition');
+                    } else if (isVisibleNow && isVisibleNext && !layoutShifted) {
                         el.classList.add('pause-swup-transition');
                         pausedElementIds.add(el.id);
                     } else {
                         el.classList.remove('pause-swup-transition');
                     }
+                }
+                if (isVisibleNow !== isVisibleNext) {
+                    layoutShifted = true;
                 }
             });
         });
