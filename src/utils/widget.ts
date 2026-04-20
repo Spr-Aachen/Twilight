@@ -39,6 +39,21 @@ export class WidgetManager {
     }
 
     /**
+     * 检查组件在当前页面和设备上是否可见
+     * @param component 组件配置
+     * @param currentPath 当前页面路径
+     * @param deviceType 设备类型: 'mobile' | 'tablet' | 'desktop'
+     */
+    isVisible(component: WidgetComponentConfig, currentPath?: string, deviceType?: 'mobile' | 'tablet' | 'desktop'): boolean {
+        // 检查响应式隐藏配置
+        if (deviceType && component.responsive?.hidden?.includes(deviceType)) {
+            return false;
+        }
+        // 检查页面路径可见性
+        return this.shouldShowComponent(component, currentPath);
+    }
+
+    /**
      * 检查组件在当前页面是否可见
      * @param component 组件配置
      * @param currentPath 当前页面路径

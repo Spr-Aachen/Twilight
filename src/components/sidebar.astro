@@ -31,7 +31,7 @@ const topComponents = allTopComponents.reduce((acc: any[], component) => {
     const isVisible = widgetManager.shouldShowComponent(component, currentPath);
     const isVolatile = !!component.visibility;
     if (isVisible) {
-        // 如果组件本身是 volatile 的（具有 visibility 配置）或者其上方的组件中存在 volatile 的（会导致位置偏移），则应该添加过渡动画类
+        // 如果组件本身是 volatile 的，或者它上方的组件中有 volatile 的（会导致当前组件位置偏移），则需要淡入淡出动画
         const shouldAnimate = isVolatile || hasVolatile;
         acc.push({ ...component, shouldAnimate, _original: component });
     }
