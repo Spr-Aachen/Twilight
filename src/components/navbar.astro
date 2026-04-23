@@ -20,9 +20,6 @@ const className = Astro.props.class;
 // 获取导航栏透明模式配置 - 根据当前壁纸模式读取正确的配置
 const navbarTransparentMode = getNavbarTransparentModeForWallpaperMode(getDefaultWallpaperMode());
 
-// 检查是否为首页
-const isHomePage = Astro.url.pathname === "/" || Astro.url.pathname === "";
-
 let links: NavbarLink[] = navbarConfig.links.map(
     (item: NavbarLink | LinkPreset): NavbarLink => {
         if (typeof item === "number") {
@@ -33,7 +30,7 @@ let links: NavbarLink[] = navbarConfig.links.map(
 );
 ---
 
-<div id="navbar" class="z-50 onload-animation-down px-3 sm:px-6 md:px-0" data-transparent-mode={navbarTransparentMode} data-is-home={isHomePage}>
+<div id="navbar" class="z-50 onload-animation-down px-3 sm:px-6 md:px-0" data-transparent-mode={navbarTransparentMode}>
     <div class="absolute h-8 left-0 right-0 -top-8 bg-(--card-bg) transition"></div> <!-- used for onload animation -->
     <div class:list={[
         className,
@@ -69,28 +66,16 @@ function initSemifullScrollDetection() {
     const transparentMode = navbar.getAttribute('data-transparent-mode');
     if (transparentMode !== 'semifull') return;
 
-    const isHomePage = navbar.getAttribute('data-is-home') === 'true';
-
-    // 如果不是首页，移除滚动事件监听器并设置为半透明状态
-    if (!isHomePage) {
-        // 移除之前的滚动事件监听器（如果存在）
-        if (window.semifullScrollHandler) {
-            window.removeEventListener('scroll', window.semifullScrollHandler);
-            window.semifullScrollHandler = null;
-        }
-        // 设置为半透明状态
-        navbar.classList.add('scrolled');
-        return;
+    // 移除之前的滚动事件监听器（如果存在）
+    if (window.semifullScrollHandler) {
+        window.removeEventListener('scroll', window.semifullScrollHandler);
     }
-
-    // 移除现有的scrolled类，重置状态
-    navbar.classList.remove('scrolled');
 
     let ticking = false;
 
     function updateNavbarState() {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        const threshold = 50; // 滚动阈值，可以根据需要调整
+        const threshold = 50; // 滚动阈值
 
         if (scrollTop > threshold) {
             navbar?.classList.add('scrolled');
@@ -106,11 +91,6 @@ function initSemifullScrollDetection() {
             requestAnimationFrame(updateNavbarState);
             ticking = true;
         }
-    }
-
-    // 移除之前的滚动事件监听器（如果存在）
-    if (window.semifullScrollHandler) {
-        window.removeEventListener('scroll', window.semifullScrollHandler);
     }
 
     // 保存新的事件处理器引用

@@ -3,10 +3,6 @@ import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
 
 import { siteConfig } from "@/config";
-import {
-    BANNER_HEIGHT,
-    MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
-} from "@constants/constants";
 import { pathsEqual, url } from "@utils/url";
 import { widgetManager } from "@utils/widget";
 import IconifyLoader from "@components/common/iconifyLoader.astro";
@@ -49,14 +45,6 @@ const hasBannerLink = !!siteConfig.wallpaper.banner?.credit?.url;
 // 检查是否为首页
 const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
 
-// 计算主内容区域位置
-const mainPanelTop = siteConfig.wallpaper.mode === "banner"
-    ? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
-    : "5.5rem";
-
-// 当banner被禁用时，主内容区域应该始终从顶栏下面开始
-const finalMainPanelTop = siteConfig.wallpaper.mode === "banner" ? mainPanelTop : "5.5rem";
-
 // 检查是否应该启用半透明效果
 const shouldEnableTransparency = siteConfig.wallpaper.mode === "banner" || siteConfig.wallpaper.mode === "fullscreen";
 
@@ -96,8 +84,7 @@ const {
     <slot slot="head" name="head" />
     <div
         id="top-row"
-        class="z-50 pointer-events-none relative transition-all duration-600 max-w-(--page-width) px-0 md:px-4 mx-auto"
-        class:list={[""]}
+        class="z-50 pointer-events-none relative transition-all duration-600 max-w-(--page-width) px-0 md:px-4 mx-auto h-(--top-row-height)"
     >
         <div
             id="navbar-wrapper"
@@ -131,16 +118,15 @@ const {
 
     <!-- Main content -->
     <div
-        class={`absolute w-full z-30 pointer-events-none transition-all duration-600 ${siteConfig.wallpaper.mode !== "banner" ? "no-banner-layout" : ""} ${transparentClass}`}
-        style={`top: ${finalMainPanelTop}`}
+        class={`absolute w-full z-30 pointer-events-none transition-all duration-600 top-(--main-content-top) min-h-[calc(100vh-var(--main-content-top))] ${siteConfig.wallpaper.mode !== "banner" ? "no-banner-layout" : ""} ${transparentClass}`}
     >
         <div
             class="relative max-w-(--page-width) mx-auto pointer-events-auto"
         >
             <div
-                    id="main-grid"
-                    class={`transition-all duration-600 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!hasAnyComponents ? "mobile-no-sidebar" : ""} ${(hasLeftSidebar || hasRightSidebar) ? "mobile-both-sidebar" : ""}`}
-                >
+                id="main-grid"
+                class={`w-full left-0 right-0 grid ${gridCols} grid-rows-[auto] mx-auto gap-4 px-0 md:px-4 ${!hasAnyComponents ? "mobile-no-sidebar" : ""} ${(hasLeftSidebar || hasRightSidebar) ? "mobile-both-sidebar" : ""}`}
+            >
                 <!-- Banner image credit -->
                 {
                     hasBannerCredit && (

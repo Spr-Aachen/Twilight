@@ -27,23 +27,6 @@ html.banner-hiding #banner-wrapper {
     height: 0 !important;
 }
 
-/* 退出动画时，强制子组件同步上移，避免主内容区域出现“两段式”位移 */
-html.banner-hiding #main-grid {
-    translate: none !important;
-}
-html.banner-hiding #top-row {
-    height: 0 !important;
-}
-html.banner-hiding #sidebar-sticky {
-    top: 1rem !important;
-}
-
-/* 切换模式时隐藏标题，以便后续触发动画 */
-html.banner-transitioning .banner-title,
-html.banner-transitioning .banner-subtitle {
-    opacity: 0 !important;
-}
-
 /* 标题样式 */
 .banner-title {
     text-shadow: 0px 3px 12px rgba(0, 0, 0, 0.36), 0 0 24px color-mix(in srgb, var(--primary), transparent 48%);

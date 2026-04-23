@@ -14,6 +14,9 @@ import {
     SYSTEM_MODE,
     PAGE_WIDTH,
     NAVBAR_HEIGHT,
+    NAVBAR_GAP,
+    NAVBAR_FOLLOW_DISTANCE,
+    MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
 } from "@constants/constants";
 import { pathsEqual, url } from "@utils/url";
 import FontLoader from "@components/fontLoader.astro";
@@ -241,12 +244,40 @@ const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
 
 
 <style is:global define:vars={{
+    'navbar-height': `${NAVBAR_HEIGHT / 16}rem`,
+    'navbar-gap': `${NAVBAR_GAP}rem`,
+    'navbar-follow-distance': `${NAVBAR_FOLLOW_DISTANCE}rem`,
+    'main-panel-overlaps-banner-height': `${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem`,
     bannerOffset,
     'banner-height-home': `${BANNER_HEIGHT_HOME}vh`,
     'banner-height': `${BANNER_HEIGHT}vh`,
 }}>
 @reference "../styles/main.css";
 @layer components {
+    /* Base CSS variables for main content top and top-row height */
+    :root {
+        --main-content-top: calc(var(--navbar-height) + var(--navbar-gap) + var(--navbar-follow-distance));
+        --top-row-height: calc(var(--main-content-top) - var(--navbar-gap));
+    }
+    /* Banner mode overrides */
+    body.enable-banner {
+        --main-content-top: calc(var(--banner-height) - var(--main-panel-overlaps-banner-height));
+        --top-row-height: calc(var(--main-content-top) - var(--navbar-gap));
+    }
+    html.banner-hiding body.enable-banner {
+        --main-content-top: calc(var(--navbar-height) + var(--navbar-gap) + var(--navbar-follow-distance)) !important;
+        --top-row-height: calc(var(--main-content-top) - var(--navbar-gap)) !important;
+    }
+    /* Home page with Banner mode overrides */
+    body.enable-banner.is-home {
+        --main-content-top: calc(var(--banner-height) - var(--main-panel-overlaps-banner-height) + var(--banner-height-extend, 36vh));
+        --top-row-height: calc(var(--main-content-top) - var(--navbar-gap));
+    }
+    html.banner-hiding body.enable-banner.is-home {
+        --main-content-top: calc(var(--navbar-height) + var(--navbar-gap) + var(--navbar-follow-distance)) !important;
+        --top-row-height: calc(var(--main-content-top) - var(--navbar-gap)) !important;
+    }
+
     .enable-banner.is-home #banner-wrapper {
         @apply h-(--banner-height-home) translate-y-(--banner-height-extend)
     }
@@ -259,30 +290,16 @@ const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
     .enable-banner #banner {
         @apply h-(--banner-height-home) translate-y-(--bannerOffset)
     }
-    .enable-banner.is-home #main-grid {
-        translate: 0 var(--banner-height-extend);
-    }
-    .enable-banner #top-row {
-        height: calc(var(--banner-height-home) - 5.5rem);
-    }
-    .enable-banner.is-home #sidebar-sticky {
-        top: calc(1rem - var(--banner-height-extend)) !important;
-    }
 }
 </style>
 
 
 <script>
 import {
-    NAVBAR_HEIGHT,
     BANNER_HEIGHT,
     BANNER_HEIGHT_HOME,
     BANNER_HEIGHT_EXTEND,
 } from "@/constants/constants";
-import {
-    BREAKPOINT_MD,
-    BREAKPOINT_LG,
-} from "@constants/breakpoints";
 import { widgetManager, getComponentConfig } from "@utils/widget";
 import { pathsEqual, url } from "@utils/url";
 import { initWallpaperMode } from "@utils/wallpaper";
@@ -297,20 +314,6 @@ import { setupParticleEffects } from "@/utils/particle";
 // 初始化Swup
 const setup = () => {
     let pausedElementIds = new Set();
-    // Swup can update the body for each page visit, but it's after the page transition, causing a delay for banner height change, so use Swup hooks instead to change the height immediately when a link is clicked
-    window.swup.hooks.on('link:click', () => {
-        // 简化 navbar 处理逻辑
-        const bannerEnabled = !!document.getElementById('banner-wrapper')
-        if (bannerEnabled) {
-            const navbar = document.getElementById('navbar-wrapper')
-            if (navbar && document.body.classList.contains('is-home')) {
-                const threshold = window.innerHeight * (BANNER_HEIGHT / 100) - NAVBAR_HEIGHT
-                if (document.documentElement.scrollTop >= threshold) {
-                    navbar.classList.add('navbar-hidden')
-                }
-            }
-        }
-    })
     window.swup.hooks.on('content:replace', () => {
         // Update main grid layout class name after page transition
         const gridClassCarrier = document.getElementById("grid-class-carrier");
@@ -322,17 +325,6 @@ const setup = () => {
                 const newClasses = currentClasses.filter(c => !c.startsWith("lg:grid-cols-") && !c.startsWith("md:grid-cols-") && !c.startsWith("grid-cols-"));
                 const gridClasses = gridClass.split(" ");
                 mainGrid.className = [...newClasses, ...gridClasses].join(" ");
-            }
-        }
-        // Reinitialize semifull mode scroll detection after page transition
-        const navbar = document.getElementById('navbar')
-        if (navbar) {
-            const transparentMode = navbar.getAttribute('data-transparent-mode')
-            if (transparentMode === 'semifull') {
-                // Re-call the initialization function to rebind scroll events
-                if (typeof (window as any).initSemifullScrollDetection === 'function') {
-                    (window as any).initSemifullScrollDetection()
-                }
             }
         }
         // Restore pause-swup-transition class to newly replaced persistent elements
@@ -464,8 +456,6 @@ if (window?.swup?.hooks) {
     document.addEventListener('swup:enable', setup)
 }
 
-// 初始化 navbar 元素，用于控制 banner 隐藏
-let navbar = document.getElementById('navbar-wrapper')
 // 初始化返回顶部按钮元素，用于控制返回顶部按钮的显示与隐藏
 let backToTopBtn = document.getElementById('back-to-top-btn');
 // 节流函数
@@ -483,7 +473,6 @@ function throttle(func: (...args: any[]) => void, limit: number) {
 function scrollFunction() {
     const scrollTop = document.documentElement.scrollTop;
     const bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100);
-    const bannerEnabled = !!document.getElementById('banner-wrapper')
     // 批量处理DOM操作
     requestAnimationFrame(() => {
         if (backToTopBtn) {
@@ -491,16 +480,6 @@ function scrollFunction() {
                 backToTopBtn.classList.remove('hide')
             } else {
                 backToTopBtn.classList.add('hide')
-            }
-        }
-        if (bannerEnabled && navbar) {
-            const isHome = document.body.classList.contains('is-home');
-            const currentBannerHeight = isHome ? BANNER_HEIGHT_HOME : BANNER_HEIGHT;
-            const threshold = window.innerHeight * (currentBannerHeight / 100) - NAVBAR_HEIGHT;
-            if (scrollTop >= threshold) {
-                navbar.classList.add('navbar-hidden')
-            } else {
-                navbar.classList.remove('navbar-hidden')
             }
         }
     });

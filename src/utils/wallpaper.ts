@@ -2,8 +2,6 @@ import {
     WALLPAPER_FULLSCREEN,
     WALLPAPER_BANNER,
     WALLPAPER_NONE,
-    BANNER_HEIGHT,
-    MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
 } from "@constants/constants";
 import type {
     WALLPAPER_MODE,
@@ -79,23 +77,22 @@ function adjustMainContentPosition(mode: WALLPAPER_MODE | 'banner' | 'none' | 'f
     if (!mainContent) return;
     // Remove existing position classes
     mainContent.classList.remove('no-banner-layout');
+    // Remove inline styles to let CSS variables take over
+    mainContent.style.top = '';
     // Add new position classes based on mode
     switch (mode) {
         case WALLPAPER_BANNER:
         case 'banner':
-            // 主内容在banner下方
-            mainContent.style.top = `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`;
+            // Position is handled by CSS based on .enable-banner class
             break;
         case WALLPAPER_FULLSCREEN:
         case 'fullscreen':
         case WALLPAPER_NONE:
         case 'none':
-            // 主内容从导航栏下方开始
             mainContent.classList.add('no-banner-layout');
-            mainContent.style.top = '5.5rem';
+            // Position is handled by CSS
             break;
         default:
-            mainContent.style.top = '5.5rem';
             break;
     }
 }

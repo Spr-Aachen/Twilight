@@ -1,4 +1,4 @@
-import { NAVBAR_HEIGHT } from "@constants/constants";
+import { NAVBAR_HEIGHT, NAVBAR_GAP } from "@constants/constants";
 import { widgetManager } from "@utils/widget";
 
 
@@ -141,7 +141,8 @@ export class TableOfContents extends HTMLElement {
             const targetElement = document.getElementById(id);
             if (targetElement) {
                 const navbarHeight = parseInt(this.dataset.navbarHeight || NAVBAR_HEIGHT.toString());
-                const targetTop = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight;
+                const gap = NAVBAR_GAP * 16; // Convert rem to px
+                const targetTop = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight - gap;
                 window.scrollTo({
                     top: targetTop,
                     behavior: "smooth"
