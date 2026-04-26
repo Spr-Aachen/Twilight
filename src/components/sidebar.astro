@@ -88,7 +88,7 @@ function renderComponent(component: any, index: number) {
 }
 ---
 
-<div id={id || "sidebar"} data-side={side} class:list={[className, "flex flex-col w-full h-full gap-4"]}>
+<div id={id || "sidebar"} data-side={side} class:list={[className, "flex flex-col w-full h-full gap-(--sidebar-spacing)"]}>
     <!-- 顶部固定组件区域 -->
     {topComponents.map((component, index) => {
         const renderData = renderComponent(component, index);
@@ -100,7 +100,7 @@ function renderComponent(component: any, index: number) {
 
     <!-- 粘性组件区域 -->
     {stickyComponents.length > 0 && (
-        <div id="sidebar-sticky" class="flex flex-col w-full gap-4 sticky top-4">
+        <div id="sidebar-sticky" class="flex flex-col w-full gap-(--sidebar-spacing) sticky top-[calc(var(--sidebar-top)-var(--main-content-top))]">
             {stickyComponents.map((component, index) => {
                 const renderData = renderComponent(component, index);
                 if (!renderData) return null;

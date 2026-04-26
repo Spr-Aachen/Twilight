@@ -17,6 +17,8 @@ import {
     NAVBAR_GAP,
     NAVBAR_FOLLOW_DISTANCE,
     MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
+    SIDEBAR_TOP,
+    SIDEBAR_SPACING,
 } from "@constants/constants";
 import { pathsEqual, url } from "@utils/url";
 import FontLoader from "@components/fontLoader.astro";
@@ -248,6 +250,8 @@ const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
     'navbar-gap': `${NAVBAR_GAP}rem`,
     'navbar-follow-distance': `${NAVBAR_FOLLOW_DISTANCE}rem`,
     'main-panel-overlaps-banner-height': `${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem`,
+    'sidebar-top': `${SIDEBAR_TOP}rem`,
+    'sidebar-spacing': `${SIDEBAR_SPACING}rem`,
     bannerOffset,
     'banner-height-home': `${BANNER_HEIGHT_HOME}vh`,
     'banner-height': `${BANNER_HEIGHT}vh`,
@@ -258,6 +262,8 @@ const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
     :root {
         --main-content-top: calc(var(--navbar-height) + var(--navbar-gap) + var(--navbar-follow-distance));
         --top-row-height: calc(var(--main-content-top) - var(--navbar-gap));
+        --sidebar-top: var(--sidebar-top);
+        --sidebar-spacing: var(--sidebar-spacing);
     }
     /* Banner mode overrides */
     body.enable-banner {
@@ -300,6 +306,10 @@ import {
     BANNER_HEIGHT_HOME,
     BANNER_HEIGHT_EXTEND,
 } from "@/constants/constants";
+import {
+    BREAKPOINT_MD,
+    BREAKPOINT_LG,
+} from "@constants/breakpoints";
 import { widgetManager, getComponentConfig } from "@utils/widget";
 import { pathsEqual, url } from "@utils/url";
 import { initWallpaperMode } from "@utils/wallpaper";
@@ -355,18 +365,6 @@ const setup = () => {
                 bannerTextOverlay.classList.remove('hidden')
             } else {
                 bannerTextOverlay.classList.add('hidden')
-            }
-        }
-        // Control navbar transparency based on page
-        const navbar = document.getElementById('navbar')
-        if (navbar) {
-            navbar.setAttribute('data-is-home', isHomePage.toString())
-            const transparentMode = navbar.getAttribute('data-transparent-mode')
-            if (transparentMode === 'semifull') {
-                // Re-call the initialization function to rebind scroll events
-                if (typeof window.initSemifullScrollDetection === 'function') {
-                    window.initSemifullScrollDetection()
-                }
             }
         }
         // Increase the page height during page transition to prevent the scrolling animation from jumping

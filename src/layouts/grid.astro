@@ -118,7 +118,8 @@ const {
 
     <!-- Main content -->
     <div
-        class={`absolute w-full z-30 pointer-events-none transition-all duration-600 top-(--main-content-top) min-h-[calc(100vh-var(--main-content-top))] ${siteConfig.wallpaper.mode !== "banner" ? "no-banner-layout" : ""} ${transparentClass}`}
+        class={`absolute w-full z-30 pointer-events-none transition-transform duration-600 top-0 min-h-[calc(100vh-var(--main-content-top))] ${siteConfig.wallpaper.mode !== "banner" ? "no-banner-layout" : ""} ${transparentClass}`}
+        style="transform: translateY(var(--main-content-top))"
     >
         <div
             class="relative max-w-(--page-width) mx-auto pointer-events-auto"

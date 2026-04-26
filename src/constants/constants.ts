@@ -23,6 +23,11 @@ export const BANNER_HEIGHT_HOME = BANNER_HEIGHT + BANNER_HEIGHT_EXTEND;
 // The height the main panel overlaps the banner (rem)
 export const MAIN_PANEL_OVERLAPS_BANNER_HEIGHT = 0;
 
+// Sidebar sticky top offset (rem)
+export const SIDEBAR_TOP = 1;
+// Sidebar component spacing (rem)
+export const SIDEBAR_SPACING = 1;
+
 // Page width (rem)
 export const PAGE_WIDTH = 90;
 
