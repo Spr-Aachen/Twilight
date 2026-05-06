@@ -38,7 +38,7 @@
 		"@tailwindcss/vite": "^4.2.4",
 		"@types/js-yaml": "^4.0.9",
 		"astro": "5.16.15",
-		"astro-expressive-code": "^0.41.7",
+		"astro-expressive-code": "^0.42.0",
 		"astro-icon": "^1.1.5",
 		"crypto-js": "^4.2.0",
 		"dayjs": "^1.11.20",
