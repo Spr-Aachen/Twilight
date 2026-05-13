@@ -40,7 +40,7 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 const adapter = process.env.GITHUB_ACTIONS
     ? undefined
     : (process.env.CF_PAGES
-        ? cloudflarePages()
+        ? cloudflarePages({ imageService: "passthrough" })
         : (process.env.NETLIFY
             ? netlify()
             : (process.env.EDGEONE
@@ -56,6 +56,11 @@ export default defineConfig({
     base: "/",
     trailingSlash: "always",
     adapter: adapter,
+    session: {
+        driver: {
+            entrypoint: "unstorage/drivers/memory",
+        },
+    },
     integrations: [
         decapCmsOauth({
             configPath: "./.decap.yml", // Path to the Decap CMS configuration file

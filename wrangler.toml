@@ -1,0 +1,3 @@
+# Cloudflare Pages 兼容性标志
+# 启用 Node.js 兼容性以确保 node:fs, Buffer, crypto 等 API 正常运行
+compatibility_flags = ["nodejs_compat"]

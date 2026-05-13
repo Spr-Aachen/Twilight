@@ -1,9 +1,6 @@
 import { getCollection } from "astro:content";
 import type { APIContext, GetStaticPaths } from "astro";
 import type { CollectionEntry } from "astro:content";
-import * as fs from "node:fs";
-import satori from "satori";
-import sharp from "sharp";
 
 import { profileConfig, siteConfig } from "@/config";
 import { defaultFavicons } from "@constants/icon";
@@ -99,19 +96,25 @@ export async function GET({
 }: APIContext<{ post: CollectionEntry<"posts"> }>) {
     const { post } = props;
 
+    // 动态导入构建时依赖：prerender=true 时此函数仅在构建阶段执行，
+    // 运行时 Worker 不会调用这些 import，避免 sharp（native addon）导致 Worker 启动失败
+    const { readFileSync } = await import("node:fs");
+    const { default: satori } = await import("satori");
+    const { default: sharp } = await import("sharp");
+
     // Try to fetch fonts from Google Fonts (woff2) at runtime.
     const { regular: fontRegular, bold: fontBold } = await fetchNotoSansSCFonts();
 
     // Avatar + icon: still read from disk (small assets)
     let avatarPath = `./public${profileConfig.avatar}`;
-    const avatarBuffer = fs.readFileSync(avatarPath);
+    const avatarBuffer = readFileSync(avatarPath);
     const avatarBase64 = `data:image/png;base64,${avatarBuffer.toString("base64")}`;
 
     let iconPath = `./public${defaultFavicons[0].src}`;
     if (siteConfig.favicon.length > 0) {
         iconPath = `./public${siteConfig.favicon[0].src}`;
     }
-    const iconBuffer = fs.readFileSync(iconPath);
+    const iconBuffer = readFileSync(iconPath);
     const iconBase64 = `data:image/png;base64,${iconBuffer.toString("base64")}`;
 
     const hue = siteConfig.themeColor.hue;

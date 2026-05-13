@@ -8,6 +8,9 @@ node_modules/
 .astro/
 .vercel/
 
+# claude code worktrees
+.claude/worktrees/
+
 # build output
 dist/
 
