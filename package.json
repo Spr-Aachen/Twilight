@@ -15,12 +15,12 @@
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.9",
-		"@astrojs/cloudflare": "^12.6.13",
-		"@astrojs/netlify": "^6.6.5",
+		"@astrojs/cloudflare": "^13.5.0",
+		"@astrojs/netlify": "^7.0.8",
 		"@astrojs/rss": "^4.0.18",
 		"@astrojs/sitemap": "^3.7.2",
-		"@astrojs/svelte": "7.2.5",
-		"@astrojs/vercel": "^9.0.5",
+		"@astrojs/svelte": "8.1.0",
+		"@astrojs/vercel": "^10.0.6",
 		"@edgeone/astro": "^1.1.2",
 		"@expressive-code/core": "^0.41.7",
 		"@expressive-code/plugin-collapsible-sections": "^0.41.7",
@@ -37,7 +37,7 @@
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.2.4",
 		"@types/js-yaml": "^4.0.9",
-		"astro": "5.16.15",
+		"astro": "6.3.1",
 		"astro-expressive-code": "^0.41.7",
 		"astro-icon": "^1.1.5",
 		"crypto-js": "^4.2.0",
@@ -78,7 +78,8 @@
 		"@types/markdown-it": "^14.1.2",
 		"@types/mdast": "^4.0.4",
 		"@types/sanitize-html": "^2.16.1",
-		"postcss-import": "^16.1.1"
+		"postcss-import": "^16.1.1",
+		"wrangler": "^4.90.1"
 	},
 	"packageManager": "pnpm@9.14.4"
 }

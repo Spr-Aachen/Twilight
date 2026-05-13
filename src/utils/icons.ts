@@ -4,7 +4,9 @@
  * 请勿手动编辑此文件
  */
 
-const iconSvgData: Record<string, string> = {};
+const iconSvgData: Record<string, string> = {
+
+};
 
 export function getIconSvg(iconName: string): string {
     return iconSvgData[iconName] || "";
