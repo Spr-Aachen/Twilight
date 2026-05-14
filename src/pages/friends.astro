@@ -10,13 +10,12 @@ import GridLayout from "@layouts/grid.astro";
 import BackwardButton from "@components/backwardButton.astro";
 
 
-const pageTitle = LinkPresets[LinkPreset.Friends].name;
-const pageDescription = LinkPresets[LinkPreset.Friends].description;
-
 const friendsPost = await getEntry("spec", "friends");
 if (!friendsPost) {
     throw new Error("friends page content not found");
 }
+const pageTitle = friendsPost.data.title || LinkPresets[LinkPreset.Friends].name;
+const pageDescription = friendsPost.data.description || LinkPresets[LinkPreset.Friends].description;
 
 const { Content, headings } = await render(friendsPost);
 const items = friendsData;

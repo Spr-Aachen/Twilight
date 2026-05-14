@@ -1,4 +1,6 @@
 ---
+title: Friends
+---
 
 ## How to Apply
 

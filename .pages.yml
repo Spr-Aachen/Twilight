@@ -208,3 +208,23 @@ content:
       - { name: desc, label: Description, type: text }
       - { name: siteurl, label: Site URL, type: string }
       - { name: tags, label: Tags, type: string, list: true, required: false }
+
+  # 友链页面
+  - type: file
+    name: page_friends
+    label: Friends Page
+    path: src/content/friends.md
+    fields:
+      - { name: title, label: Title, type: string, required: false }
+      - { name: description, label: Description, type: string, required: false }
+      - { name: body, label: Body, type: rich-text }
+
+  # 关于页面
+  - type: file
+    name: page_about
+    label: About Page
+    path: src/content/about.md
+    fields:
+      - { name: title, label: Title, type: string, required: false }
+      - { name: description, label: Description, type: string, required: false }
+      - { name: body, label: Body, type: rich-text }

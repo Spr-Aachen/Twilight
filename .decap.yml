@@ -336,6 +336,44 @@ collections:
             - # 标签
                 { name: "tags", label: "Tags", widget: "list", required: false, default: [] }
 
+    - # 友链说明
+        # 集合名称
+        name: "page_friends"
+        # 后台显示标签
+        label: "Friends Page"
+        # 文件列表
+        files:
+            - # friends.md
+                name: "friends"
+                label: "Friends"
+                file: "src/content/friends.md"
+                fields:
+                    - # 名称
+                       { name: "title", label: "Title", widget: "string", required: false }
+                    - # 描述
+                       { name: "description", label: "Description", widget: "string", required: false }
+                    - # 内容
+                        { name: "body", label: "Body", widget: "markdown" }
+
+    - # 关于
+        # 集合名称
+        name: "page_about"
+        # 后台显示标签
+        label: "About Page"
+        # 文件列表
+        files:
+            - # about.md
+                name: "about"
+                label: "About"
+                file: "src/content/about.md"
+                fields:
+                    - # 名称
+                       { name: "title", label: "Title", widget: "string", required: false }
+                    - # 描述
+                       { name: "description", label: "Description", widget: "string", required: false }
+                    - # 内容
+                        { name: "body", label: "Body", widget: "markdown" }
+
 
 # 编辑器配置
 editor:
