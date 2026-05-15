@@ -215,8 +215,8 @@ content:
     label: Friends Page
     path: src/content/friends.md
     fields:
-      - { name: title, label: Title, type: string, required: false }
-      - { name: description, label: Description, type: string, required: false }
+      #- { name: title, label: Title, type: string, required: false }
+      #- { name: description, label: Description, type: string, required: false }
       - { name: body, label: Body, type: rich-text }
 
   # 关于页面
@@ -225,6 +225,6 @@ content:
     label: About Page
     path: src/content/about.md
     fields:
-      - { name: title, label: Title, type: string, required: false }
-      - { name: description, label: Description, type: string, required: false }
+      #- { name: title, label: Title, type: string, required: false }
+      #- { name: description, label: Description, type: string, required: false }
       - { name: body, label: Body, type: rich-text }

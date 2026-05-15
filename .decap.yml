@@ -348,10 +348,10 @@ collections:
                 label: "Friends"
                 file: "src/content/friends.md"
                 fields:
-                    - # 名称
-                       { name: "title", label: "Title", widget: "string", required: false }
-                    - # 描述
-                       { name: "description", label: "Description", widget: "string", required: false }
+                    #- # 名称
+                    #    { name: "title", label: "Title", widget: "string", required: false }
+                    #- # 描述
+                    #    { name: "description", label: "Description", widget: "string", required: false }
                     - # 内容
                         { name: "body", label: "Body", widget: "markdown" }
 
@@ -367,10 +367,10 @@ collections:
                 label: "About"
                 file: "src/content/about.md"
                 fields:
-                    - # 名称
-                       { name: "title", label: "Title", widget: "string", required: false }
-                    - # 描述
-                       { name: "description", label: "Description", widget: "string", required: false }
+                    #- # 名称
+                    #    { name: "title", label: "Title", widget: "string", required: false }
+                    #- # 描述
+                    #    { name: "description", label: "Description", widget: "string", required: false }
                     - # 内容
                         { name: "body", label: "Body", widget: "markdown" }
 
