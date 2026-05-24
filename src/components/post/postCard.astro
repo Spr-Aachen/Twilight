@@ -86,7 +86,7 @@ const imageBaseDir = getFileDirFromPath(entry.filePath || "");
 
     {hasCover &&
         <a href={url} aria-label={title} class:list={["group",
-                "max-h-[20vh] md:max-h-none mx-4 mt-4 -mb-2 md:mb-0 md:mx-0 md:mt-0",
+                "max-h-[20vh] h-[20vh] md:max-h-none md:h-auto mx-4 mt-4 -mb-2 md:mb-0 md:mx-0 md:mt-0",
                 "md:w-(--coverWidth) relative md:absolute md:top-(--coverMargin) md:bottom-(--coverMargin) rounded-xl overflow-hidden active:scale-95",
                 {"md:right-(--coverMargin)": isCoverOnRight, "md:left-(--coverMargin)": !isCoverOnRight}
             ]}
