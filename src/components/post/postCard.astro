@@ -46,25 +46,31 @@ const { remarkPluginFrontmatter } = await render(entry);
 
 // derive image base path from the real file path to preserve directory casing
 const imageBaseDir = getFileDirFromPath(entry.filePath || "");
+
+const gradientColors = [
+    "linear-gradient(135deg, rgba(102, 126, 234, 0.51) 0%, rgba(118, 102, 162, 0.51) 100%)",
+    "linear-gradient(135deg, rgba(240, 147, 251, 0.51) 0%, rgba(245, 102, 108, 0.51) 100%)",
+    "linear-gradient(135deg, rgba(102, 172, 254, 0.51) 0%, rgba(102, 242, 254, 0.51) 100%)",
+    "linear-gradient(135deg, rgba(102, 151, 123, 0.51) 0%, rgba(102, 249, 215, 0.51) 100%)"
+];
+const gradientIndex = title.charCodeAt(0) % gradientColors.length;
+const defaultCoverGradient = gradientColors[gradientIndex];
 ---
 
 <div class:list={["card-base flex flex-col-reverse @min-[768px]:flex-col w-full rounded-(--radius-large) overflow-hidden relative @container", className]} style={style}>
     <div class:list={["pl-6 @min-[768px]:pl-9 pr-6 @min-[768px]:pr-2 pt-6 @min-[768px]:pt-7 pb-6 relative", 
-        {"w-full @min-[768px]:w-[calc(100%-52px-var(--coverGap))]": !hasCover, 
-         "w-full @min-[768px]:w-[calc(100%-var(--coverWidth)-var(--coverGap))]": hasCover && isCoverOnRight,
-         "ml-0 @min-[768px]:ml-[calc(var(--coverWidth)+var(--coverGap))]": hasCover && !isCoverOnRight}
+        {"w-full @min-[768px]:w-[calc(100%-var(--coverWidth)-var(--coverGap))]": isCoverOnRight,
+         "ml-0 @min-[768px]:ml-[calc(var(--coverWidth)+var(--coverGap))]": !isCoverOnRight}
     ]}>
         <a href={url}
-           class="transition group w-full block font-bold mb-3 text-3xl text-90
-            hover:text-(--primary) dark:hover:text-(--primary)
-            active:text-(--title-active) dark:active:text-(--title-active)
-            before:w-1 before:h-5 before:rounded-md before:bg-(--primary)
-            before:absolute before:top-[35px] before:left-[18px] before:hidden @min-[768px]:before:block
+            class="transition group w-full block font-bold mb-3 text-3xl text-90
+                hover:text-(--primary) dark:hover:text-(--primary)
+                active:text-(--title-active) dark:active:text-(--title-active)
+                before:w-1 before:h-5 before:rounded-md before:bg-(--primary)
+                before:absolute before:top-[35px] before:left-[18px] before:hidden @min-[768px]:before:block
         ">
             {pinned && <Icon name="mdi:pin" class="inline text-(--primary) text-2xl mr-2 -translate-y-0.5"></Icon>}
             {title}
-            <Icon class="inline text-[2rem] text-(--primary) @min-[768px]:hidden translate-y-0.5 absolute" name="material-symbols:chevron-right-rounded" ></Icon>
-            <Icon class="text-(--primary) text-[2rem] transition hidden @min-[768px]:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0" name="material-symbols:chevron-right-rounded"></Icon>
         </a>
         <!-- metadata -->
         <PostMetadata published={published} updated={updated} tags={tags} category={category || undefined} hideTagsForMobile={true} hideUpdateDate={true} postUrl={url} className="mb-4"></PostMetadata>
@@ -84,35 +90,26 @@ const imageBaseDir = getFileDirFromPath(entry.filePath || "");
         </div>
     </div>
 
-    {hasCover &&
-        <a href={url} aria-label={title} class:list={["group",
-                "max-h-[20vh] h-[20vh] @min-[768px]:max-h-none @min-[768px]:h-auto mx-4 mt-4 -mb-2 @min-[768px]:mb-0 @min-[768px]:mx-0 @min-[768px]:mt-0",
-                "@min-[768px]:w-(--coverWidth) relative @min-[768px]:absolute @min-[768px]:top-(--coverMargin) @min-[768px]:bottom-(--coverMargin) rounded-xl overflow-hidden active:scale-95",
-                {"@min-[768px]:right-(--coverMargin)": isCoverOnRight, "@min-[768px]:left-(--coverMargin)": !isCoverOnRight}
-            ]}
-        >
-            <div class="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition"></div>
-            <div class="absolute pointer-events-none z-20 w-full h-full flex items-center justify-center ">
-                <Icon name="material-symbols:chevron-right-rounded"
-                    class="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl">
-                </Icon>
-            </div>
-            <ImageWrapper src={cover} basePath={imageBaseDir} alt="Cover Image of the Post"
-                    class="w-full h-full">
-            </ImageWrapper>
-        </a>
-    }
-
-    {!hasCover &&
-        <a href={url} aria-label={title} class="hidden! @min-[768px]:flex! w-13
-            absolute right-3 top-3 bottom-3 rounded-xl bg-(--enter-btn-bg)
-            hover:bg-(--enter-btn-bg-hover) active:bg-(--enter-btn-bg-active) active:scale-95
-        ">
+    <a href={url} aria-label={title} class:list={["group",
+            "max-h-[20vh] h-[20vh] @min-[768px]:max-h-none @min-[768px]:h-auto mx-4 mt-4 -mb-2 @min-[768px]:mb-0 @min-[768px]:mx-0 @min-[768px]:mt-0",
+            "@min-[768px]:w-(--coverWidth) relative @min-[768px]:absolute @min-[768px]:top-(--coverMargin) @min-[768px]:bottom-(--coverMargin) rounded-xl overflow-hidden active:scale-95",
+            {"@min-[768px]:right-(--coverMargin)": isCoverOnRight, "@min-[768px]:left-(--coverMargin)": !isCoverOnRight}
+        ]}
+    >
+        <div class="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition"></div>
+        <div class="absolute pointer-events-none z-20 w-full h-full flex items-center justify-center ">
             <Icon name="material-symbols:chevron-right-rounded"
-                class="transition text-(--primary) text-4xl mx-auto">
+                class="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl">
             </Icon>
-        </a>
-    }
+        </div>
+        {hasCover ? (
+            <ImageWrapper src={cover} basePath={imageBaseDir} alt="Cover Image of the Post"
+                class="w-full h-full">
+            </ImageWrapper>
+        ) : (
+            <div class="w-full h-full" style={`background: ${defaultCoverGradient}`}></div>
+        )}
+    </a>
 </div>
 
 <style define:vars={{coverWidth, coverMargin, coverGap}}>
