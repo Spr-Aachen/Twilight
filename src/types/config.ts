@@ -374,6 +374,8 @@ export type PostConfig = {
     card: {
         // 封面配置
         cover: {
+            // 封面位置 ("left" | "right")
+            side: "left" | "right";
             // 封面宽度
             width: string;
         };

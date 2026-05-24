@@ -4,8 +4,9 @@ import { render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
 import { getFileDirFromPath, getPostUrl } from "@utils/url";
-import I18nKey from "@i18n/i18nKey";
+import { postConfig } from "@/config";
 import { i18n } from "@i18n/translation";
+import I18nKey from "@i18n/i18nKey";
 import ImageWrapper from "@components/common/imageWrapper.astro";
 import PostMetadata from "./postMeta.astro";
 
@@ -35,6 +36,8 @@ const {
 
 const hasCover = cover !== undefined && cover !== null && cover !== "";
 
+const coverSide = postConfig.card.cover.side;
+const isCoverOnRight = coverSide === "right";
 const coverWidth = postConfig.card.cover.width;
 const coverMargin = "12px";
 const coverGap = "12px";
@@ -48,7 +51,8 @@ const imageBaseDir = getFileDirFromPath(entry.filePath || "");
 <div class:list={["card-base flex flex-col-reverse md:flex-col w-full rounded-(--radius-large) overflow-hidden relative", className]} style={style}>
     <div class:list={["pl-6 md:pl-9 pr-6 md:pr-2 pt-6 md:pt-7 pb-6 relative", 
         {"w-full md:w-[calc(100%-52px-var(--coverGap))]": !hasCover, 
-         "w-full md:w-[calc(100%-var(--coverWidth)-var(--coverGap))]": hasCover}
+         "w-full md:w-[calc(100%-var(--coverWidth)-var(--coverGap))]": hasCover && isCoverOnRight,
+         "ml-0 md:ml-[calc(var(--coverWidth)+var(--coverGap))]": hasCover && !isCoverOnRight}
     ]}>
         <a href={url}
            class="transition group w-full block font-bold mb-3 text-3xl text-90
@@ -83,7 +87,8 @@ const imageBaseDir = getFileDirFromPath(entry.filePath || "");
     {hasCover &&
         <a href={url} aria-label={title} class:list={["group",
                 "max-h-[20vh] md:max-h-none mx-4 mt-4 -mb-2 md:mb-0 md:mx-0 md:mt-0",
-                "md:w-(--coverWidth) relative md:absolute md:top-(--coverMargin) md:bottom-(--coverMargin) md:right-3 rounded-xl overflow-hidden active:scale-95"
+                "md:w-(--coverWidth) relative md:absolute md:top-(--coverMargin) md:bottom-(--coverMargin) rounded-xl overflow-hidden active:scale-95",
+                {"md:right-(--coverMargin)": isCoverOnRight, "md:left-(--coverMargin)": !isCoverOnRight}
             ]}
         >
             <div class="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition"></div>
