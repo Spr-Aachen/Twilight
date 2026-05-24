@@ -321,6 +321,8 @@ post:
             side: "left"
             # 封面宽度
             width: "33%"
+            # 封面上是否显示文字（标题、标签、摘要）
+            showContent: true
     # 显示“上次编辑”卡片
     showLastModified: true
     # 代码高亮配置

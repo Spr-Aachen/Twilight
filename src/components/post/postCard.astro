@@ -41,6 +41,7 @@ const isCoverOnRight = coverSide === "right";
 const coverWidth = postConfig.card.cover.width;
 const coverMargin = "12px";
 const coverGap = "12px";
+const showContentOnCover = postConfig.card.cover.showContent;
 
 const { remarkPluginFrontmatter } = await render(entry);
 
@@ -111,7 +112,7 @@ const defaultCoverGradient = gradientColors[gradientIndex];
                 style={`background: ${defaultCoverGradient}`}>
                 {entry.data.encrypted ? (
                     <Icon name="mdi:lock" class="text-5xl text-white/81" />
-                ) : (
+                ) : showContentOnCover ? (
                     <div class="flex flex-col gap-1 w-full">
                         <span class="text-white/81 text-xs font-medium tracking-wide uppercase">
                             {title}
@@ -133,7 +134,7 @@ const defaultCoverGradient = gradientColors[gradientIndex];
                             </p>
                         )}
                     </div>
-                )}
+                ) : null}
             </div>
         )}
     </a>
