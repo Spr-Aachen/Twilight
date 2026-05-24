@@ -48,28 +48,28 @@ const { remarkPluginFrontmatter } = await render(entry);
 const imageBaseDir = getFileDirFromPath(entry.filePath || "");
 ---
 
-<div class:list={["card-base flex flex-col-reverse md:flex-col w-full rounded-(--radius-large) overflow-hidden relative", className]} style={style}>
-    <div class:list={["pl-6 md:pl-9 pr-6 md:pr-2 pt-6 md:pt-7 pb-6 relative", 
-        {"w-full md:w-[calc(100%-52px-var(--coverGap))]": !hasCover, 
-         "w-full md:w-[calc(100%-var(--coverWidth)-var(--coverGap))]": hasCover && isCoverOnRight,
-         "ml-0 md:ml-[calc(var(--coverWidth)+var(--coverGap))]": hasCover && !isCoverOnRight}
+<div class:list={["card-base flex flex-col-reverse @min-[768px]:flex-col w-full rounded-(--radius-large) overflow-hidden relative @container", className]} style={style}>
+    <div class:list={["pl-6 @min-[768px]:pl-9 pr-6 @min-[768px]:pr-2 pt-6 @min-[768px]:pt-7 pb-6 relative", 
+        {"w-full @min-[768px]:w-[calc(100%-52px-var(--coverGap))]": !hasCover, 
+         "w-full @min-[768px]:w-[calc(100%-var(--coverWidth)-var(--coverGap))]": hasCover && isCoverOnRight,
+         "ml-0 @min-[768px]:ml-[calc(var(--coverWidth)+var(--coverGap))]": hasCover && !isCoverOnRight}
     ]}>
         <a href={url}
            class="transition group w-full block font-bold mb-3 text-3xl text-90
             hover:text-(--primary) dark:hover:text-(--primary)
             active:text-(--title-active) dark:active:text-(--title-active)
             before:w-1 before:h-5 before:rounded-md before:bg-(--primary)
-            before:absolute before:top-[35px] before:left-[18px] before:hidden md:before:block
+            before:absolute before:top-[35px] before:left-[18px] before:hidden @min-[768px]:before:block
         ">
             {pinned && <Icon name="mdi:pin" class="inline text-(--primary) text-2xl mr-2 -translate-y-0.5"></Icon>}
             {title}
-            <Icon class="inline text-[2rem] text-(--primary) md:hidden translate-y-0.5 absolute" name="material-symbols:chevron-right-rounded" ></Icon>
-            <Icon class="text-(--primary) text-[2rem] transition hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0" name="material-symbols:chevron-right-rounded"></Icon>
+            <Icon class="inline text-[2rem] text-(--primary) @min-[768px]:hidden translate-y-0.5 absolute" name="material-symbols:chevron-right-rounded" ></Icon>
+            <Icon class="text-(--primary) text-[2rem] transition hidden @min-[768px]:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0" name="material-symbols:chevron-right-rounded"></Icon>
         </a>
         <!-- metadata -->
         <PostMetadata published={published} updated={updated} tags={tags} category={category || undefined} hideTagsForMobile={true} hideUpdateDate={true} postUrl={url} className="mb-4"></PostMetadata>
         <!-- description -->
-        <div class:list={["transition text-75 mb-3.5 pr-4", {"line-clamp-2 md:line-clamp-1": !description}]}>
+        <div class:list={["transition text-75 mb-3.5 pr-4", {"line-clamp-2 @min-[768px]:line-clamp-1": !description}]}>
             { description || remarkPluginFrontmatter.excerpt }
         </div>
         <!-- word count and read time  -->
@@ -86,9 +86,9 @@ const imageBaseDir = getFileDirFromPath(entry.filePath || "");
 
     {hasCover &&
         <a href={url} aria-label={title} class:list={["group",
-                "max-h-[20vh] h-[20vh] md:max-h-none md:h-auto mx-4 mt-4 -mb-2 md:mb-0 md:mx-0 md:mt-0",
-                "md:w-(--coverWidth) relative md:absolute md:top-(--coverMargin) md:bottom-(--coverMargin) rounded-xl overflow-hidden active:scale-95",
-                {"md:right-(--coverMargin)": isCoverOnRight, "md:left-(--coverMargin)": !isCoverOnRight}
+                "max-h-[20vh] h-[20vh] @min-[768px]:max-h-none @min-[768px]:h-auto mx-4 mt-4 -mb-2 @min-[768px]:mb-0 @min-[768px]:mx-0 @min-[768px]:mt-0",
+                "@min-[768px]:w-(--coverWidth) relative @min-[768px]:absolute @min-[768px]:top-(--coverMargin) @min-[768px]:bottom-(--coverMargin) rounded-xl overflow-hidden active:scale-95",
+                {"@min-[768px]:right-(--coverMargin)": isCoverOnRight, "@min-[768px]:left-(--coverMargin)": !isCoverOnRight}
             ]}
         >
             <div class="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition"></div>
@@ -104,7 +104,7 @@ const imageBaseDir = getFileDirFromPath(entry.filePath || "");
     }
 
     {!hasCover &&
-        <a href={url} aria-label={title} class="hidden! md:flex! btn-regular w-13
+        <a href={url} aria-label={title} class="hidden! @min-[768px]:flex! w-13
             absolute right-3 top-3 bottom-3 rounded-xl bg-(--enter-btn-bg)
             hover:bg-(--enter-btn-bg-hover) active:bg-(--enter-btn-bg-active) active:scale-95
         ">
