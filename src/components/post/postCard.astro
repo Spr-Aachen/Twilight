@@ -107,7 +107,34 @@ const defaultCoverGradient = gradientColors[gradientIndex];
                 class="w-full h-full">
             </ImageWrapper>
         ) : (
-            <div class="w-full h-full" style={`background: ${defaultCoverGradient}`}></div>
+            <div class="w-full h-full flex items-center justify-center p-4 @min-[768px]:p-6"
+                style={`background: ${defaultCoverGradient}`}>
+                {entry.data.encrypted ? (
+                    <Icon name="mdi:lock" class="text-5xl text-white/81" />
+                ) : (
+                    <div class="flex flex-col gap-1 w-full">
+                        <span class="text-white/81 text-xs font-medium tracking-wide uppercase">
+                            {title}
+                        </span>
+                        <div class="flex flex-wrap gap-1.5 mt-0.5">
+                            {tags && tags.length > 0 ? tags.map((tag) => (
+                                <span class="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/81 bg-white/9 rounded-md">
+                                    {tag}
+                                </span>
+                            )) : (
+                                <span class="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/63 bg-white/6 rounded-md">
+                                    No Tags
+                                </span>
+                            )}
+                        </div>
+                        {remarkPluginFrontmatter.excerpt && (
+                            <p class="text-white/63 text-sm leading-relaxed line-clamp-3">
+                                {remarkPluginFrontmatter.excerpt}
+                            </p>
+                        )}
+                    </div>
+                )}
+            </div>
         )}
     </a>
 </div>
