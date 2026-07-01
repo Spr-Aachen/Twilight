@@ -428,7 +428,7 @@ const setup = () => {
         });
         // Check if the current page is a post page, if so, trigger a custom event to initialize the comment system
         setTimeout(() => {
-            if (document.getElementById('tcomment')) {
+            if (document.querySelector('[data-comment-root]')) {
                 const pageLoadedEvent = new CustomEvent('twilight:page:loaded', {
                     detail: {
                         path: window.location.pathname,

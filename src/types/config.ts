@@ -369,6 +369,9 @@ export type BlogPostData = {
 };
 
 
+// 评论服务提供商
+export type CommentProvider = "twikoo";
+
 // 文章配置
 export type PostConfig = {
     // 文章卡片配置
@@ -407,6 +410,8 @@ export type PostConfig = {
     comment: {
         // 启用评论功能
         enable: boolean;
+        // 评论服务提供商（不指定时自动检测已配置的服务）
+        provider?: CommentProvider;
         // Twikoo 评论系统配置
         twikoo?: {
             // 环境 ID

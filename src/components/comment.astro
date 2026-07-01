@@ -20,14 +20,11 @@ if (explicitPath) {
     path = getPostUrl(post);
 }
 
-let commentService = "";
-if (postConfig.comment?.enable && postConfig.comment?.twikoo) {
-    commentService = "twikoo";
-}
+const provider = postConfig.comment?.enable ? postConfig.comment.provider : undefined;
 ---
 
-{postConfig.comment?.enable && (
-    <div class="card-base p-6 mb-4 transition-swup-fade">
-        {commentService === 'twikoo' && <Twikoo path={path} />}
+{provider && (
+    <div class="card-base p-6 mb-4 transition-swup-fade" data-comment-root>
+        {provider === 'twikoo' && <Twikoo path={path} />}
     </div>
 )}

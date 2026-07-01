@@ -345,12 +345,14 @@ post:
     comment:
         # 启用评论功能
         enable: false
+        # 评论服务提供商（可选，不填则自动检测已配置的服务）
+        provider:
         # Twikoo 评论系统配置
         twikoo:
             # 环境 ID
-            envId: "https://twikoo.vercel.app"
+            envId: ""
             # 语言
-            lang: "en"
+            lang: ""
 
 # 页脚配置
 footer:

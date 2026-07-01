@@ -9,12 +9,12 @@ interface Props {
 
 const config = {
     ...postConfig.comment.twikoo,
-    el: "#tcomment",
+    el: "#comment-container",
     path: Astro.props.path,
 };
 ---
 
-<div id="tcomment"></div>
+<div id="comment-container"></div>
 <script is:inline src={url("/assets/js/twikoo.all.min.js")}></script>
 <link rel="stylesheet" href={url("/assets/css/twikoo.css")} />
 <script is:inline define:vars={{ config }}>
@@ -29,13 +29,13 @@ const config = {
         return {
             ...config,
             path: getCurrentPath(),
-            el: "#tcomment",
+            el: "#comment-container",
         };
     }
 
     function initTwikoo() {
         if (typeof twikoo !== "undefined") {
-            const commentEl = document.getElementById("tcomment");
+            const commentEl = document.getElementById("comment-container");
             if (commentEl) {
                 commentEl.innerHTML = "";
                 const dynamicConfig = createTwikooConfig();
@@ -71,7 +71,7 @@ const config = {
     }
 
     document.addEventListener("twilight:page:loaded", function () {
-        const commentEl = document.getElementById("tcomment");
+        const commentEl = document.getElementById("comment-container");
         if (commentEl) {
             console.log("[Twikoo] 通过自定义事件重新初始化");
             initTwikoo();
