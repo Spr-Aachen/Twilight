@@ -347,6 +347,12 @@ post:
         enable: false
         # 评论服务提供商（可选，不填则自动检测已配置的服务）
         provider:
+        # Waline 评论系统配置
+        waline:
+            # 服务端地址
+            serverURL: ""
+            # 语言
+            lang: ""
         # Twikoo 评论系统配置
         twikoo:
             # 环境 ID

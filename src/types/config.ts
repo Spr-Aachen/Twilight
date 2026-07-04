@@ -370,7 +370,7 @@ export type BlogPostData = {
 
 
 // 评论服务提供商
-export type CommentProvider = "twikoo";
+export type CommentProvider = "waline" |"twikoo";
 
 // 文章配置
 export type PostConfig = {
@@ -412,6 +412,19 @@ export type PostConfig = {
         enable: boolean;
         // 评论服务提供商（不指定时自动检测已配置的服务）
         provider?: CommentProvider;
+        // Waline 评论系统配置
+        waline?: {
+            // 服务端地址
+            serverURL: string;
+            // 语言
+            lang?: string;
+            // 每页评论数
+            pageSize?: number;
+            // 是否启用表情反应
+            reaction?: boolean | string[];
+            // 必填项
+            requiredMeta?: ("nick" | "mail" | "link")[];
+        };
         // Twikoo 评论系统配置
         twikoo?: {
             // 环境 ID

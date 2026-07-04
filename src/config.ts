@@ -74,7 +74,14 @@ const resolvedPostConfig: PostConfig = {
     comment: {
         ...config.post.comment,
         provider: config.post.comment.provider
+            ?? (config.post.comment.waline ? "waline" : undefined)
             ?? (config.post.comment.twikoo ? "twikoo" : undefined),
+        waline: config.post.comment.waline
+            ? {
+                ...config.post.comment.waline,
+                lang: config.post.comment.waline.lang ?? config.site.lang,
+            }
+            : undefined,
         twikoo: config.post.comment.twikoo
             ? {
                 ...config.post.comment.twikoo,

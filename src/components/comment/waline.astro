@@ -1,0 +1,66 @@
+---
+import { postConfig } from "@/config";
+
+
+interface Props {
+    path: string;
+}
+
+const config = {
+    ...postConfig.comment.waline,
+    dark: "html.dark",
+    el: "#comment-container",
+    path: Astro.props.path,
+};
+---
+
+<div id="comment-container"></div>
+<script is:inline src="https://unpkg.com/@waline/client@v3/dist/waline.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css" />
+<script is:inline define:vars={{ config }}>
+    function getCurrentPath() {
+        const pathname = window.location.pathname;
+        return pathname.endsWith("/") && pathname.length > 1
+            ? pathname.slice(0, -1)
+            : pathname;
+    }
+
+    function initWaline() {
+        if (typeof Waline !== "undefined") {
+            const commentEl = document.getElementById("comment-container");
+            if (commentEl) {
+                commentEl.innerHTML = "";
+                Waline.init({
+                    ...config,
+                    path: getCurrentPath(),
+                    el: "#comment-container",
+                });
+            }
+        } else {
+            setTimeout(initWaline, 500);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", initWaline);
+
+    if (window.swup && window.swup.hooks) {
+        window.swup.hooks.on("content:replace", function () {
+            setTimeout(initWaline, 200);
+        });
+    } else {
+        document.addEventListener("swup:enable", function () {
+            if (window.swup && window.swup.hooks) {
+                window.swup.hooks.on("content:replace", function () {
+                    setTimeout(initWaline, 200);
+                });
+            }
+        });
+    }
+
+    document.addEventListener("twilight:page:loaded", function () {
+        const commentEl = document.getElementById("comment-container");
+        if (commentEl) {
+            initWaline();
+        }
+    });
+</script>
