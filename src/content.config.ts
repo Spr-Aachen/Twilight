@@ -25,6 +25,7 @@ const postsCollection = defineCollection({
     loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "./src/content/posts" }),
     schema: z.object({
         title: z.string(),
+        directoryTitle: z.string().optional().default(""),
         published: optionalDateSchema,
         updated: optionalDateSchema,
         description: z.string().optional().default(""),

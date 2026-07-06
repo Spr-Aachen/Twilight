@@ -44,7 +44,7 @@ export async function getDirectoryTree(): Promise<DirectoryNode[]> {
         const parts = post.id.split('/');
         const fileName = parts.pop()!;
         const paths = [rootMap.posts, ...parts];
-        addNode(paths, post.data.title || fileName, `/posts/${post.id}/`);
+        addNode(paths, post.data.directoryTitle || post.data.title || fileName, `/posts/${post.id}/`);
     }
 
     for (const album of sortedAlbums) {
