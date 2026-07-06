@@ -241,9 +241,10 @@ const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
         {pioConfig.enable && <Pio client:visible />}
         <!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
         <div id="page-height-extend" class="hidden h-[300vh]"></div>
+        <style is:global>*{user-select:none!important}input,textarea{user-select:text!important}</style>
+        <script is:inline>document.addEventListener("copy",function(e){e.preventDefault()});document.addEventListener("cut",function(e){e.preventDefault()});document.addEventListener("paste",function(e){e.preventDefault()});document.addEventListener("contextmenu",function(e){e.preventDefault()});document.addEventListener("keydown",function(e){if(e.ctrlKey){var k=e.key.toLowerCase();if(k==="c"||k==="x"||k==="v"||k==="u"||k==="s"||k==="a"){e.preventDefault()}}if(e.key==="F12"){e.preventDefault()}});</script>
     </body>
 </html>
-
 
 <style is:global define:vars={{
     'navbar-height': `${NAVBAR_HEIGHT / 16}rem`,
@@ -298,7 +299,6 @@ const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
     }
 }
 </style>
-
 
 <script>
 import {
