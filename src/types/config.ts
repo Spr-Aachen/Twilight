@@ -352,22 +352,6 @@ export type SidebarConfig = {
  * 
  */
 
-export type BlogPostData = {
-    body: string;
-    title: string;
-    published: Date;
-    description: string;
-    tags: string[];
-    draft?: boolean;
-    image?: string;
-    category?: string;
-    pinned?: boolean;
-    prevTitle?: string;
-    prevSlug?: string;
-    nextTitle?: string;
-    nextSlug?: string;
-};
-
 
 // 评论服务提供商
 export type CommentProvider = "waline" |"twikoo";
