@@ -18,6 +18,7 @@ import ImageWrapper from "@components/common/imageWrapper.astro";
 import PasswordProtection from "@components/common/passwordProtection.astro";
 import PostMetadata from "@components/post/postMeta.astro";
 import Comment from "@components/comment.astro";
+import CopyProtection from "@components/copyProtection.astro";
 import GridLayout from "@layouts/grid.astro";
 
 
@@ -380,4 +381,10 @@ const jsonLd = {
             }
         </a>
     </div>
+    <CopyProtection
+        blockSelection={entry.data.blockSelection}
+        blockClipboard={entry.data.blockClipboard}
+        blockContextMenu={entry.data.blockContextMenu}
+        blockDevTools={entry.data.blockDevTools}
+    />
 </GridLayout>

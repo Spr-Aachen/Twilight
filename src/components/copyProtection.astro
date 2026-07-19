@@ -1,0 +1,39 @@
+---
+interface Props {
+    blockSelection?: boolean;
+    blockClipboard?: boolean;
+    blockContextMenu?: boolean;
+    blockDevTools?: boolean;
+}
+
+const { blockSelection = false, blockClipboard = false, blockContextMenu = false, blockDevTools = false } = Astro.props;
+---
+
+{blockSelection && (
+    <style is:global>
+        *{user-select:none!important}input,textarea{user-select:text!important}
+    </style>
+)}
+
+{blockClipboard && (
+    <script is:inline>
+        document.addEventListener("copy",function(e){e.preventDefault()});
+        document.addEventListener("cut",function(e){e.preventDefault()});
+        document.addEventListener("paste",function(e){e.preventDefault()});
+    </script>
+)}
+
+{blockContextMenu && (
+    <script is:inline>
+        document.addEventListener("contextmenu",function(e){e.preventDefault()});
+    </script>
+)}
+
+{blockDevTools && (
+    <script is:inline>
+        document.addEventListener("keydown",function(e){
+            if(e.key==="F12"){e.preventDefault()}
+            if(e.ctrlKey){var k=e.key.toLowerCase();if(k==="u"||k==="s"){e.preventDefault()}}
+        });
+    </script>
+)}
