@@ -1,12 +1,21 @@
 ---
-interface Props {
+interface CopyProtection {
     blockSelection?: boolean;
     blockClipboard?: boolean;
     blockContextMenu?: boolean;
     blockDevTools?: boolean;
 }
 
-const { blockSelection = false, blockClipboard = false, blockContextMenu = false, blockDevTools = false } = Astro.props;
+interface Props {
+    copyProtection?: CopyProtection;
+}
+
+const {
+    blockSelection = false,
+    blockClipboard = false,
+    blockContextMenu = false,
+    blockDevTools = false,
+} = Astro.props.copyProtection ?? {};
 ---
 
 {blockSelection && (

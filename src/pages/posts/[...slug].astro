@@ -381,10 +381,5 @@ const jsonLd = {
             }
         </a>
     </div>
-    <CopyProtection
-        blockSelection={entry.data.blockSelection}
-        blockClipboard={entry.data.blockClipboard}
-        blockContextMenu={entry.data.blockContextMenu}
-        blockDevTools={entry.data.blockDevTools}
-    />
+    <CopyProtection copyProtection={entry.data.copyProtection} />
 </GridLayout>
