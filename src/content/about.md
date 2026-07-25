@@ -27,3 +27,4 @@ Twilight is a CMS integrated static blog template built with [Astro](https://ast
 - Non-breaking PagesCMS support in [#114](https://github.com/Spr-Aachen/Twilight/pull/114)
 - Directory tree view component in [#117](https://github.com/Spr-Aachen/Twilight/pull/117)
 - Enhanced post card cover handler in [#141](https://github.com/Spr-Aachen/Twilight/pull/141)
+- Configurable post copy protection support in [#160](https://github.com/Spr-Aachen/Twilight/pull/160)
