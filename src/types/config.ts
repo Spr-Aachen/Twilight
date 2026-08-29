@@ -2,10 +2,12 @@ import type {
     SYSTEM_MODE,
     DARK_MODE,
     LIGHT_MODE,
+} from "@constants/style";
+import type {
     WALLPAPER_FULLSCREEN,
     WALLPAPER_BANNER,
-    WALLPAPER_NONE
-} from "@constants/constants";
+    WALLPAPER_NONE,
+} from "@constants/layout";
 import type { SupportedLanguage } from "@i18n/language";
 
 

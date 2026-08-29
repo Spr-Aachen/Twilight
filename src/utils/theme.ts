@@ -2,7 +2,7 @@ import {
     SYSTEM_MODE,
     DARK_MODE,
     LIGHT_MODE,
-} from "@constants/constants";
+} from "@constants/style";
 import type {
     LIGHT_DARK_MODE,
 } from "@/types/config";

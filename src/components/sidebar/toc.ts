@@ -1,4 +1,4 @@
-import { NAVBAR_HEIGHT, NAVBAR_GAP } from "@constants/constants";
+import { NAVBAR_HEIGHT, NAVBAR_GAP } from "@constants/layout";
 import { widgetManager } from "@utils/widget";
 
 

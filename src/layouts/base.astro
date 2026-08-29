@@ -5,13 +5,11 @@ import { siteConfig, profileConfig, musicPlayerConfig, pioConfig } from "@/confi
 import { getAnalyticsConfig } from "@utils/analytics";
 import type { Favicon } from "@/types/config";
 import { defaultFavicons } from "@constants/icon";
+import { LIGHT_MODE, DARK_MODE, SYSTEM_MODE } from "@constants/style";
 import {
     BANNER_HEIGHT,
     BANNER_HEIGHT_EXTEND,
     BANNER_HEIGHT_HOME,
-    LIGHT_MODE,
-    DARK_MODE,
-    SYSTEM_MODE,
     PAGE_WIDTH,
     NAVBAR_HEIGHT,
     NAVBAR_GAP,
@@ -19,7 +17,7 @@ import {
     MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
     SIDEBAR_TOP,
     SIDEBAR_SPACING,
-} from "@constants/constants";
+} from "@constants/layout";
 import { pathsEqual, url } from "@utils/url";
 import FontLoader from "@components/fontLoader.astro";
 import LoadingOverlay from "@components/loadingOverlay.astro";
@@ -305,7 +303,7 @@ import {
     BANNER_HEIGHT,
     BANNER_HEIGHT_HOME,
     BANNER_HEIGHT_EXTEND,
-} from "@/constants/constants";
+} from "@/constants/layout";
 import {
     BREAKPOINT_MD,
     BREAKPOINT_LG,

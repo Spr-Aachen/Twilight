@@ -2,7 +2,7 @@
 import { onMount } from "svelte";
 
 import { BREAKPOINT_LG } from "@constants/breakpoints";
-import { SYSTEM_MODE, DARK_MODE, LIGHT_MODE } from "@constants/constants";
+import { SYSTEM_MODE, DARK_MODE, LIGHT_MODE } from "@constants/style";
 import {
     getStoredTheme,
     setTheme,
