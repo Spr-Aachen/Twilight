@@ -2,7 +2,7 @@ import {
     WALLPAPER_FULLSCREEN,
     WALLPAPER_BANNER,
     WALLPAPER_NONE,
-} from "@constants/constants";
+} from "@constants/layout";
 import type {
     WALLPAPER_MODE,
 } from "@/types/config";

@@ -3,6 +3,7 @@
     import { slide } from "svelte/transition";
 
     import type { DirectoryNode } from "@utils/directory";
+    import { TRANSITION_DURATION_MEDIUM } from "@constants/transitions";
 
 
     let { tree } = $props<{
@@ -90,7 +91,7 @@
             </div>
             
             {#if expandedFolders[currentPathStr] && node.children}
-                <div class="min-w-0 flex flex-col pl-3 ml-2 border-l border-(--line-divider)" transition:slide={{ duration: 300 }}>
+                <div class="min-w-0 flex flex-col pl-3 ml-2 border-l border-(--line-divider)" transition:slide={{ duration: TRANSITION_DURATION_MEDIUM }}>
                     {#each node.children as child}
                         {@render renderNode(child, currentPathStr, depth + 1)}
                     {/each}

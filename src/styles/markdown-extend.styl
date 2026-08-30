@@ -183,8 +183,8 @@ a.card-github
             mask-position: center
             mask-repeat: no-repeat
             transition-property: background-color, background;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)
-            transition-duration: 0.15s
+            transition-timing-function: var(--transition-ease-default)
+            transition-duration: var(--transition-duration-fast)
 
     .gc-stars
         &:before
@@ -210,7 +210,7 @@ a.card-github
 a.card-github.fetch-waiting
     pointer-events: none
     opacity: 0.7
-    transition: opacity 0.15s ease-in-out
+    transition: opacity var(--transition-duration-fast) ease-in-out
 
     .gc-description, .gc-infobar, .gc-avatar
         background-color: var(--tw-prose-body)
@@ -234,8 +234,8 @@ a.card-github.fetch-error
 
 .card-github, .gc-description, .gc-titlebar, .gc-stars, .gc-forks, .gc-license, .gc-avatar, .github-logo
     transition-property: all
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)
-    transition-duration: 0.15s
+    transition-timing-function: var(--transition-ease-default)
+    transition-duration: var(--transition-duration-fast)
 
 
 .mermaid-wrapper
@@ -283,7 +283,7 @@ a.card-github.fetch-error
         margin: 0 0 0.5rem 0
 
     button
-        transition: all 0.2s ease
+        transition: all var(--transition-duration-normal) ease
 
         &:hover
             background: var(--primary-hover) !important
@@ -292,7 +292,7 @@ a.card-github.fetch-error
 
 .mermaid-zoom-wrapper
     transform-origin: 0 0;
-    transition: transform 120ms ease-out;
+    transition: transform var(--transition-duration-fastest) ease-out;
     will-change: transform;
     cursor: grab;
     background: transparent;
@@ -315,7 +315,7 @@ a.card-github.fetch-error
     border-radius: 0.75rem
     overflow: hidden
     background: var(--card-bg)
-    transition: all 0.3s ease
+    transition: all var(--transition-duration-medium) ease
 
     &:hover
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)
@@ -353,7 +353,7 @@ a.card-github.fetch-error
     height: auto
     padding: 0.75rem
     gap: 1rem
-    transition: all 0.3s ease
+    transition: all var(--transition-duration-medium) ease
     align-items: stretch
 
     &:hover
@@ -377,7 +377,7 @@ a.card-github.fetch-error
             inset: 0
             background: rgba(0,0,0,0.1)
             opacity: 0
-            transition: opacity 0.3s
+            transition: opacity var(--transition-duration-medium)
             border-radius: 0.5rem
             
         .card-music:hover &::after
@@ -445,7 +445,7 @@ a.card-github.fetch-error
                 justify-content: center
                 cursor: pointer
                 flex-shrink: 0
-                transition: all 0.2s
+                transition: all var(--transition-duration-normal)
                 border: none
                 outline: none
                 
@@ -475,7 +475,7 @@ a.card-github.fetch-error
                     background: var(--primary)
                     border-radius: 2px
                     width: 0%
-                    transition: width 0.1s linear
+                    transition: width var(--transition-duration-tiny) linear
                     
             .time-display
                 font-size: 0.75rem

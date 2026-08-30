@@ -1,6 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-import { NAVBAR_HEIGHT } from "@constants/constants";
+import { NAVBAR_HEIGHT } from "@constants/layout";
 import { i18n } from "@i18n/translation";
 import I18nKey from "@i18n/i18nKey";
 
@@ -40,7 +40,7 @@ const { class: className, style } = Astro.props;
         right: 1rem
         bottom: 6.78rem
         z-index: 90
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+        transition: transform var(--transition-duration-medium) var(--transition-ease-default)
         pointer-events: none
 
     .toc-floating-btn-wrapper
@@ -56,7 +56,7 @@ const { class: className, style } = Astro.props;
         cursor: pointer
         color: inherit
         border: none
-        transition: transform 0.2s, background-color 0.2s
+        transition: transform var(--transition-duration-normal), background-color var(--transition-duration-normal)
 
         &:active
             scale: 0.9
@@ -74,7 +74,7 @@ const { class: className, style } = Astro.props;
         padding: 0.75rem
         box-shadow: var(--shadow-lg)
         border: 1px solid var(--btn-regular-bg)
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+        transition: all var(--transition-duration-medium) var(--transition-ease-default)
         z-index: 91
         pointer-events: auto
         

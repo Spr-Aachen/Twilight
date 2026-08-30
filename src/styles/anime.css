@@ -321,7 +321,7 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--primary), transparent);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--transition-duration-medium) ease;
 }
 
 .anime-page .anime-card:hover::before {
@@ -353,7 +353,7 @@
     mask-composite: xor;
     -webkit-mask-composite: xor;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--transition-duration-medium) ease;
 }
 
 .anime-page .anime-card:hover::after {

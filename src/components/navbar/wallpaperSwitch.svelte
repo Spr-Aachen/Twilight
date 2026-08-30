@@ -2,7 +2,7 @@
 import { onMount } from "svelte";
 
 import { BREAKPOINT_LG } from "@/constants/breakpoints";
-import { WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "@constants/constants";
+import { WALLPAPER_FULLSCREEN, WALLPAPER_BANNER, WALLPAPER_NONE } from "@constants/layout";
 import {
     getStoredWallpaperMode,
     setWallpaperMode,

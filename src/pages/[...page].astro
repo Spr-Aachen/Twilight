@@ -4,7 +4,7 @@ export const prerender = true;
 
 import type { GetStaticPaths } from "astro";
 
-import { PAGE_SIZE } from "@constants/constants";
+import { PAGE_SIZE } from "@constants/pagination";
 import { getSortedPosts } from "@utils/post";
 import Pagination from "@components/pagination.astro";
 import PostPage from "@components/postPage.astro";

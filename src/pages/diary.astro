@@ -107,7 +107,7 @@ function formatTime(dateString: string): string {
     .card-base {
         background: var(--card-bg);
         border: 1px solid var(--line-divider);
-        transition: all 0.3s ease;
+        transition: all var(--transition-duration-medium) ease;
     }
 
     .moments-header {
@@ -145,7 +145,7 @@ function formatTime(dateString: string): string {
     }
 
     .image-item img {
-        transition: scale 0.3s ease;
+        transition: scale var(--transition-duration-medium) ease;
     }
 
     .image-item:hover img {

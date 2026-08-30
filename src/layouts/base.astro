@@ -5,13 +5,11 @@ import { siteConfig, profileConfig, musicPlayerConfig, pioConfig } from "@/confi
 import { getAnalyticsConfig } from "@utils/analytics";
 import type { Favicon } from "@/types/config";
 import { defaultFavicons } from "@constants/icon";
+import { LIGHT_MODE, DARK_MODE, SYSTEM_MODE } from "@constants/style";
 import {
     BANNER_HEIGHT,
     BANNER_HEIGHT_EXTEND,
     BANNER_HEIGHT_HOME,
-    LIGHT_MODE,
-    DARK_MODE,
-    SYSTEM_MODE,
     PAGE_WIDTH,
     NAVBAR_HEIGHT,
     NAVBAR_GAP,
@@ -19,7 +17,26 @@ import {
     MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
     SIDEBAR_TOP,
     SIDEBAR_SPACING,
-} from "@constants/constants";
+} from "@constants/layout";
+import {
+    MAIN_PANEL_TOP_DEFAULT,
+    MAIN_PANEL_TOP_BANNER,
+    MAIN_PANEL_TOP_BANNER_HOME,
+} from "@constants/panelTop";
+import {
+    TRANSITION_DURATION_TINY,
+    TRANSITION_DURATION_FASTEST,
+    TRANSITION_DURATION_FAST,
+    TRANSITION_DURATION_NORMAL,
+    TRANSITION_DURATION_MEDIUM,
+    TRANSITION_DURATION_SLOW,
+    TRANSITION_DURATION_SLOWER,
+    TRANSITION_DURATION_LONG,
+    TRANSITION_DURATION_VERY_SLOW,
+    EASE_DEFAULT,
+    EASE_PAGE_IN,
+    EASE_PAGE_OUT,
+} from "@constants/transitions";
 import { pathsEqual, url } from "@utils/url";
 import FontLoader from "@components/fontLoader.astro";
 import LoadingOverlay from "@components/loadingOverlay.astro";
@@ -249,38 +266,53 @@ const { enabled: analyticsEnabled, code: analyticsCode } = getAnalyticsConfig();
     'navbar-height': `${NAVBAR_HEIGHT / 16}rem`,
     'navbar-gap': `${NAVBAR_GAP}rem`,
     'navbar-follow-distance': `${NAVBAR_FOLLOW_DISTANCE}rem`,
-    'main-panel-overlaps-banner-height': `${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem`,
     'sidebar-top': `${SIDEBAR_TOP}rem`,
     'sidebar-spacing': `${SIDEBAR_SPACING}rem`,
     bannerOffset,
     'banner-height-home': `${BANNER_HEIGHT_HOME}vh`,
     'banner-height': `${BANNER_HEIGHT}vh`,
+    'main-panel-overlaps-banner-height': `${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem`,
+    'main-panel-top-default': MAIN_PANEL_TOP_DEFAULT,
+    'main-panel-top-banner': MAIN_PANEL_TOP_BANNER,
+    'main-panel-top-banner-home': MAIN_PANEL_TOP_BANNER_HOME,
+    'transition-duration-tiny': `${TRANSITION_DURATION_TINY}ms`,
+    'transition-duration-fastest': `${TRANSITION_DURATION_FASTEST}ms`,
+    'transition-duration-fast': `${TRANSITION_DURATION_FAST}ms`,
+    'transition-duration-normal': `${TRANSITION_DURATION_NORMAL}ms`,
+    'transition-duration-medium': `${TRANSITION_DURATION_MEDIUM}ms`,
+    'transition-duration-slow': `${TRANSITION_DURATION_SLOW}ms`,
+    'transition-duration-slower': `${TRANSITION_DURATION_SLOWER}ms`,
+    'transition-duration-long': `${TRANSITION_DURATION_LONG}ms`,
+    'transition-duration-very-slow': `${TRANSITION_DURATION_VERY_SLOW}ms`,
+    'transition-ease-default': EASE_DEFAULT,
+    'transition-ease-page-in': EASE_PAGE_IN,
+    'transition-ease-page-out': EASE_PAGE_OUT,
 }}>
 @reference "../styles/main.css";
 @layer components {
     /* Base CSS variables for main content top and top-row height */
     :root {
-        --main-content-top: calc(var(--navbar-height) + var(--navbar-gap) + var(--navbar-follow-distance));
+        --main-content-top: var(--main-panel-top-default);
         --top-row-height: calc(var(--main-content-top) - var(--navbar-gap));
         --sidebar-top: var(--sidebar-top);
         --sidebar-spacing: var(--sidebar-spacing);
     }
     /* Banner mode overrides */
     body.enable-banner {
-        --main-content-top: calc(var(--banner-height) - var(--main-panel-overlaps-banner-height));
+        --main-content-top: var(--main-panel-top-banner);
         --top-row-height: calc(var(--main-content-top) - var(--navbar-gap));
     }
     html.banner-hiding body.enable-banner {
-        --main-content-top: calc(var(--navbar-height) + var(--navbar-gap) + var(--navbar-follow-distance)) !important;
+        --main-content-top: var(--main-panel-top-default) !important;
         --top-row-height: calc(var(--main-content-top) - var(--navbar-gap)) !important;
     }
     /* Home page with Banner mode overrides */
     body.enable-banner.is-home {
-        --main-content-top: calc(var(--banner-height) - var(--main-panel-overlaps-banner-height) + var(--banner-height-extend, 36vh));
+        --main-content-top: var(--main-panel-top-banner-home);
         --top-row-height: calc(var(--main-content-top) - var(--navbar-gap));
     }
     html.banner-hiding body.enable-banner.is-home {
-        --main-content-top: calc(var(--navbar-height) + var(--navbar-gap) + var(--navbar-follow-distance)) !important;
+        --main-content-top: var(--main-panel-top-default) !important;
         --top-row-height: calc(var(--main-content-top) - var(--navbar-gap)) !important;
     }
 
@@ -305,7 +337,7 @@ import {
     BANNER_HEIGHT,
     BANNER_HEIGHT_HOME,
     BANNER_HEIGHT_EXTEND,
-} from "@/constants/constants";
+} from "@/constants/layout";
 import {
     BREAKPOINT_MD,
     BREAKPOINT_LG,

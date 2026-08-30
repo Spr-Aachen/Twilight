@@ -40,11 +40,11 @@ html.banner-hiding #banner-wrapper {
 /* 标题动画 */
 .show-initial-animation .banner-title,
 .show-banner-animation .banner-title {
-    animation: fadeInUp 1s ease-out forwards;
+    animation: fadeInUp var(--transition-duration-long) ease-out forwards;
 }
 .show-initial-animation .banner-subtitle,
 .show-banner-animation .banner-subtitle {
-    animation: fadeInUp 1s ease-out 0.3s both;
+    animation: fadeInUp var(--transition-duration-long) ease-out var(--transition-duration-medium) both;
 }
 /* 动画结束后的状态 */
 html:not(.is-loading):not(.show-initial-animation):not(.show-banner-animation) .banner-title,
@@ -53,7 +53,7 @@ html:not(.is-loading):not(.show-initial-animation):not(.show-banner-animation) .
 }
 /* 页面切换时标题淡入淡出 */
 .banner-text-overlay {
-    transition: opacity 300ms ease;
+    transition: opacity var(--transition-duration-medium) ease;
 }
 .banner-text-overlay.fade-out {
     opacity: 0;
@@ -61,10 +61,10 @@ html:not(.is-loading):not(.show-initial-animation):not(.show-banner-animation) .
 
 /* 页面背景平滑过渡（Fullscreen 与 Banner 模式切换时） */
 body {
-    transition: background-color 0.6s ease, background-image 0.6s ease;
+    transition: background-color var(--transition-duration-slower) ease, background-image var(--transition-duration-slower) ease;
 }
 html.is-wallpaper-transitioning body {
-    transition: background-color 0.6s ease, background-image 0.6s ease !important;
+    transition: background-color var(--transition-duration-slower) ease, background-image var(--transition-duration-slower) ease !important;
 }
 
 /**
@@ -105,11 +105,11 @@ html.is-wallpaper-transitioning body {
     .carousel-item img,
     #banner img {
         object-position: center center !important; /* 确保图片居中显示 */
-        transition: transform 1.2s ease-out !important;
+        transition: transform var(--transition-duration-very-slow) ease-out !important;
     }
     /* 轮播图片过渡 */
     .carousel-item {
-        transition: opacity 1.2s ease-in-out !important;
+        transition: opacity var(--transition-duration-very-slow) ease-in-out !important;
     }
     .carousel-item.ken-burns-enabled {
         transform-origin: center center !important; /* 确保缩放从中心开始 */
@@ -144,11 +144,11 @@ html.is-wallpaper-transitioning body {
     .carousel-item img,
     #banner img {
         object-position: center center !important; /* 确保图片居中显示 */
-        transition: transform 1.2s ease-out !important;
+        transition: transform var(--transition-duration-very-slow) ease-out !important;
     }
     /* 轮播图片过渡 */
     .carousel-item {
-        transition: opacity 1.2s ease-in-out !important;
+        transition: opacity var(--transition-duration-very-slow) ease-in-out !important;
     }
     .carousel-item.ken-burns-enabled {
         transform-origin: center center !important; /* 确保缩放从中心开始 */
@@ -243,7 +243,7 @@ html.is-wallpaper-transitioning body {
         height: 8px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.5);
-        transition: all 0.3s ease;
+        transition: all var(--transition-duration-medium) ease;
         cursor: pointer;
     }
     .carousel-indicator.active {

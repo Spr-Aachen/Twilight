@@ -1,9 +1,3 @@
-export const PAGE_SIZE = 8;
-
-export const LIGHT_MODE = "light",
-    DARK_MODE = "dark",
-    SYSTEM_MODE = "system";
-
 export const WALLPAPER_FULLSCREEN = "fullscreen",
     WALLPAPER_BANNER = "banner",
     WALLPAPER_NONE = "none";
@@ -30,6 +24,3 @@ export const SIDEBAR_SPACING = 1;
 
 // Page width (rem)
 export const PAGE_WIDTH = 90;
-
-// Category constants
-export const UNCATEGORIZED = "uncategorized";
