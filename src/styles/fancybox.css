@@ -42,7 +42,7 @@
     border-radius: 4px;
     overflow: hidden;
     border: 2px solid transparent;
-    transition: all 0.2s ease;
+    transition: all var(--transition-duration-normal) ease;
 }
 .fancybox__thumb.is-loading {
     background: rgba(255, 255, 255, 0.1);
@@ -60,7 +60,7 @@
     border-radius: 50%;
     width: 44px;
     height: 44px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-duration-normal) ease;
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }

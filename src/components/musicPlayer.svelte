@@ -16,6 +16,7 @@ import {
 } from "@/utils/music";
 import { i18n } from "@i18n/translation";
 import Key from "@i18n/i18nKey";
+import { TRANSITION_DURATION_MEDIUM } from "@constants/transitions";
 import "@styles/musicplayer.css";
 
 
@@ -665,7 +666,7 @@ onDestroy(() => {
      class:collapsed={isCollapsed}>
     {#if showPlaylist}
         <div class="playlist-panel float-panel w-80 max-h-96 overflow-hidden z-50 mb-4 pointer-events-auto"
-             transition:slide={{ duration: 300, axis: 'y' }}>
+             transition:slide={{ duration: TRANSITION_DURATION_MEDIUM, axis: 'y' }}>
             <div class="playlist-header flex items-center justify-between p-4 border-b border-(--line-divider)">
                 <h3 class="text-lg font-semibold text-90">{i18n(Key.playlist)}</h3>
                 <div class="flex items-center gap-1">
@@ -790,7 +791,7 @@ onDestroy(() => {
             </div>
         </div>
         {#if showLyrics}
-        <div class="lyrics-section mb-2 px-1" transition:slide={{ duration: 300 }}>
+        <div class="lyrics-section mb-2 px-1" transition:slide={{ duration: TRANSITION_DURATION_MEDIUM }}>
             <div class="lyrics-container h-[88px] overflow-y-auto overflow-x-hidden relative text-center scroll-smooth"
                  bind:this={lrcContainer}
                  onscroll={handleLrcScroll}>

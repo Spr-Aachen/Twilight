@@ -97,7 +97,7 @@ $effect(() => {
             -webkit-appearance none
             height 1.5rem
             background-image var(--color-selection-bar)
-            transition background-image 0.15s ease-in-out
+            transition background-image var(--transition-duration-fast) ease-in-out
 
             /* Input Thumb */
             &::-webkit-slider-thumb

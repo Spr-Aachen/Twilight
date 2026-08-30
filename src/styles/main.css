@@ -16,6 +16,9 @@
     --breakpoint-lg: 1280px;
     --breakpoint-xl: 1920px;
 
+    /* Tailwind duration-* utilities.
+       Keep in sync with src/constants/transitions.ts:
+       medium = TRANSITION_DURATION_MEDIUM (300ms), slower = TRANSITION_DURATION_SLOWER (600ms) */
     --transition-duration-300: 300ms;
     --transition-duration-600: 600ms;
 }
@@ -630,7 +633,7 @@
     );
     pointer-events: none;
     z-index: 20;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-duration-medium) var(--transition-ease-default);
     }
 
     /* 暗色主题下的渐变高光效果 */
@@ -672,7 +675,7 @@
     left: calc(50% - 1px);
     border-left: 2px dashed var(--line-color);
     pointer-events: none;
-    transition: all 0.3s;
+    transition: all var(--transition-duration-medium);
     translate: 0 -50%;
 }
 

@@ -9,7 +9,7 @@
 .navbar-nav-links {
     min-width: 0;
     flex-shrink: 1;
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s, gap 0.3s ease;
+    transition: opacity var(--transition-duration-medium) ease, transform var(--transition-duration-medium) ease, visibility var(--transition-duration-medium), gap var(--transition-duration-medium) ease;
 }
 
 /* 导航链接样式 */
@@ -60,7 +60,7 @@
 #navbar > div {
     background: var(--card-bg);
     border-radius: var(--radius-large);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-duration-medium) var(--transition-ease-default);
 }
 
 
@@ -71,7 +71,7 @@
     border: 1px solid rgba(255, 255, 255, 0.55) !important;
     border-radius: 0.75rem !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all var(--transition-duration-medium) var(--transition-ease-default) !important;
 }
 /* 半透明模式 - 在有banner时启用 - 暗色主题 */
 :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-transparent-mode="semi"] > div {
@@ -87,7 +87,7 @@
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all var(--transition-duration-medium) var(--transition-ease-default) !important;
 }
 /* 完全透明模式 - 在有banner时启用 - 暗色主题 */
 :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-transparent-mode="full"] > div {
@@ -102,7 +102,7 @@
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all var(--transition-duration-medium) var(--transition-ease-default) !important;
 }
 /* 半完全透明模式 - 在有banner时启用 - 默认状态：页面顶部时完全透明 - 暗色主题 */
 :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-transparent-mode="semifull"] > div {
@@ -117,7 +117,7 @@
     border: 1px solid rgba(255, 255, 255, 0.55) !important;
     border-radius: 0.75rem !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all var(--transition-duration-medium) var(--transition-ease-default) !important;
 }
 /* 半完全透明模式 - 在有banner时启用 - 滚动状态：下滑后变为半透明圆角 - 暗色主题 */
 :root.dark :is(#banner-wrapper ~ *, body:has(#banner-wrapper)) #navbar[data-transparent-mode="semifull"].scrolled > div {

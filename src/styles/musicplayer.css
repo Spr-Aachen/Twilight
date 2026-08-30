@@ -23,7 +23,7 @@
     }
 }
 .animate-slide-up {
-    animation: slide-up 0.3s ease-out;
+    animation: slide-up var(--transition-duration-medium) ease-out;
 }
 
 @keyframes rotate {
@@ -70,7 +70,7 @@ button.bg-\(--primary\) {
     border-radius: 50%;
     z-index: -1;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--transition-duration-medium) ease;
 }
 .orb-player:hover::before {
     opacity: 0.3;
@@ -101,13 +101,13 @@ button.bg-\(--primary\) {
 .progress-section div:hover,
 .bottom-controls > div:hover {
     scale: 1 1.2;
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-duration-normal) ease;
 }
 /* Playlist Scrollbar Styles */
 .playlist-content {
     scrollbar-width: thin;
     scrollbar-color: transparent transparent;
-    transition: scrollbar-color 0.3s ease;
+    transition: scrollbar-color var(--transition-duration-medium) ease;
 }
 .playlist-content:hover {
     scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
@@ -130,7 +130,7 @@ button.bg-\(--primary\) {
 .lyrics-container {
     scrollbar-width: thin;
     scrollbar-color: transparent transparent;
-    transition: scrollbar-color 0.3s ease;
+    transition: scrollbar-color var(--transition-duration-medium) ease;
 }
 .lyrics-container:hover, .lyrics-container.scrolling {
     scrollbar-color: rgba(155, 155, 155, 0.5) transparent;

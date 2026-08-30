@@ -559,7 +559,7 @@
         border: 1px solid var(--line-color);
         cursor: pointer;
         opacity: 0.7;
-        transition: all 0.2s;
+        transition: all var(--transition-duration-normal);
         outline: none;
     }
     .time-scale-select:hover {
@@ -587,7 +587,7 @@
         opacity: 0;
         visibility: hidden;
         translate: 0 -10px;
-        transition: all 0.2s;
+        transition: all var(--transition-duration-normal);
         z-index: 50;
         min-width: 80px;
         overflow: hidden;
@@ -601,7 +601,7 @@
         background: transparent;
         border: none;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all var(--transition-duration-normal);
     }
     .dropdown-item-custom:hover {
         background: var(--btn-plain-bg-hover);
@@ -614,7 +614,7 @@
     }
     .dropdown-icon {
         font-size: 0.9rem;
-        transition: rotate 0.2s;
+        transition: rotate var(--transition-duration-normal);
     }
     .dropdown-wrapper:hover .dropdown-icon {
         rotate: 180deg;
