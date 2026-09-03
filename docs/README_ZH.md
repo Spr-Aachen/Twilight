@@ -84,14 +84,14 @@
 
 ## 💻 调试
 
-1. **克隆仓库**
-   ```bash
-   git clone https://github.com/Spr-Aachen/Twilight.git
-   # 切换到项目目录
-   cd Twilight
-   ```
+### 0. Fork 仓库
+   点击右上角的 `Fork` 按钮，将仓库 Fork 到自己的 GitHub 账户下
 
-2. **安装依赖**
+### 1. 克隆仓库
+   点击 `Code` -> `Open with GitHub Desktop`，或者执行 `git clone <仓库地址>` (需要安装 Git)
+
+### 2. 安装依赖
+   在项目目录下执行以下命令：
    ```bash
    # 安装 pnpm 如果未安装
    npm install -g pnpm
@@ -99,11 +99,12 @@
    pnpm install
    ```
 
-3. **配置博客**
+### 3. 配置博客
    - 在 `twilight.config.yaml` 中 [自定义博客设置](https://docs.twilight.spr-aachen.com/config/core)
    - 在 `src/content` 中 [管理站点内容](https://docs.twilight.spr-aachen.com/config/content)
 
-4. **本地调试**
+### 4. 本地调试
+   在项目目录下执行以下命令：
    ```bash
    pnpm dev
    ```

@@ -84,14 +84,19 @@ English | [**中文**](docs/README_ZH.md)
 
 ## 💻 Configuration
 
-1. **Clone the repository:**
+### 0. Fork the repository
+   Click the `Fork` button in the top-right corner to fork the repository to your GitHub account
+
+### 1. Clone the repository
+   Click `Code` -> `Open with GitHub Desktop`, or run `git clone <repository-url>` (Git required)
    ```bash
    git clone https://github.com/Spr-Aachen/Twilight.git
    # Navigate to the project directory
    cd Twilight
    ```
 
-2. **Install dependencies:**
+### 2. Install dependencies
+   Run the following commands in the project directory:
    ```bash
    # Install pnpm if not already installed
    npm install -g pnpm
@@ -99,11 +104,12 @@ English | [**中文**](docs/README_ZH.md)
    pnpm install
    ```
 
-3. **Configure your blog:**
+### 3. Configure your blog
    - [Customize blog settings](https://docs.twilight.spr-aachen.com/en/config/core) inside `twilight.config.yaml`
    - [Manage site content](https://docs.twilight.spr-aachen.com/en/config/content) inside `src/content`
 
-4. **Start the development server:**
+### 4. Start the development server:
+   Run the following command in the project directory:
    ```bash
    pnpm dev
    ```
