@@ -594,20 +594,39 @@ if (typeof window !== 'undefined') {
     };
 
     const configCarrier = document.getElementById('config-carrier');
-    const waitForAllResources = configCarrier?.dataset.waitForAllResources === 'true';
+    const waitForFonts = configCarrier?.dataset.waitForFonts !== 'false';
+    const waitForImages = configCarrier?.dataset.waitForImages !== 'false';
+    const maxWait = Math.max(0, Number(configCarrier?.dataset.maxWait ?? 5) * 1000);
 
-    if (waitForAllResources) {
-        if (document.readyState === 'complete') {
-            onPageLoaded();
-        } else {
-            window.addEventListener('load', onPageLoaded);
+    // 基线信号：DOM 解析完成
+    const domReady = document.readyState === 'loading'
+        ? new Promise<void>(resolve => document.addEventListener('DOMContentLoaded', () => resolve(), { once: true }))
+        : Promise.resolve();
+
+    // 等待字体就绪
+    const fontsReady = waitForFonts && document.fonts
+        ? document.fonts.ready.then(() => {})
+        : Promise.resolve();
+
+    // 等待首屏图片（loading="eager"）解码完成
+    const imageReady = (img: HTMLImageElement) => {
+        if (img.complete) return Promise.resolve();
+        if (typeof img.decode === 'function') {
+            return img.decode().catch(() => {});
         }
-    } else {
-        if (document.readyState !== 'loading') {
-            onPageLoaded();
-        } else {
-            document.addEventListener('DOMContentLoaded', onPageLoaded);
-        }
-    }
+        return new Promise<void>(resolve => {
+            img.addEventListener('load', () => resolve(), { once: true });
+            img.addEventListener('error', () => resolve(), { once: true });
+        });
+    };
+    const imagesReady = waitForImages
+        ? Promise.allSettled(Array.from(document.querySelectorAll('img[loading="eager"]')).map(img => imageReady(img as HTMLImageElement)))
+        : Promise.resolve();
+
+    // 各等待项全部就绪即揭开
+    Promise.race([
+        Promise.all([domReady, fontsReady, imagesReady]).then(() => {}),
+        new Promise<void>(resolve => setTimeout(resolve, maxWait)),
+    ]).then(onPageLoaded);
 }
 </script>

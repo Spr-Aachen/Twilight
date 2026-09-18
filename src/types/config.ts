@@ -42,8 +42,12 @@ export type Favicon = {
 export type LoadingOverlayConfig = {
     // 是否启用加载页
     enable: boolean;
-    // 是否等待所有资源加载完成; 若设置为 false，则会在 DOM 解析完成后立即关闭加载页
-    waitForAllResources: boolean;
+    // 揭开加载页前是否等待字体加载完成
+    waitForFonts: boolean;
+    // 揭开加载页前是否等待首屏图片解码完成
+    waitForImages: boolean;
+    // 加载页最长等待时间 (s)
+    maxWait: number;
     // 加载标题配置
     title: {
         // 是否启用加载标题

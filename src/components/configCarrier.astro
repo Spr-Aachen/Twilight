@@ -9,6 +9,8 @@ import { siteConfig } from "@/config";
     data-lang={siteConfig.lang}
     data-theme={siteConfig.defaultTheme}
     data-wallpaper-mode={siteConfig.wallpaper.mode}
-    data-wait-for-all-resources={siteConfig.loadingOverlay?.waitForAllResources.toString()}
+    data-wait-for-fonts={(siteConfig.loadingOverlay?.waitForFonts ?? true).toString()}
+    data-wait-for-images={(siteConfig.loadingOverlay?.waitForImages ?? true).toString()}
+    data-max-wait={siteConfig.loadingOverlay?.maxWait ?? 5}
 >
 </div>
