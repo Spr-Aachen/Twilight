@@ -63,6 +63,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
                             src={src}
                             position={config.position}
                             loading={index === 0 ? "eager" : "lazy"}
+                            fetchPriority={index === 0 ? "high" : "auto"}
                         />
                     </li>
                 ))}
@@ -78,6 +79,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
                             src={src}
                             position={config.position}
                             loading={index === 0 ? "eager" : "lazy"}
+                            fetchPriority={index === 0 ? "high" : "auto"}
                         />
                     </li>
                 ))}
@@ -91,6 +93,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
                 src={imageSources.mobile[0] || imageSources.desktop[0] || ''}
                 position={config.position}
                 loading="eager"
+                fetchPriority="high"
             />
             <ImageWrapper
                 id="banner"
@@ -99,6 +102,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
                 src={imageSources.desktop[0] || imageSources.mobile[0] || ''}
                 position={config.position}
                 loading="eager"
+                fetchPriority="high"
             />
         </div>
     )}
