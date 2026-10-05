@@ -8,6 +8,7 @@ import type {
     SidebarConfig,
     ProfileConfig,
     AnnouncementConfig,
+    CommentProvider,
     PostConfig,
     FooterConfig,
     ParticleConfig,
@@ -69,26 +70,51 @@ const normalizeNavbarLink = (
 const normalizeNavbarLinks = (links: Array<NavbarLink | LinkPreset | string>) =>
     links.map(normalizeNavbarLink);
 
+// 判断配置项是否已填写有效内容
+const isFilled = (value: unknown): value is string =>
+    typeof value === "string" && value.trim().length > 0;
+// 解析评论配置
+const resolveCommentConfig = (): PostConfig["comment"] => {
+    const comment = config.post.comment ?? { enable: false };
+    const waline = comment.waline
+        ? {
+            ...comment.waline,
+            lang: isFilled(comment.waline.lang) ? comment.waline.lang : config.site.lang,
+        }
+        : undefined;
+    const twikoo = comment.twikoo
+        ? {
+            ...comment.twikoo,
+            lang: isFilled(comment.twikoo.lang) ? comment.twikoo.lang : config.site.lang,
+        }
+        : undefined;
+    // 仅当必填配置项均已填写时，才认为该服务提供商可用
+    const configuredProviders: CommentProvider[] = [];
+    if (isFilled(comment.waline?.serverURL)) configuredProviders.push("waline");
+    if (isFilled(comment.twikoo?.envId)) configuredProviders.push("twikoo");
+    // 如果显式指定了评论服务提供商，则检查其是否已配置
+    const explicitProvider = comment.provider ?? undefined;
+    if (explicitProvider !== undefined) {
+        if (explicitProvider !== "waline" && explicitProvider !== "twikoo") {
+            throw new Error(`Unknown CommentProvider: ${explicitProvider}`);
+        }
+        if (!configuredProviders.includes(explicitProvider)) {
+            const requiredKey = explicitProvider === "waline" ? "waline.serverURL" : "twikoo.envId";
+            throw new Error(
+                `CommentProvider "${explicitProvider}" is selected but "post.comment.${requiredKey}" is not configured.`,
+            );
+        }
+    }
+    // 未显式指定时，按 waline -> twikoo 的顺序选取第一个已配置的服务提供商
+    const provider = explicitProvider ?? configuredProviders[0];
+    // 
+    return { ...comment, provider, waline, twikoo };
+};
+
+// 文章配置
 const resolvedPostConfig: PostConfig = {
     ...config.post,
-    comment: {
-        ...config.post.comment,
-        provider: config.post.comment.provider
-            ?? (config.post.comment.waline ? "waline" : undefined)
-            ?? (config.post.comment.twikoo ? "twikoo" : undefined),
-        waline: config.post.comment.waline
-            ? {
-                ...config.post.comment.waline,
-                lang: config.post.comment.waline.lang ?? config.site.lang,
-            }
-            : undefined,
-        twikoo: config.post.comment.twikoo
-            ? {
-                ...config.post.comment.twikoo,
-                lang: config.post.comment.twikoo.lang ?? config.site.lang,
-            }
-            : undefined,
-    },
+    comment: resolveCommentConfig(),
 };
 
 // 站点配置
