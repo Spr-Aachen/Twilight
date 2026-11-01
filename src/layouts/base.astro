@@ -342,6 +342,10 @@ import {
     BREAKPOINT_MD,
     BREAKPOINT_LG,
 } from "@constants/breakpoints";
+import {
+    TRANSITION_DURATION_SLOWER,
+    TRANSITION_DURATION_VERY_SLOW,
+} from "@constants/transitions";
 import { widgetManager, getComponentConfig } from "@utils/widget";
 import { pathsEqual, url } from "@utils/url";
 import { initWallpaperMode } from "@utils/wallpaper";
@@ -351,6 +355,10 @@ import { initMarkdownActions } from "@/utils/markdown";
 import { initFancybox, cleanupFancybox } from "@utils/fancybox";
 import { loadAndInitTranslate } from "@utils/language";
 import { setupParticleEffects } from "@/utils/particle";
+
+
+// 揭开流程里等待 CSS 过渡的兜底超时
+const TRANSITION_FALLBACK_MS = TRANSITION_DURATION_SLOWER * 2;
 
 
 // 初始化Swup
@@ -557,40 +565,53 @@ setupParticleEffects();
 
 // Remove is-loading class and trigger initial-animation after page load
 if (typeof window !== 'undefined') {
-    const onPageLoaded = () => {
+    // 等待某条过渡真正结束；过渡被禁用（如 prefers-reduced-motion）时兜底超时，避免卡住揭开流程
+    const whenTransitionEnds = (el: Element | null, propertyName: string, fallbackMs: number): Promise<void> =>
+        new Promise<void>(resolve => {
+            if (!el) {
+                resolve();
+                return;
+            }
+            let finished = false;
+            const finish = () => {
+                if (finished) return;
+                finished = true;
+                el.removeEventListener('transitionend', onTransitionEnd);
+                clearTimeout(fallback);
+                resolve();
+            };
+            const onTransitionEnd = (event: TransitionEvent) => {
+                if (event.target === el && event.propertyName === propertyName) finish();
+            };
+            el.addEventListener('transitionend', onTransitionEnd);
+            const fallback = setTimeout(finish, fallbackMs);
+        });
+
+    const onReveal = async () => {
         const overlay = document.getElementById('loading-overlay');
         const enableBanner = document.body.classList.contains('enable-banner');
-        // 触发 LoadingOverlay 淡出
+
+        // 遮罩淡出（CSS transition）
         if (overlay) {
             overlay.classList.add('fade-out');
+            await whenTransitionEnds(overlay, 'opacity', TRANSITION_FALLBACK_MS);
+            overlay.style.display = 'none';
         }
-        // 等待 LoadingOverlay 淡出（600ms）
+
+        if (enableBanner) {
+            // banner 高度从 0 恢复（CSS transition）
+            document.documentElement.classList.add('banner-restoring');
+            await whenTransitionEnds(document.getElementById('banner-wrapper'), 'height', TRANSITION_FALLBACK_MS);
+        }
+
+        // 摘除 is-loading：首屏可见，此时 banner 轮播才被允许启动（见 @utils/wallpaper）
+        document.documentElement.classList.remove('is-loading');
+        // 触发各容器淡入动画
+        document.documentElement.classList.add('show-initial-animation');
         setTimeout(() => {
-            if (overlay) {
-                overlay.style.display = 'none';
-            }
-            if (enableBanner) {
-                // banner 开始恢复过渡：添加 banner-restoring 类（解除 CSS 中的 height: 0）
-                document.documentElement.classList.add('banner-restoring');
-                // 等待 banner 恢复过渡完成（600ms）
-                setTimeout(() => {
-                    // 触发各容器淡入动画
-                    document.documentElement.classList.remove('is-loading');
-                    document.documentElement.classList.add('show-initial-animation');
-                    setTimeout(() => {
-                        document.documentElement.classList.remove('show-initial-animation');
-                        document.documentElement.classList.remove('banner-restoring');
-                    }, 1200);
-                }, 600);
-            } else {
-                // 非 banner 模式，直接触发淡入
-                document.documentElement.classList.remove('is-loading');
-                document.documentElement.classList.add('show-initial-animation');
-                setTimeout(() => {
-                    document.documentElement.classList.remove('show-initial-animation');
-                }, 1200);
-            }
-        }, 600);
+            document.documentElement.classList.remove('show-initial-animation');
+            document.documentElement.classList.remove('banner-restoring');
+        }, TRANSITION_DURATION_VERY_SLOW);
     };
 
     const configCarrier = document.getElementById('config-carrier');
@@ -608,7 +629,7 @@ if (typeof window !== 'undefined') {
         ? document.fonts.ready.then(() => {})
         : Promise.resolve();
 
-    // 等待首屏图片（loading="eager"）解码完成
+    // 等待单张图片解码完成
     const imageReady = (img: HTMLImageElement) => {
         if (img.complete) return Promise.resolve();
         if (typeof img.decode === 'function') {
@@ -619,14 +640,28 @@ if (typeof window !== 'undefined') {
             img.addEventListener('error', () => resolve(), { once: true });
         });
     };
+    // 只等真正会出现在首屏的 eager 图片
+    const isFirstScreenImage = (img: HTMLImageElement) => {
+        if (typeof img.checkVisibility === 'function' && !img.checkVisibility({ visibilityProperty: true })) {
+            return false;
+        }
+        // is-loading 期间 #banner-wrapper 高度被压到 0，图片矩形无意义，但揭开后必在首屏
+        if (img.closest('#banner-wrapper')) return true;
+        const rect = img.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0
+            && rect.bottom > 0 && rect.right > 0
+            && rect.top < window.innerHeight && rect.left < window.innerWidth;
+    };
     const imagesReady = waitForImages
-        ? Promise.allSettled(Array.from(document.querySelectorAll('img[loading="eager"]')).map(img => imageReady(img as HTMLImageElement)))
+        ? Promise.allSettled(Array.from(document.querySelectorAll<HTMLImageElement>('img[loading="eager"]'))
+            .filter(isFirstScreenImage)
+            .map(img => imageReady(img)))
         : Promise.resolve();
 
     // 各等待项全部就绪即揭开
     Promise.race([
         Promise.all([domReady, fontsReady, imagesReady]).then(() => {}),
         new Promise<void>(resolve => setTimeout(resolve, maxWait)),
-    ]).then(onPageLoaded);
+    ]).then(onReveal);
 }
 </script>

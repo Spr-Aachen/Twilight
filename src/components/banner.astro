@@ -49,7 +49,7 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
     style={`top: -${BANNER_HEIGHT_EXTEND}vh`}
 >
     {isCarouselEnabled ? (
-        <div id="banner-carousel" class="relative h-full w-full" data-carousel-config={JSON.stringify(carouselConfig)}>
+        <div id="banner-carousel" class="relative h-full w-full" data-carousel-config={JSON.stringify({ ...carouselConfig, interval: carouselInterval })}>
             <ul class="carousel-list h-full w-full">
                 {imageSources.desktop.map((src, index) => (
                     <li class:list={[
@@ -202,138 +202,11 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
     )}
 </div>
 
-<script define:vars={{ carouselInterval }}>
-    // 轮播图初始化函数
-    window.initBannerCarousel = function() {
-        const carousel = document.getElementById('banner-carousel');
-        if (!carousel) return;
-
-        // 检查是否是同一个 DOM 元素且定时器正在运行，避免重复初始化导致动画重置
-        if (window.bannerCarouselTimer && window.currentBannerCarousel === carousel) {
-            return;
-        }
-        window.currentBannerCarousel = carousel;
-
-        // 初始化全局状态
-        if (!window.bannerCarouselState) {
-            window.bannerCarouselState = {
-                currentIndex: 0,
-                lastSwitchTime: Date.now()
-            };
-        }
-
-        // 清理旧的定时器，防止重复初始化导致的闪烁
-        if (window.bannerCarouselTimer) {
-            clearTimeout(window.bannerCarouselTimer);
-            window.bannerCarouselTimer = null;
-        }
-
-        const carouselConfigData = carousel.getAttribute('data-carousel-config');
-        const carouselConfig = carouselConfigData ? JSON.parse(carouselConfigData) : {};
-
-        const desktopItems = carousel.querySelectorAll('.carousel-item.desktop-item');
-        const mobileItems = carousel.querySelectorAll('.carousel-item.mobile-item');
-
-        function setupCarousel(items, isEnabled) {
-            if (items.length === 0) return null;
-
-            // 如果禁用了轮播但有多张图，则随机显示一张
-            if (items.length > 1 && !isEnabled) {
-                items.forEach(item => {
-                    item.classList.add('opacity-0');
-                    item.classList.remove('opacity-100');
-                });
-                const randomIndex = Math.floor(Math.random() * items.length);
-                const randomItem = items[randomIndex];
-                randomItem.classList.add('opacity-100');
-                randomItem.classList.remove('opacity-0');
-                return null;
-            }
-
-            if (items.length > 1 && isEnabled) {
-                // 使用全局状态中的索引
-                let currentIndex = window.bannerCarouselState.currentIndex;
-                // 确保索引有效
-                if (currentIndex >= items.length) {
-                    currentIndex = 0;
-                    window.bannerCarouselState.currentIndex = 0;
-                }
-                
-                function switchToSlide(index) {
-                    const currentItem = items[currentIndex];
-                    currentItem.classList.remove('opacity-100');
-                    currentItem.classList.add('opacity-0');
-                    currentIndex = index;
-                    // 更新全局状态
-                    window.bannerCarouselState.currentIndex = index;
-                    window.bannerCarouselState.lastSwitchTime = Date.now();
-
-                    const nextItem = items[currentIndex];
-                    nextItem.classList.add('opacity-100');
-                    nextItem.classList.remove('opacity-0');
-                    // 通过切换 is-animating 类来重置下一张图片的动画
-                    if (nextItem.classList.contains('ken-burns-enabled')) {
-                        nextItem.classList.remove('is-animating');
-                        nextItem.offsetHeight; // 强制重绘
-                        nextItem.classList.add('is-animating');
-                    }
-                }
-
-                // 初始化：根据当前索引显示图片
-                items.forEach((item, index) => {
-                    if (index === currentIndex) {
-                        item.classList.add('opacity-100');
-                        item.classList.remove('opacity-0');
-                        // 初始图片开启动画
-                        if (item.classList.contains('ken-burns-enabled')) {
-                            item.classList.add('is-animating');
-                        }
-                    } else {
-                        item.classList.add('opacity-0');
-                        item.classList.remove('opacity-100');
-                        item.classList.remove('is-animating');
-                    }
-                });
-
-                return {
-                    next: () => switchToSlide((currentIndex + 1) % items.length),
-                    prev: () => switchToSlide((currentIndex - 1 + items.length) % items.length),
-                };
-            }
-            return null;
-        }
-
-        const desktopCtrl = setupCarousel(desktopItems, carouselConfig?.enable);
-        const mobileCtrl = setupCarousel(mobileItems, carouselConfig?.enable);
-
-        if (carouselConfig?.enable && (desktopCtrl || mobileCtrl)) {
-            function startCarousel() {
-                if (window.bannerCarouselTimer) clearTimeout(window.bannerCarouselTimer);
-                
-                const runLoop = () => {
-                    const now = Date.now();
-                    const intervalMs = carouselInterval * 1000;
-                    const elapsed = now - window.bannerCarouselState.lastSwitchTime;
-                    let delay = intervalMs - elapsed;
-                    
-                    if (delay < 0) delay = 0;
-
-                    window.bannerCarouselTimer = setTimeout(() => {
-                        desktopCtrl?.next();
-                        mobileCtrl?.next();
-                        runLoop();
-                    }, delay);
-                };
-
-                runLoop();
-            }
-
-            startCarousel();
-        }
-    }
+<script>
+    import { initWallpaperCarousel, onPageViewReady } from "@utils/wallpaper";
 
     // Banner显示控制函数
-    function showBanner() {
+    const showBanner = (): void => {
         requestAnimationFrame(() => {
             const banner = document.getElementById('banner');
             if (banner) {
@@ -344,21 +217,13 @@ const isPerformanceMode = config.banner?.waves?.performanceMode;
                 mobileBanner.classList.remove('opacity-0');
                 mobileBanner.classList.add('opacity-100');
             }
-            const carousel = document.getElementById('banner-carousel');
-            if (carousel) {
-                window.initBannerCarousel();
+            if (document.getElementById('banner-carousel')) {
+                window.initBannerCarousel?.();
             }
         });
-    }
+    };
 
-    // 监听 Astro 页面切换事件
-    document.addEventListener('astro:after-swap', () => {
-        showBanner();
-    });
+    window.initBannerCarousel = () => initWallpaperCarousel('banner-carousel');
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', showBanner);
-    } else {
-        showBanner();
-    }
+    onPageViewReady(showBanner);
 </script>

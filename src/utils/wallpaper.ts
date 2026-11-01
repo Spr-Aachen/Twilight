@@ -1,4 +1,7 @@
 import {
+    BREAKPOINT_MD
+} from "@constants/breakpoints";
+import {
     WALLPAPER_FULLSCREEN,
     WALLPAPER_BANNER,
     WALLPAPER_NONE,
@@ -11,24 +14,12 @@ import {
 } from "@/config";
 
 
-// Declare global function types for carousel initializers
+// 
 declare global {
     interface Window {
+        initSemifullScrollDetection?: () => void;
         initBannerCarousel?: () => void;
         initFullscreenWallpaperCarousel?: () => void;
-        initSemifullScrollDetection?: () => void;
-        bannerCarouselState?: {
-            currentIndex: number;
-            lastSwitchTime: number;
-        };
-        fullscreenWallpaperState?: {
-            currentIndex: number;
-            lastSwitchTime: number;
-        };
-        bannerCarouselTimer?: any;
-        fullscreenWallpaperTimer?: any;
-        currentBannerCarousel?: HTMLElement | null;
-        currentFullscreenWallpaperCarousel?: HTMLElement | null;
     }
 }
 
@@ -356,4 +347,239 @@ export function getStoredWallpaperMode(): WALLPAPER_MODE {
 export function initWallpaperMode(): void {
     const storedMode = getStoredWallpaperMode();
     applyWallpaperModeToDocument(storedMode, true);
+}
+
+
+// ── 壁纸轮播（banner 与 fullscreen 共用） ────────────────────────────────────
+
+/** 仅在容器上没写入 interval 时兜底（两个组件都会写入构建期解析后的值） */
+const DEFAULT_CAROUSEL_INTERVAL = 6;
+
+interface CarouselConfig {
+    enable: boolean;
+    intervalMs: number;
+}
+
+interface CarouselState {
+    /** 当前绑定的容器，换页后需要重新绑定 */
+    container: HTMLElement | null;
+    currentIndex: number;
+    lastSwitchTime: number;
+    timer: ReturnType<typeof setTimeout> | null;
+    /** 启动是否已排队（等待首屏可见），用于避免重复排队 */
+    startScheduled: boolean;
+}
+
+interface SlideController {
+    next: () => void;
+}
+
+/** 按容器 id 隔离，跨 swup 导航保留当前索引与定时器 */
+const states = new Map<string, CarouselState>();
+
+const getState = (key: string): CarouselState => {
+    let state = states.get(key);
+    if (!state) {
+        state = {
+            container: null,
+            currentIndex: 0,
+            lastSwitchTime: 0,
+            timer: null,
+            startScheduled: false,
+        };
+        states.set(key, state);
+    }
+    return state;
+};
+
+const runWhenIdle = (callback: () => void): void => {
+    if (typeof requestIdleCallback === "function") {
+        requestIdleCallback(callback, { timeout: 1000 });
+    } else {
+        setTimeout(callback, 1);
+    }
+};
+
+const parseCarouselConfig = (container: HTMLElement): CarouselConfig => {
+    const raw = container.getAttribute("data-carousel-config");
+    const parsed = raw ? JSON.parse(raw) : {};
+    return {
+        enable: Boolean(parsed.enable),
+        intervalMs: (Number(parsed.interval) || DEFAULT_CAROUSEL_INTERVAL) * 1000,
+    };
+};
+
+
+// ── 首屏可见信号 ────────────────────────────────────────────────────────────
+
+const revealCallbacks = new Set<() => void>();
+let revealObserver: MutationObserver | null = null;
+
+/** `is-loading` 摘除即代表 loading overlay 已揭开、首屏可见 */
+const onFirstScreenVisible = (callback: () => void): void => {
+    if (!document.documentElement.classList.contains("is-loading")) {
+        runWhenIdle(callback);
+        return;
+    }
+    revealCallbacks.add(callback);
+    if (revealObserver) return;
+    revealObserver = new MutationObserver(() => {
+        if (document.documentElement.classList.contains("is-loading")) return;
+        revealObserver?.disconnect();
+        revealObserver = null;
+        const pending = Array.from(revealCallbacks);
+        revealCallbacks.clear();
+        pending.forEach(runWhenIdle);
+    });
+    revealObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+    });
+};
+
+const startWhenVisible = (state: CarouselState, begin: () => void): void => {
+    if (state.startScheduled) return;
+    state.startScheduled = true;
+    onFirstScreenVisible(() => {
+        state.startScheduled = false;
+        begin();
+    });
+};
+
+
+// ── 幻灯片 ────────────────────────────────────────────────────────────────
+
+/** 预取当前视口对应那套幻灯片的下一张 */
+const prefetchNextSlide = (container: HTMLElement, currentIndex: number): void => {
+    // 两套幻灯片靠 `hidden md:block` / `block md:hidden` 互斥，只预取当前可见的那一套
+    const selector = window.innerWidth >= BREAKPOINT_MD
+        ? ".carousel-item.desktop-item"
+        : ".carousel-item.mobile-item";
+    const items = container.querySelectorAll<HTMLElement>(selector);
+    if (items.length < 2) return;
+    const nextImage = items[(currentIndex + 1) % items.length].querySelector<HTMLImageElement>("img");
+    if (!nextImage?.src) return;
+    runWhenIdle(() => {
+        const preloader = new Image();
+        preloader.decoding = "async";
+        preloader.src = nextImage.src;
+        preloader.decode?.().catch(() => {});
+    });
+};
+
+const setupSlides = (
+    items: NodeListOf<HTMLElement>,
+    enable: boolean,
+    state: CarouselState,
+    onSwitch: () => void,
+): SlideController | null => {
+    if (items.length === 0) return null;
+
+    // 多图但禁用轮播：随机显示一张
+    if (items.length > 1 && !enable) {
+        items.forEach(item => {
+            item.classList.add("opacity-0");
+            item.classList.remove("opacity-100");
+        });
+        const randomItem = items[Math.floor(Math.random() * items.length)];
+        randomItem.classList.add("opacity-100");
+        randomItem.classList.remove("opacity-0");
+        return null;
+    }
+
+    if (items.length <= 1) return null;
+
+    // 索引跨页保留，超出长度时回到第一张
+    if (state.currentIndex >= items.length) state.currentIndex = 0;
+    let currentIndex = state.currentIndex;
+
+    const switchToSlide = (index: number): void => {
+        const currentItem = items[currentIndex];
+        currentItem.classList.remove("opacity-100");
+        currentItem.classList.add("opacity-0");
+        currentIndex = index;
+        state.currentIndex = index;
+        state.lastSwitchTime = Date.now();
+
+        const nextItem = items[currentIndex];
+        nextItem.classList.add("opacity-100");
+        nextItem.classList.remove("opacity-0");
+        // 通过切换 is-animating 类来重置下一张图片的 Ken Burns 动画
+        if (nextItem.classList.contains("ken-burns-enabled")) {
+            nextItem.classList.remove("is-animating");
+            void nextItem.offsetHeight; // 强制重绘
+            nextItem.classList.add("is-animating");
+        }
+        onSwitch();
+    };
+
+    // 初始化：按当前索引显示图片
+    items.forEach((item, index) => {
+        if (index === currentIndex) {
+            item.classList.add("opacity-100");
+            item.classList.remove("opacity-0");
+            if (item.classList.contains("ken-burns-enabled")) {
+                item.classList.add("is-animating");
+            }
+        } else {
+            item.classList.add("opacity-0");
+            item.classList.remove("opacity-100");
+            item.classList.remove("is-animating");
+        }
+    });
+
+    return { next: () => switchToSlide((currentIndex + 1) % items.length) };
+};
+
+
+// ── 轮播对外接口 ───────────────────────────────────────────────────────────
+
+/** 初始化（或重新绑定）一个壁纸轮播容器 */
+export function initWallpaperCarousel(containerId: string): void {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const state = getState(containerId);
+    // 同一个容器且轮播已运行或已排队时不再重建，避免重复初始化导致动画重置
+    if (state.container === container && (state.timer !== null || state.startScheduled)) return;
+    if (state.timer !== null) {
+        clearTimeout(state.timer);
+        state.timer = null;
+    }
+    state.container = container;
+
+    const { enable, intervalMs } = parseCarouselConfig(container);
+    const onSwitch = (): void => prefetchNextSlide(container, state.currentIndex);
+    const controllers = [
+        setupSlides(container.querySelectorAll<HTMLElement>(".carousel-item.desktop-item"), enable, state, onSwitch),
+        setupSlides(container.querySelectorAll<HTMLElement>(".carousel-item.mobile-item"), enable, state, onSwitch),
+    ];
+
+    if (!enable || !controllers.some(Boolean)) return;
+
+    const runLoop = (): void => {
+        const elapsed = Date.now() - state.lastSwitchTime;
+        state.timer = setTimeout(() => {
+            state.timer = null;
+            controllers.forEach(controller => controller?.next());
+            runLoop();
+        }, Math.max(0, intervalMs - elapsed));
+    };
+
+    startWhenVisible(state, () => {
+        // 首屏可见这一刻起算一个完整间隔
+        if (state.lastSwitchTime === 0) state.lastSwitchTime = Date.now();
+        runLoop();
+        prefetchNextSlide(container, state.currentIndex);
+    });
+}
+
+/** 首次加载与 swup 换页后各触发一次 */
+export function onPageViewReady(callback: () => void): void {
+    document.addEventListener("astro:after-swap", callback);
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", callback, { once: true });
+    } else {
+        callback();
+    }
 }
