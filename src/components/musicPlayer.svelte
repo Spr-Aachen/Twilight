@@ -33,12 +33,15 @@ let meting_id = musicPlayerConfig.meting?.id ?? "2161912966";
 // 是否启用自动播放，从配置中获取或使用默认值
 let isAutoplayEnabled = $state(musicPlayerConfig.autoplay ?? false);
 
+// 折叠状态下使用的占位封面（避免自动元数据加载时提前拉取真实封面）
+const DEFAULT_COVER = "/favicon/icon-light.ico";
+
 // 当前歌曲信息
 let currentSong: MusicPlayerTrack = $state({
     id: 0,
     title: "Music",
     artist: "Artist",
-    cover: "/favicon/icon-light.ico",
+    cover: DEFAULT_COVER,
     url: "",
     duration: 0,
 });
@@ -80,6 +83,14 @@ let errorMessage = $state("");
 let showError = $state(false);
 // 音量过渡间隔
 let fadeInterval: number | null = null;
+// 播放列表是否已初始化，避免首次交互后被重复拉流
+let playlistInitialized = false;
+// 歌单请求序号，丢弃切换模式 / 刷新后返回的过期响应
+let playlistRequestId = 0;
+// 元数据自动加载的监听 / idle 句柄，供 onDestroy 清理
+let metadataObserver: MutationObserver | null = null;
+let metadataIdleHandle: number | null = null;
+let metadataTimeoutHandle: number | null = null;
 
 // Lyrics State
 let lyrics: { time: number; text: string }[] = $state([]);
@@ -88,9 +99,13 @@ let lrcContainer: HTMLElement | undefined = $state();
 let isUserScrolling = $state(false);
 let scrollTimeout: number | null = null;
 let noLyrics = $state(false); // Flag if no lyrics available
+// 歌词按歌曲懒加载，并丢弃切换歌曲后返回的过期响应
+let lyricsRequestId = 0;
+let lyricsSongKey: string | null = null;
 
 // Load lyrics function
 async function loadLyrics(song: MusicPlayerTrack) {
+    const requestId = ++lyricsRequestId;
     lyrics = [];
     currentLrcIndex = -1;
     noLyrics = false;
@@ -101,6 +116,7 @@ async function loadLyrics(song: MusicPlayerTrack) {
     }
 
     const lrcText = await fetchLyrics(song.lrc);
+    if (requestId !== lyricsRequestId) return;
 
     if (lrcText) {
         lyrics = parseLRC(lrcText);
@@ -108,6 +124,15 @@ async function loadLyrics(song: MusicPlayerTrack) {
     } else {
         noLyrics = true;
     }
+}
+
+// 歌词体积不大，但没必要在 idle 阶段随歌单元数据一起请求；
+// 展开播放器或首次播放时再取，同一首歌只请求一次。
+function ensureLyrics(song: MusicPlayerTrack) {
+    const key = song.lrc || song.url;
+    if (!key || key === lyricsSongKey) return;
+    lyricsSongKey = key;
+    void loadLyrics(song);
 }
 
 // Seek to lyric time
@@ -176,7 +201,17 @@ function fadeInVolume(targetVolume: number, duration: number = 2000) {
     });
 }
 
-function restoreLastSong() {
+function restoreSong(song: MusicPlayerTrack, loadAudio: boolean) {
+    if (loadAudio) {
+        loadSong(song);
+    } else {
+        applySongMetadata(song);
+        // 没加载音频时拿不到真实时长，先不显示恢复的进度，避免出现「1:18 / 0:00」
+        currentTime = pendingProgress > 0 && duration > 0 ? pendingProgress : 0;
+    }
+}
+
+function restoreLastSong(loadAudio = true) {
     if (playlist.length === 0) return;
     if (typeof localStorage !== 'undefined') {
         const lastId = localStorage.getItem(STORAGE_KEYS.LAST_SONG_ID);
@@ -192,13 +227,13 @@ function restoreLastSong() {
             if (savedProgress) {
                 pendingProgress = parseFloat(savedProgress);
             }
-            loadSong(playlist[currentIndex]);
+            restoreSong(playlist[currentIndex], loadAudio);
             return;
         }
     }
     // 如果没有找到上次播放的歌曲，或者没有记录，加载第一首
     currentIndex = 0;
-    loadSong(playlist[0]);
+    restoreSong(playlist[0], loadAudio);
 }
 
 function showErrorMessage(message: string) {
@@ -209,31 +244,119 @@ function showErrorMessage(message: string) {
     }, 3000);
 }
 
-async function fetchMetingPlaylist() {
-    if (!meting_api || !meting_id) return;
-    isLoading = true;
+async function fetchMetingPlaylist(loadAudio = true, restoreLast = true, showLoading = loadAudio) {
+    if (!meting_api || !meting_id) {
+        if (showLoading) isLoading = false;
+        return;
+    }
+    const requestId = ++playlistRequestId;
+    // idle 预取元数据时不显示加载态，避免 orb 无故转圈
+    if (showLoading) isLoading = true;
     try {
-        playlist = await fetchMetingPlaylistUtil(
+        const result = await fetchMetingPlaylistUtil(
             meting_api,
             meting_server,
             meting_type,
             meting_id
         );
+        // 模式已切换或有更新的请求，丢弃过期响应
+        if (requestId !== playlistRequestId || mode !== "meting") return;
+        playlist = result;
+        playlistInitialized = true;
+
+        if (!restoreLast) {
+            // 刷新歌单时保持当前播放状态，只同步高亮位置
+            const index = playlist.findIndex(s => String(s.id) === String(currentSong.id));
+            currentIndex = index >= 0 ? index : 0;
+            if (showLoading) isLoading = false;
+            return;
+        }
+
         if (playlist.length > 0) {
             // 使用 setTimeout 确保 Svelte 响应式变量已更新
             setTimeout(() => {
-                restoreLastSong();
+                if (requestId !== playlistRequestId || mode !== "meting") return;
+                restoreLastSong(loadAudio);
             }, 0);
+        } else if (showLoading) {
+            isLoading = false;
         }
-        isLoading = false;
-    } catch (e) {
-        showErrorMessage(i18n(Key.musicMetingFailed));
-        isLoading = false;
+        // 加载音频时由 setAudioSource / handleLoadSuccess 接管加载态
+        if (showLoading && !loadAudio) isLoading = false;
+    } catch {
+        if (requestId !== playlistRequestId || mode !== "meting") return;
+        // 允许后续展开面板 / 刷新时重试
+        playlistInitialized = false;
+        if (showLoading) {
+            showErrorMessage(i18n(Key.musicMetingFailed));
+            isLoading = false;
+        }
+    }
+}
+
+// 页面揭开后自动拉取歌单元数据；音频字节仍等首次播放
+function initPlaylist(loadAudio = true) {
+    if (playlistInitialized) return;
+    playlistInitialized = true;
+    if (mode === "meting") {
+        fetchMetingPlaylist(loadAudio);
+    } else {
+        playlist = [...(musicPlayerConfig.local?.playlist ?? [])];
+        if (playlist.length > 0) {
+            setTimeout(() => {
+                restoreLastSong(loadAudio);
+            }, 0);
+        } else {
+            showErrorMessage(i18n(Key.musicEmptyPlaylist));
+        }
+    }
+}
+
+function scheduleMetadataInit() {
+    if (typeof document === "undefined" || typeof window === "undefined") return;
+    if (!musicPlayerConfig.enable) return;
+    if (isAutoplayEnabled) {
+        // 显式开启自动播放时才在挂载阶段预加载（浏览器仍可能拦截播放）
+        initPlaylist(true);
+        return;
+    }
+
+    const run = () => {
+        if (metadataObserver) {
+            metadataObserver.disconnect();
+            metadataObserver = null;
+        }
+        if (typeof window.requestIdleCallback === "function") {
+            metadataIdleHandle = window.requestIdleCallback(() => {
+                metadataIdleHandle = null;
+                initPlaylist(false);
+            }, { timeout: 3000 });
+        } else {
+            metadataTimeoutHandle = window.setTimeout(() => {
+                metadataTimeoutHandle = null;
+                initPlaylist(false);
+            }, 200);
+        }
+    };
+
+    if (document.documentElement.classList.contains("is-loading")) {
+        metadataObserver = new MutationObserver(() => {
+            if (!document.documentElement.classList.contains("is-loading")) {
+                run();
+            }
+        });
+        metadataObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+    } else {
+        run();
     }
 }
 
 async function toggleMode() {
     if (!musicPlayerConfig.enable) return;
+    playlistInitialized = true;
     mode = mode === "meting" ? "local" : "meting";
     showPlaylist = false;
     isLoading = false;
@@ -247,12 +370,13 @@ async function toggleMode() {
     currentTime = 0;
     duration = 0;
     if (mode === "meting") {
-        await fetchMetingPlaylist();
+        // 只恢复元数据，音频字节等用户点播放时再加载
+        await fetchMetingPlaylist(false, true, true);
     } else {
         playlist = [...(musicPlayerConfig.local?.playlist ?? [])];
         if (playlist.length > 0) {
             setTimeout(() => {
-                restoreLastSong();
+                restoreLastSong(false);
             }, 0);
         } else {
             showErrorMessage(i18n(Key.musicEmptyPlaylist));
@@ -268,18 +392,18 @@ function togglePlay() {
             fadeInterval = null;
         }
         audio.pause();
-        if (typeof localStorage !== 'undefined') {
-            localStorage.setItem(STORAGE_KEYS.USER_PAUSED, "true");
-        }
     } else {
+        if (!audio.src) {
+            // 首次播放才拉取音频字节；由 handleLoadSuccess 在恢复进度后开始播放
+            shouldPlay = true;
+            setAudioSource(currentSong);
+            return;
+        }
         const playPromise = audio.play();
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 fadeInVolume(volume);
             }).catch(() => {});
-        }
-        if (typeof localStorage !== 'undefined') {
-            localStorage.setItem(STORAGE_KEYS.USER_PAUSED, "false");
         }
     }
 }
@@ -288,6 +412,12 @@ function toggleCollapse() {
     isCollapsed = !isCollapsed;
     if (isCollapsed) {
         showPlaylist = false;
+    } else {
+        if (!playlistInitialized) {
+            // rIC 未触发 / 自动拉取失败时的兜底
+            initPlaylist(false);
+        }
+        ensureLyrics(currentSong);
     }
 }
 
@@ -345,17 +475,13 @@ function playSong(index: number) {
     currentIndex = index;
     // 用户手动选择歌曲（或自动切换），标记为应该播放
     shouldPlay = true;
-    // 用户手动选择歌曲，清除暂停偏好和待恢复进度
-     if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.USER_PAUSED, "false");
-    }
+    // 用户手动选择歌曲，清除待恢复进度
     pendingProgress = 0;
     // 加载歌曲
     loadSong(playlist[currentIndex]);
 }
 
-function loadSong(song: MusicPlayerTrack) {
-    if (!song || !audio) return;
+function applySongMetadata(song: MusicPlayerTrack) {
     currentSong = { ...song };
     // 记录最后播放的歌曲 ID (排除初始化的占位符 ID 0)
     if (typeof localStorage !== 'undefined' && song.id !== undefined && song.id !== 0) {
@@ -365,28 +491,40 @@ function loadSong(song: MusicPlayerTrack) {
             localStorage.setItem(STORAGE_KEYS.LAST_SONG_PROGRESS, "0");
         }
     }
-    if (song.url) {
-        isLoading = true;
-        loadLyrics(song);
-        // 如果有待恢复的进度，先不要重置为 0，以免进度条跳变
-        if (pendingProgress > 0) {
-            currentTime = pendingProgress;
-        } else {
-            audio.currentTime = 0;
-            currentTime = 0;
-        }
-        duration = song.duration ?? 0;
-        audio.removeEventListener("canplay", handleLoadSuccess);
-        audio.removeEventListener("error", handleLoadError);
-        audio.removeEventListener("loadstart", handleLoadStart);
-        audio.addEventListener("canplay", handleLoadSuccess, { once: true });
-        audio.addEventListener("error", handleLoadError, { once: true });
-        audio.addEventListener("loadstart", handleLoadStart, { once: true });
-        audio.src = getAssetPath(song.url);
-        audio.load();
-    } else {
+    // 歌词等展开 / 首次播放时再取，避免 idle 阶段多一次请求
+    if (!isCollapsed) ensureLyrics(song);
+    duration = song.duration ?? 0;
+}
+
+function setAudioSource(song: MusicPlayerTrack) {
+    if (!audio || !song.url) {
         isLoading = false;
+        return;
     }
+    ensureLyrics(song);
+    isLoading = true;
+    // 如果有待恢复的进度，先不要重置为 0，以免进度条跳变
+    if (pendingProgress > 0) {
+        currentTime = pendingProgress;
+    } else {
+        audio.currentTime = 0;
+        currentTime = 0;
+    }
+    duration = song.duration ?? 0;
+    audio.removeEventListener("canplay", handleLoadSuccess);
+    audio.removeEventListener("error", handleLoadError);
+    audio.removeEventListener("loadstart", handleLoadStart);
+    audio.addEventListener("canplay", handleLoadSuccess, { once: true });
+    audio.addEventListener("error", handleLoadError, { once: true });
+    audio.addEventListener("loadstart", handleLoadStart, { once: true });
+    audio.src = getAssetPath(song.url);
+    audio.load();
+}
+
+function loadSong(song: MusicPlayerTrack) {
+    if (!song || !audio) return;
+    applySongMetadata(song);
+    setAudioSource(song);
 }
 
 let autoplayFailed = $state(false);
@@ -529,9 +667,6 @@ function handleAudioEvents() {
         isPlaying = true;
         autoplayFailed = false;
         isAutoplayEnabled = false;
-        if (typeof localStorage !== 'undefined') {
-            localStorage.setItem(STORAGE_KEYS.USER_PAUSED, "false");
-        }
     });
     audio.addEventListener("pause", () => {
         isPlaying = false;
@@ -584,10 +719,6 @@ const interactionEvents = ['click', 'keydown', 'touchstart'];
 onMount(() => {
     // 从缓存中读取用户偏好
     if (typeof localStorage !== 'undefined') {
-        const userPaused = localStorage.getItem(STORAGE_KEYS.USER_PAUSED) === "true";
-        if (userPaused) {
-            isAutoplayEnabled = false;
-        }
         const savedVolume = localStorage.getItem(STORAGE_KEYS.VOLUME);
         if (savedVolume !== null) {
             volume = parseFloat(savedVolume);
@@ -603,6 +734,7 @@ onMount(() => {
     }
 
     audio = new Audio();
+    audio.preload = "none";
     audio.volume = volume;
     handleAudioEvents();
     interactionEvents.forEach(event => {
@@ -611,22 +743,23 @@ onMount(() => {
     if (!musicPlayerConfig.enable) {
         return;
     }
-    if (mode === "meting") {
-        fetchMetingPlaylist();
-    } else {
-        // 使用本地播放列表，不发送任何API请求
-        playlist = [...(musicPlayerConfig.local?.playlist ?? [])];
-        if (playlist.length > 0) {
-            setTimeout(() => {
-                restoreLastSong();
-            }, 0);
-        } else {
-            showErrorMessage(i18n(Key.musicEmptyPlaylist));
-        }
-    }
+    scheduleMetadataInit();
 });
 
 onDestroy(() => {
+    lyricsRequestId++;
+    if (metadataObserver) {
+        metadataObserver.disconnect();
+        metadataObserver = null;
+    }
+    if (metadataIdleHandle !== null && typeof window !== "undefined" && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(metadataIdleHandle);
+        metadataIdleHandle = null;
+    }
+    if (metadataTimeoutHandle !== null) {
+        clearTimeout(metadataTimeoutHandle);
+        metadataTimeoutHandle = null;
+    }
     if (fadeInterval) {
         clearInterval(fadeInterval);
         fadeInterval = null;
@@ -672,7 +805,7 @@ onDestroy(() => {
                 <div class="flex items-center gap-1">
                     {#if mode === "meting"}
                         <button class="btn-plain w-8 h-8 rounded-lg flex items-center justify-center"
-                                onclick={fetchMetingPlaylist}
+                                onclick={() => fetchMetingPlaylist(false, false, true)}
                                 disabled={isLoading}
                                 title={i18n(Key.musicRefresh)}>
                             {#if isLoading}
@@ -713,7 +846,9 @@ onDestroy(() => {
                         </div>
                         <!-- 歌单列表内封面仍为圆角矩形 -->
                         <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0 shadow-sm">
-                            <img src={getAssetPath(song.cover)} alt={song.title} class="w-full h-full object-cover" />
+                            <img src={getAssetPath(song.cover)} alt={song.title}
+                                 class="w-full h-full object-cover"
+                                 width="40" height="40" loading="lazy" decoding="async" />
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="font-medium truncate" class:text-(--primary)={index === currentIndex} class:text-90={index !== currentIndex}>
@@ -764,10 +899,11 @@ onDestroy(() => {
          class:pointer-events-none={isCollapsed}>
         <div class="flex items-center gap-4 mb-4">
             <div class="cover-container relative w-16 h-16 rounded-full overflow-hidden shrink-0">
-                <img src={getAssetPath(currentSong.cover)} alt="封面"
+                <img src={getAssetPath(isCollapsed ? DEFAULT_COVER : currentSong.cover)} alt="封面"
                      class="w-full h-full object-cover transition-transform duration-300"
                      class:spinning={isPlaying && !isLoading}
-                     class:animate-pulse={isLoading} />
+                     class:animate-pulse={isLoading}
+                     width="64" height="64" loading="lazy" decoding="async" />
             </div>
             <div class="flex-1 min-w-0">
                 <div class="song-title text-lg font-bold text-90 truncate mb-1">{currentSong.title}</div>

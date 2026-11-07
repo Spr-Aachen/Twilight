@@ -4,7 +4,6 @@ import type { MusicPlayerTrack } from "@/types/config";
 
 // Storage keys for local storage
 export const STORAGE_KEYS = {
-    USER_PAUSED: "player_user_paused",
     VOLUME: "player_volume",
     SHUFFLE: "player_shuffle",
     REPEAT: "player_repeat",
@@ -82,13 +81,22 @@ export async function fetchLyrics(lrcSource: string): Promise<string> {
              if (res.ok) {
                  return await res.text();
              }
-         } catch (e) {
-             console.error("Failed to fetch lyrics", e);
+         } catch {
+             // 歌词失败静默降级，避免在控制台产生 errors-in-console
          }
     } else {
         return lrcSource;
     }
     return "";
+}
+
+// Netease 的封面 URL 默认返回原图，显示尺寸只有 40–64px，用 `param` 让 CDN 直接返回缩略图。
+const NETEASE_COVER_HOST = /^(?:https?:)?\/\/[^/]*music\.126\.net\//;
+
+export function getCoverThumbnail(url: string, size = 128): string {
+    if (!url || !NETEASE_COVER_HOST.test(url)) return url;
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}param=${size}y${size}`;
 }
 
 /**
@@ -106,37 +114,31 @@ export async function fetchMetingPlaylist(
         server: server,
         type: type,
         id: id,
-        r: Math.random().toString(), // Prevent caching
     });
     const separator = api.includes("?") ? "&" : "?";
     const apiUrl = `${api}${separator}${query.toString()}`;
     
-    try {
-        const res = await fetch(apiUrl);
-        if (!res.ok) throw new Error("meting api error");
-        const list = await res.json();
-        
-        return list.map((song: any, index: number) => {
-            let title = song.title ?? song.name ?? i18n(Key.musicUnknownTrack);
-            let author = song.author ?? song.artist ?? i18n(Key.musicUnknownArtist);
-            let cover = song.pic ?? song.cover ?? "";
-            let dur = song.duration ?? 0;
-            if (dur > 10000) dur = Math.floor(dur / 1000);
-            if (!Number.isFinite(dur) || dur <= 0) dur = 0;
-            return {
-                id: song.id ?? `meting-${index}`,
-                title,
-                author,
-                cover,
-                url: song.url ?? "",
-                lrc: song.lrc ?? "",
-                duration: dur,
-            };
-        });
-    } catch (e) {
-        console.error("Failed to fetch meting playlist", e);
-        throw e;
-    }
+    const res = await fetch(apiUrl);
+    if (!res.ok) throw new Error("meting api error");
+    const list = await res.json();
+    
+    return list.map((song: any, index: number) => {
+        let title = song.title ?? song.name ?? i18n(Key.musicUnknownTrack);
+        let author = song.author ?? song.artist ?? i18n(Key.musicUnknownArtist);
+        let cover = getCoverThumbnail(song.pic ?? song.cover ?? "");
+        let dur = song.duration ?? 0;
+        if (dur > 10000) dur = Math.floor(dur / 1000);
+        if (!Number.isFinite(dur) || dur <= 0) dur = 0;
+        return {
+            id: song.id ?? `meting-${index}`,
+            title,
+            author,
+            cover,
+            url: song.url ?? "",
+            lrc: song.lrc ?? "",
+            duration: dur,
+        };
+    });
 }
 
 /**
