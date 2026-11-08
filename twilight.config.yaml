@@ -448,7 +448,7 @@ musicPlayer:
                 # 时长
                 duration: 146
     # 是否自动播放
-    autoplay: true
+    autoplay: false
 
 # 看板娘配置
 pio:
