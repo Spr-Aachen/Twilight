@@ -71,9 +71,6 @@ importers:
       '@iconify-json/material-symbols':
         specifier: ^1.2.87
         version: 1.2.87
-      '@iconify/svelte':
-        specifier: ^5.2.2
-        version: 5.2.2(svelte@5.57.2(@typescript-eslint/types@8.59.1))
       '@swup/astro':
         specifier: ^1.8.0
         version: 1.8.0(@types/babel__core@7.20.5)
@@ -1656,11 +1653,6 @@ packages:
 
   '@iconify-json/mdi@1.2.3':
     resolution: {integrity: sha512-O3cLwbDOK7NNDf2ihaQOH5F9JglnulNDFV7WprU2dSoZu3h3cWH//h74uQAB87brHmvFVxIOkuBX2sZSzYhScg==}
-
-  '@iconify/svelte@5.2.2':
-    resolution: {integrity: sha512-XMXxD3nzH7yB68C3K4sNwzrJ1TBscODR0ZqCeNf0KGuEMCTSuCo0jHNDZ0o0iRXTylO41NSz/DWam/4atLG1yw==}
-    peerDependencies:
-      svelte: '>5.0.0'
 
   '@iconify/tools@5.0.14':
     resolution: {integrity: sha512-wJ4ZE3/HZh2iBqLwG+8FOMHe7CMJAJqwSXZSpPwMdj1gZM3Z4t2hbQMVw4Vm45oQ985qn0g89PUIcDEdKTheBA==}
@@ -9226,11 +9218,6 @@ snapshots:
   '@iconify-json/mdi@1.2.3':
     dependencies:
       '@iconify/types': 2.0.0
-
-  '@iconify/svelte@5.2.2(svelte@5.57.2(@typescript-eslint/types@8.59.1))':
-    dependencies:
-      '@iconify/types': 2.0.0
-      svelte: 5.57.2(@typescript-eslint/types@8.59.1)
 
   '@iconify/tools@5.0.14':
     dependencies:
