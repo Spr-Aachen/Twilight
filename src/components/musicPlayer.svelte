@@ -14,6 +14,7 @@ import {
     fetchMetingPlaylist as fetchMetingPlaylistUtil,
     fadeInAudio 
 } from "@/utils/music";
+import { onFirstScreenVisible } from "@/utils/reveal";
 import { i18n } from "@i18n/translation";
 import Key from "@i18n/i18nKey";
 import { TRANSITION_DURATION_MEDIUM } from "@constants/transitions";
@@ -87,10 +88,8 @@ let fadeInterval: number | null = null;
 let playlistInitialized = false;
 // 歌单请求序号，丢弃切换模式 / 刷新后返回的过期响应
 let playlistRequestId = 0;
-// 元数据自动加载的监听 / idle 句柄，供 onDestroy 清理
-let metadataObserver: MutationObserver | null = null;
-let metadataIdleHandle: number | null = null;
-let metadataTimeoutHandle: number | null = null;
+// 元数据自动加载的取消函数，供 onDestroy 清理
+let cancelMetadataInit: (() => void) | null = null;
 
 // Lyrics State
 let lyrics: { time: number; text: string }[] = $state([]);
@@ -313,7 +312,6 @@ function initPlaylist(loadAudio = true) {
 }
 
 function scheduleMetadataInit() {
-    if (typeof document === "undefined" || typeof window === "undefined") return;
     if (!musicPlayerConfig.enable) return;
     if (isAutoplayEnabled) {
         // 显式开启自动播放时才在挂载阶段预加载（浏览器仍可能拦截播放）
@@ -321,37 +319,11 @@ function scheduleMetadataInit() {
         return;
     }
 
-    const run = () => {
-        if (metadataObserver) {
-            metadataObserver.disconnect();
-            metadataObserver = null;
-        }
-        if (typeof window.requestIdleCallback === "function") {
-            metadataIdleHandle = window.requestIdleCallback(() => {
-                metadataIdleHandle = null;
-                initPlaylist(false);
-            }, { timeout: 3000 });
-        } else {
-            metadataTimeoutHandle = window.setTimeout(() => {
-                metadataTimeoutHandle = null;
-                initPlaylist(false);
-            }, 200);
-        }
-    };
-
-    if (document.documentElement.classList.contains("is-loading")) {
-        metadataObserver = new MutationObserver(() => {
-            if (!document.documentElement.classList.contains("is-loading")) {
-                run();
-            }
-        });
-        metadataObserver.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ["class"],
-        });
-    } else {
-        run();
-    }
+    // overlay 揭开后再取元数据；音频字节仍等首次播放
+    cancelMetadataInit = onFirstScreenVisible(() => {
+        cancelMetadataInit = null;
+        initPlaylist(false);
+    }, 3000);
 }
 
 async function toggleMode() {
@@ -748,18 +720,8 @@ onMount(() => {
 
 onDestroy(() => {
     lyricsRequestId++;
-    if (metadataObserver) {
-        metadataObserver.disconnect();
-        metadataObserver = null;
-    }
-    if (metadataIdleHandle !== null && typeof window !== "undefined" && typeof window.cancelIdleCallback === "function") {
-        window.cancelIdleCallback(metadataIdleHandle);
-        metadataIdleHandle = null;
-    }
-    if (metadataTimeoutHandle !== null) {
-        clearTimeout(metadataTimeoutHandle);
-        metadataTimeoutHandle = null;
-    }
+    cancelMetadataInit?.();
+    cancelMetadataInit = null;
     if (fadeInterval) {
         clearInterval(fadeInterval);
         fadeInterval = null;

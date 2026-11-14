@@ -11,6 +11,7 @@
     import { i18n } from "@i18n/translation";
     import I18nKey from "@i18n/i18nKey";
     import Icon from "@components/common/icon.svelte";
+    import { onFirstScreenVisible } from "@utils/reveal";
 
 
     let {
@@ -361,6 +362,7 @@
         updateIsDesktop();
 
         let visibilityObserver: IntersectionObserver;
+        let cancelRevealInit: (() => void) | null = null;
 
         const runInit = async () => {
             await loadECharts();
@@ -386,24 +388,8 @@
                     }, { once: true });
                 }
 
-                // 使用 MutationObserver 监听 html 的 class 变化，作为更可靠的保底机制
-                const htmlObserver = new MutationObserver(() => {
-                    const isStillLoading = document.documentElement.classList.contains('is-loading');
-
-                    // 一旦 loading 结束（进入动画播放阶段），就开始绘制图表
-                    if (!isStillLoading) {
-                        startInit();
-                        htmlObserver.disconnect();
-                    }
-                });
-                htmlObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-                // 较长的保底时间（3秒），防止所有监听机制意外失效
-                setTimeout(() => {
-                    startInit();
-                    htmlObserver.disconnect();
-                }, 3000);
-
+                // is-loading 摘除后再绘制图表；3s 内未揭开时由 helper 兜底执行
+                cancelRevealInit = onFirstScreenVisible(startInit, 3000);
             } else {
                 // 无动画状态，直接加载
                 initCharts();
@@ -456,6 +442,8 @@
             window.removeEventListener('resize', handleResize);
             observer.disconnect();
             if (visibilityObserver) visibilityObserver.disconnect();
+            cancelRevealInit?.();
+            cancelRevealInit = null;
         };
     });
 

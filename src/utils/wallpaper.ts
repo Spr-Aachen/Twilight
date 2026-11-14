@@ -12,6 +12,10 @@ import type {
 import {
     siteConfig,
 } from "@/config";
+import {
+    onFirstScreenVisible,
+    runWhenIdle,
+} from "@utils/reveal";
 
 
 // 
@@ -392,14 +396,6 @@ const getState = (key: string): CarouselState => {
     return state;
 };
 
-const runWhenIdle = (callback: () => void): void => {
-    if (typeof requestIdleCallback === "function") {
-        requestIdleCallback(callback, { timeout: 1000 });
-    } else {
-        setTimeout(callback, 1);
-    }
-};
-
 const parseCarouselConfig = (container: HTMLElement): CarouselConfig => {
     const raw = container.getAttribute("data-carousel-config");
     const parsed = raw ? JSON.parse(raw) : {};
@@ -411,31 +407,6 @@ const parseCarouselConfig = (container: HTMLElement): CarouselConfig => {
 
 
 // ── 首屏可见信号 ────────────────────────────────────────────────────────────
-
-const revealCallbacks = new Set<() => void>();
-let revealObserver: MutationObserver | null = null;
-
-/** `is-loading` 摘除即代表 loading overlay 已揭开、首屏可见 */
-const onFirstScreenVisible = (callback: () => void): void => {
-    if (!document.documentElement.classList.contains("is-loading")) {
-        runWhenIdle(callback);
-        return;
-    }
-    revealCallbacks.add(callback);
-    if (revealObserver) return;
-    revealObserver = new MutationObserver(() => {
-        if (document.documentElement.classList.contains("is-loading")) return;
-        revealObserver?.disconnect();
-        revealObserver = null;
-        const pending = Array.from(revealCallbacks);
-        revealCallbacks.clear();
-        pending.forEach(runWhenIdle);
-    });
-    revealObserver.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ["class"],
-    });
-};
 
 const startWhenVisible = (state: CarouselState, begin: () => void): void => {
     if (state.startScheduled) return;
