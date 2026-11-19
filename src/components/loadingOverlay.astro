@@ -79,6 +79,11 @@ const titleInterval = config?.title?.interval ?? 1.5;
         animation: text-glow var(--titleInterval) ease-in-out infinite;
     }
 
+    /* 加载页内文字固定使用系统字体栈，不随 Web 字体加载而跳变 */
+    #loading-overlay {
+        font-family: var(--font-family-fallback);
+    }
+
     /* 手动触发淡出类 */
     #loading-overlay.fade-out {
         opacity: 0;
